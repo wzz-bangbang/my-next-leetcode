@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sandbox</title>
+  </head>
+  <body>
+    <script>
+      const safeJsonStringify = (obj) => {
+        const cache = new Set();
+        try {
+          return JSON.stringify(
+            obj,
+            (key, value) => {
+              if (typeof value === 'object' && value !== null) {
+                if (cache.has(value)) {
+                  return '[Circular]';
+                }
+                cache.add(value);
+              }
+              if (typeof value === 'function') {
+                return `[Function: ${value.name || 'anonymous'}]`;
+              }
+              return value;
+            },
+            2,
+          );
+        } catch (e) {
+          return '[Unserializable Object]';
+        }
+      };
+
+      window.addEventListener('message', (event) => {
+        // Basic security check
+        if (event.source !== window.parent) {
+          return;
+        }
+
+        const { code } = event.data;
+        const logs = [];
+        const originalConsoleLog = console.log;
+
+        console.log = (...args) => {
+          originalConsoleLog(...args); // Keep original behavior in iframe's console
+          const message = args
+            .map((arg) => {
+              if (typeof arg === 'object' && arg !== null) {
+                return safeJsonStringify(arg);
+              }
+              if (typeof arg === 'function') {
+                return `[Function: ${arg.name || 'anonymous'}]`;
+              }
+              return String(arg);
+            })
+            .join(' ');
+          logs.push(message);
+        };
+
+        try {
+          const result = window.eval(code);
+          window.parent.postMessage(
+            { type: 'result', result: safeJsonStringify(result), logs },
+            '*',
+          );
+        } catch (error) {
+          window.parent.postMessage(
+            { type: 'error', error: error.toString(), logs },
+            '*',
+          );
+        } finally {
+          console.log = originalConsoleLog; // Restore console.log
+        }
+      });
+
+      // Notify the parent window that the sandbox is ready to receive messages
+      window.parent.postMessage({ type: 'sandbox-ready' }, '*');
+    </script>
+  </body>
+</html>
