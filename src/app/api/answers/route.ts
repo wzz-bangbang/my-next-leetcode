@@ -8,9 +8,14 @@ async function getAnswers() {
   try {
     const data = await fs.readFile(answersFilePath, 'utf-8');
     return JSON.parse(data);
-  } catch (error) {
+  } catch (error: unknown) {
     // If file doesn't exist, return empty object
-    if (error.code === 'ENOENT') {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'ENOENT'
+    ) {
       return {};
     }
     throw error;
@@ -21,16 +26,17 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const questionId = searchParams.get('questionId');
 
+  const answers = await getAnswers();
+
+  // 如果没有 questionId，返回所有答案的 questionId 列表（用于同步状态）
   if (!questionId) {
-    return NextResponse.json(
-      { error: 'questionId is required' },
-      { status: 400 },
+    const answeredIds = Object.keys(answers).filter(
+      (id) => answers[id] && answers[id].trim(),
     );
+    return NextResponse.json({ answeredIds });
   }
 
-  const answers = await getAnswers();
   const code = answers[questionId] || '';
-
   return NextResponse.json({ code });
 }
 

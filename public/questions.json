@@ -1,114 +1,205 @@
 [
   {
     "id": "debounce",
-    "title": "防抖"
+    "title": "防抖",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现一个防抖函数 debounce，在事件被触发 n 秒后再执行回调，如果在这 n 秒内又被触发，则重新计时。常用于搜索框输入、窗口 resize 等场景。"
   },
   {
     "id": "throttle",
-    "title": "节流"
+    "title": "节流",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现一个节流函数 throttle，规定在一个单位时间内，只能触发一次函数。如果这个单位时间内触发多次函数，只有一次生效。常用于滚动加载、按钮点击等场景。"
   },
   {
     "id": "currying",
-    "title": "函数柯里化"
+    "title": "函数柯里化",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现一个 curry 函数，将一个多参数函数转换为一系列单参数函数。例如：curry(add)(1)(2)(3) 等价于 add(1, 2, 3)。"
   },
   {
     "id": "promise",
-    "title": "手写promise"
+    "title": "手写Promise",
+    "difficulty": 3,
+    "tags": [2],
+    "description": "根据 Promise/A+ 规范，实现一个完整的 Promise 类，包括 then、catch、finally 方法，以及 resolve、reject、all、race 等静态方法。"
   },
   {
     "id": "reduce",
-    "title": "模拟Array.reduce"
+    "title": "模拟Array.reduce",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "实现 Array.prototype.reduce 方法，对数组中的每个元素执行一个 reducer 函数，将其结果汇总为单个返回值。"
   },
   {
     "id": "promise-race",
-    "title": "模拟promise.race"
+    "title": "模拟Promise.race",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "实现 Promise.race 方法，返回一个 Promise，一旦迭代器中的某个 Promise 解决或拒绝，返回的 Promise 就会解决或拒绝。"
   },
   {
     "id": "promise-all",
-    "title": "模拟promise.all"
+    "title": "模拟Promise.all",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现 Promise.all 方法，接收一个 Promise 数组，返回一个新的 Promise。当所有 Promise 都成功时返回结果数组，任一失败则立即拒绝。"
   },
   {
     "id": "promise-any",
-    "title": "模拟promise.any"
+    "title": "模拟Promise.any",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现 Promise.any 方法，接收一个 Promise 数组，只要其中一个 Promise 成功，就返回那个成功的 Promise。如果全部失败，则返回一个 AggregateError。"
   },
   {
     "id": "deep-clone",
-    "title": "实现深拷贝（Deep Clone）"
+    "title": "实现深拷贝（Deep Clone）",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现一个深拷贝函数，能够处理对象、数组、Date、RegExp、Map、Set 等类型，并解决循环引用问题。"
   },
   {
     "id": "event-emitter",
-    "title": "实现 EventEmitter 类"
+    "title": "实现 EventEmitter 类",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现一个发布订阅模式的 EventEmitter 类，包含 on（订阅）、off（取消订阅）、emit（发布）、once（只订阅一次）等方法。"
   },
   {
     "id": "handwrite-call",
-    "title": "手写call 函数"
+    "title": "手写 call 函数",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "实现 Function.prototype.call 方法，在调用一个函数时，可以指定 this 的指向，并传入参数列表。"
   },
   {
     "id": "handwrite-apply",
-    "title": "手写 apply 函数"
+    "title": "手写 apply 函数",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "实现 Function.prototype.apply 方法，与 call 类似，但接收的是参数数组而非参数列表。"
   },
   {
     "id": "handwrite-bind",
-    "title": "手写bind 函数"
+    "title": "手写 bind 函数",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现 Function.prototype.bind 方法，创建一个新的函数，在调用时设置 this 关键字为提供的值。需要考虑作为构造函数使用的情况。"
   },
   {
     "id": "handwrite-new",
-    "title": "手写 new 操作符"
+    "title": "手写 new 操作符",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现 new 操作符的功能：创建新对象、设置原型链、执行构造函数、返回对象。"
   },
   {
     "id": "array-unique",
-    "title": "手写数组去重函数"
+    "title": "手写数组去重函数",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "实现一个数组去重函数，可以使用 Set、filter、reduce 等多种方式实现。考虑对象、NaN 等特殊值的处理。"
   },
   {
     "id": "array-flatten",
-    "title": "手写数组扁平化函数"
+    "title": "手写数组扁平化函数",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "实现一个数组扁平化函数 flatten，将多维数组转换为一维数组。可以指定扁平化的深度。"
   },
   {
     "id": "deep-equal",
-    "title": "手写深度比较函数来比较两个对象是否相同"
+    "title": "手写深度比较函数",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现一个深度比较函数 deepEqual，比较两个值是否完全相等，支持对象、数组、Date、RegExp 等类型的比较。"
   },
   {
     "id": "lru-cache",
-    "title": "实现LRU（Least Recently Used）缓存机制"
+    "title": "实现 LRU 缓存机制",
+    "difficulty": 3,
+    "tags": [2, 6],
+    "description": "实现一个 LRU (Least Recently Used) 缓存，支持 get 和 put 操作，当缓存容量达到上限时，删除最近最少使用的数据。要求时间复杂度为 O(1)。"
   },
   {
     "id": "async-concurrency-controller",
-    "title": "手写异步并发控制器"
+    "title": "手写异步并发控制器",
+    "difficulty": 3,
+    "tags": [2],
+    "description": "实现一个异步任务调度器，可以控制同时执行的异步任务数量。当正在执行的任务数小于限制时，立即执行新任务；否则将任务加入等待队列。"
   },
   {
     "id": "handwrite-object-assign",
-    "title": "手写Object.assign"
+    "title": "手写 Object.assign",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "实现 Object.assign 方法，将所有可枚举属性的值从一个或多个源对象复制到目标对象，返回目标对象。"
   },
   {
     "id": "handwrite-websocket",
-    "title": "手写一个基础的websocket"
+    "title": "手写一个基础的 WebSocket",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "封装一个 WebSocket 类，实现自动重连、心跳检测、消息队列等功能。"
   },
   {
     "id": "postmessage-event-hub",
-    "title": "手写一个基于postmessage的事件通信机制"
+    "title": "手写基于 postMessage 的事件通信",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现一个基于 postMessage 的跨窗口/跨 iframe 通信机制，支持消息的发送、接收和回复。"
   },
   {
     "id": "message-channel",
-    "title": "messageChannel"
+    "title": "MessageChannel 通信",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "使用 MessageChannel API 实现两个独立上下文之间的双向通信，理解端口（port）的概念和使用方式。"
   },
   {
-    "id": "use-update",
-    "title": "手写 useUpdate 强制渲染hook"
+    "id": "myUseUpdate",
+    "title": "手写 useUpdate 强制渲染 Hook",
+    "difficulty": 1,
+    "tags": [4, 2],
+    "description": "实现一个 useUpdate Hook，返回一个函数，调用该函数可以强制组件重新渲染。"
   },
   {
-    "id": "use-async-effect",
-    "title": "手写 useAsyncEffect Hook"
+    "id": "myUseAsyncEffect",
+    "title": "手写 useAsyncEffect Hook",
+    "difficulty": 2,
+    "tags": [4, 2],
+    "description": "实现一个支持异步函数的 useAsyncEffect Hook，处理异步操作的清理和竞态条件。"
   },
   {
-    "id": "use-debounce",
-    "title": "手写 useDebounce Hook"
+    "id": "myUseDebounce",
+    "title": "手写 useDebounce Hook",
+    "difficulty": 2,
+    "tags": [4, 2],
+    "description": "实现一个 useDebounce Hook，对值或函数进行防抖处理，常用于搜索输入等场景。"
   },
   {
-    "id": "use-interval",
-    "title": "手写 useInterval Hook"
+    "id": "myUseInterval",
+    "title": "手写 useInterval Hook",
+    "difficulty": 2,
+    "tags": [4, 2],
+    "description": "实现一个 useInterval Hook，封装 setInterval，支持动态修改间隔时间，正确处理清理逻辑。"
   },
   {
-    "id": "use-mini-state",
-    "title": "手写 useState Hook"
+    "id": "myUseState",
+    "title": "手写 useState Hook",
+    "difficulty": 3,
+    "tags": [4, 2],
+    "description": "模拟实现 React 的 useState Hook，理解闭包、状态管理和触发重渲染的机制。"
+  },
+  {
+    "id": "proxy",
+    "title": "手写 Proxy 代理",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "使用 Proxy 实现数据响应式，当数据变化时自动触发更新。理解 handler 中的 get、set 等捕获器。"
   }
 ]
