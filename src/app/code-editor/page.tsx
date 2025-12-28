@@ -5,10 +5,11 @@ import { Button, Modal, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import Header from '@/components/Header';
-import CodeEditorPanel from '@/components/CodeEditorPanel';
-import ExecutionResultPanel from '@/components/ExecutionResultPanel';
-import QuestionSidebar, { QuestionStatus, setQuestionStatus, getQuestionStatusMap } from '@/components/QuestionSidebar';
+import CodeEditorPanel from './_components/CodeEditorPanel';
+import ExecutionResultPanel from './_components/ExecutionResultPanel';
+import QuestionSidebar, { QuestionStatus, setQuestionStatus, getQuestionStatusMap } from './_components/QuestionSidebar';
 import { CategoryTag, Difficulty, DifficultyLabel, DifficultyColor, CategoryTagLabel } from '@/types/question';
+import { useQuestionRoute, scrollToSelected } from '@/hooks/useQuestionRoute';
 
 interface Question {
   id: string;
@@ -23,7 +24,9 @@ function CodeEditorPage() {
   const [code, setCode] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
+  const [selectedCategoryTag, setSelectedCategoryTag] = useState<CategoryTag | null>(null); // 当前选中题目所在的分类
   const [pendingQuestionId, setPendingQuestionId] = useState<string | null>(null);
+  const [pendingCategoryTag, setPendingCategoryTag] = useState<CategoryTag | null>(null);
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
   const [clearModalOpened, { open: openClearModal, close: closeClearModal }] = useDisclosure(false);
   const [executionResult, setExecutionResult] = useState<string>('执行结果将在这里显示');
@@ -32,6 +35,7 @@ function CodeEditorPage() {
   
   // 展开的分类
   const [expandedCategories, setExpandedCategories] = useState<Set<CategoryTag>>(new Set());
+  const sidebarRef = useRef<HTMLDivElement>(null);
   
   // 拖拽分隔条相关状态
   const [descWidthPercent, setDescWidthPercent] = useState(28); // 描述区域占比
@@ -72,7 +76,7 @@ function CodeEditorPage() {
   const [sidebarKey, setSidebarKey] = useState(0);
 
   // 切换分类展开状态
-  const toggleCategory = (tag: CategoryTag) => {
+  const toggleCategory = useCallback((tag: CategoryTag) => {
     setExpandedCategories(prev => {
       const next = new Set(prev);
       if (next.has(tag)) {
@@ -82,7 +86,75 @@ function CodeEditorPage() {
       }
       return next;
     });
-  };
+  }, []);
+
+  // 扁平化题目列表（用于 URL 路由）
+  const flatQuestions = useMemo(() => {
+    const result: { question: Question; categoryTag: CategoryTag }[] = [];
+    Object.values(CategoryTag).filter(v => typeof v === 'number').forEach(tag => {
+      const categoryQuestions = questionsByCategory.get(tag as CategoryTag) || [];
+      categoryQuestions.forEach(q => {
+        result.push({ question: q, categoryTag: tag as CategoryTag });
+      });
+    });
+    return result;
+  }, [questionsByCategory]);
+
+  // 生成 URL 键
+  const getUrlKey = useCallback((item: { question: Question; categoryTag: CategoryTag }) => {
+    return `${item.categoryTag}-${item.question.id}`;
+  }, []);
+
+  // 当前选中的 URL 键
+  const selectedUrlKey = useMemo(() => {
+    if (!selectedQuestionId || selectedCategoryTag === null) return null;
+    return `${selectedCategoryTag}-${selectedQuestionId}`;
+  }, [selectedQuestionId, selectedCategoryTag]);
+
+  // URL 路由同步 - 直接选择题目（不触发弹窗检查）
+  const selectQuestionDirect = useCallback((item: { question: Question; categoryTag: CategoryTag }) => {
+    const { question, categoryTag } = item;
+    setSelectedQuestionId(question.id);
+    setSelectedCategoryTag(categoryTag);
+    setCode('');
+    setExecutionResult('执行结果将在这里显示');
+    // 自动展开选中的分类
+    setExpandedCategories(prev => {
+      if (prev.has(categoryTag)) return prev;
+      return new Set([...prev, categoryTag]);
+    });
+  }, []);
+
+  // 选择第一题
+  const selectFirstQuestion = useCallback(() => {
+    if (flatQuestions.length > 0) {
+      selectQuestionDirect(flatQuestions[0]);
+    }
+  }, [flatQuestions, selectQuestionDirect]);
+
+  // URL 路由同步
+  useQuestionRoute({
+    questions: flatQuestions,
+    getKey: getUrlKey,
+    selectedKey: selectedUrlKey,
+    onSelect: selectQuestionDirect,
+    onSelectFirst: selectFirstQuestion,
+    paramName: 'q',
+  });
+
+  // 切换题目时滚动侧边栏
+  useEffect(() => {
+    if (selectedQuestionId && selectedCategoryTag !== null) {
+      setTimeout(() => {
+        // 使用分类+id组合来定位
+        scrollToSelected(
+          sidebarRef.current, 
+          `${selectedCategoryTag}-${selectedQuestionId}`,
+          (key) => `[data-question-key="${key}"]`
+        );
+      }, 100);
+    }
+  }, [selectedQuestionId, selectedCategoryTag]);
 
   // 更新题目状态并刷新侧边栏
   const markQuestionAsAttempted = useCallback((questionId: string) => {
@@ -163,28 +235,12 @@ function CodeEditorPage() {
         .then((res) => res.json())
         .then((data) => {
           setQuestions(data);
-          const lastSelectedId = localStorage.getItem('selectedQuestionId');
-          const initialId = lastSelectedId || data[0]?.id;
-          if (initialId) {
-            setSelectedQuestionId(initialId);
-            // 自动展开包含该题目的分类
-            const question = data.find((q: Question) => q.id === initialId);
-            if (question) {
-              setExpandedCategories(new Set(question.tags));
-            }
-          }
         });
       
       // 同步已有答案的题目状态
       syncQuestionStatus();
     }
   }, [isClient, syncQuestionStatus]);
-
-  useEffect(() => {
-    if (selectedQuestionId) {
-      localStorage.setItem('selectedQuestionId', selectedQuestionId);
-    }
-  }, [selectedQuestionId]);
 
   // 切换题目时自动加载历史代码
   const loadSavedCode = useCallback(async (questionId: string) => {
@@ -210,8 +266,8 @@ function CodeEditorPage() {
     }
   }, [selectedQuestionId, isClient, loadSavedCode]);
 
-  const handleSelectChange = async (value: string | null) => {
-    if (value && value !== selectedQuestionId) {
+  const handleSelectChange = async (value: string | null, categoryTag?: CategoryTag) => {
+    if (value && (value !== selectedQuestionId || categoryTag !== selectedCategoryTag)) {
       // 检查当前代码是否有修改
       let hasChanges = false;
       
@@ -234,9 +290,11 @@ function CodeEditorPage() {
       
       if (hasChanges) {
         setPendingQuestionId(value);
+        setPendingCategoryTag(categoryTag ?? null);
         openModal();
       } else {
         setSelectedQuestionId(value);
+        setSelectedCategoryTag(categoryTag ?? null);
         setCode('');
         setExecutionResult('执行结果将在这里显示');
       }
@@ -246,9 +304,11 @@ function CodeEditorPage() {
   const confirmChange = () => {
     if (pendingQuestionId) {
       setSelectedQuestionId(pendingQuestionId);
+      setSelectedCategoryTag(pendingCategoryTag);
       setCode('');
       setExecutionResult('执行结果将在这里显示');
       setPendingQuestionId(null);
+      setPendingCategoryTag(null);
     }
     closeModal();
   };
@@ -262,11 +322,11 @@ function CodeEditorPage() {
 
   const handleSave = async () => {
     if (!selectedQuestionId) {
-      notifications.show({ title: '操作失败', message: '请先选择一个题目', color: 'yellow' });
+      notifications.show({ autoClose: 1500, title: '操作失败', message: '请先选择一个题目', color: 'yellow' });
       return;
     }
     if (!code.trim()) {
-      notifications.show({ title: '提示', message: '代码内容不能为空', color: 'yellow' });
+      notifications.show({ autoClose: 1500, title: '提示', message: '代码内容不能为空', color: 'yellow' });
       return;
     }
     try {
@@ -277,19 +337,19 @@ function CodeEditorPage() {
       });
       if (res.ok) {
         markQuestionAsAttempted(selectedQuestionId); // 标记为做过
-        notifications.show({ title: '保存成功', message: '代码已保存！', color: 'green' });
+        notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存！', color: 'green' });
       } else {
-        notifications.show({ title: '保存失败', message: '请稍后再试', color: 'red' });
+        notifications.show({ autoClose: 1500, title: '保存失败', message: '请稍后再试', color: 'red' });
       }
     } catch (error) {
       console.error('Save failed:', error);
-      notifications.show({ title: '网络错误', message: '保存时发生错误', color: 'red' });
+      notifications.show({ autoClose: 1500, title: '网络错误', message: '保存时发生错误', color: 'red' });
     }
   };
 
   const handleLoad = async () => {
     if (!selectedQuestionId) {
-      notifications.show({ title: '提示', message: '请先选择一个题目', color: 'blue' });
+      notifications.show({ autoClose: 1500, title: '提示', message: '请先选择一个题目', color: 'blue' });
       return;
     }
     setExecutionResult('执行结果将在这里显示');
@@ -299,23 +359,23 @@ function CodeEditorPage() {
         const data = await res.json();
         if (data.code) {
           setCode(data.code);
-          notifications.show({ title: '加载成功', message: '已加载保存的代码', color: 'green' });
+          notifications.show({ autoClose: 1500, title: '加载成功', message: '已加载保存的代码', color: 'green' });
         } else {
-          notifications.show({ title: '提示', message: '当前题目没有保存的代码', color: 'blue' });
+          notifications.show({ autoClose: 1500, title: '提示', message: '当前题目没有保存的代码', color: 'blue' });
         }
       } else {
-        notifications.show({ title: '加载失败', message: '请稍后再试', color: 'red' });
+        notifications.show({ autoClose: 1500, title: '加载失败', message: '请稍后再试', color: 'red' });
       }
     } catch (error) {
       console.error('Load failed:', error);
-      notifications.show({ title: '网络错误', message: '加载时发生错误', color: 'red' });
+      notifications.show({ autoClose: 1500, title: '网络错误', message: '加载时发生错误', color: 'red' });
     }
   };
 
   // 清空代码 - 打开确认弹窗
   const handleClear = () => {
     if (!code.trim()) {
-      notifications.show({ title: '提示', message: '代码已经是空的', color: 'blue' });
+      notifications.show({ autoClose: 1500, title: '提示', message: '代码已经是空的', color: 'blue' });
       return;
     }
     openClearModal();
@@ -335,7 +395,7 @@ function CodeEditorPage() {
       });
       if (res.ok) {
         markQuestionAsAttempted(selectedQuestionId);
-        notifications.show({ title: '保存成功', message: '代码已保存', color: 'green' });
+        notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存', color: 'green' });
       }
     } catch (error) {
       console.error('Save failed:', error);
@@ -350,18 +410,18 @@ function CodeEditorPage() {
     setCode('');
     setExecutionResult('执行结果将在这里显示');
     closeClearModal();
-    notifications.show({ title: '已清空', message: '代码已清空', color: 'blue' });
+    notifications.show({ autoClose: 1500, title: '已清空', message: '代码已清空', color: 'blue' });
   };
 
   // 标记为已完成
   const handleMarkAsSolved = () => {
     if (!selectedQuestionId) {
-      notifications.show({ title: '提示', message: '请先选择一个题目', color: 'yellow' });
+      notifications.show({ autoClose: 1500, title: '提示', message: '请先选择一个题目', color: 'yellow' });
       return;
     }
     setQuestionStatus(selectedQuestionId, QuestionStatus.SOLVED);
     setSidebarKey(prev => prev + 1);
-    notifications.show({ title: '🎉 恭喜', message: '已标记为完成！', color: 'green' });
+    notifications.show({ autoClose: 1500, title: '🎉 恭喜', message: '已标记为完成！', color: 'green' });
   };
 
   const onCodeChange = useCallback((value: string) => {
@@ -472,6 +532,24 @@ function CodeEditorPage() {
       {/* 公共头部 */}
       <Header />
 
+      {/* 移动端提示 */}
+      <div className="md:hidden flex-1 flex flex-col items-center justify-center px-6 text-center relative z-10">
+        <div className="text-6xl mb-6">💻</div>
+        <h2 className="text-xl font-bold text-gray-800 mb-3">请使用电脑访问</h2>
+        <p className="text-gray-500 text-sm max-w-xs">
+          代码编辑器需要较大屏幕才能正常使用，请在电脑端打开本页面
+        </p>
+        <a
+          href="/bagu"
+          className="mt-6 px-6 py-2.5 rounded-full text-sm font-medium text-white shadow-md"
+          style={{
+            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          }}
+        >
+          📚 去看八股文
+        </a>
+      </div>
+
       {/* 切换题目确认弹窗 */}
       {isClient && (
         <Modal opened={modalOpened} onClose={closeModal} title="确认" centered>
@@ -495,14 +573,16 @@ function CodeEditorPage() {
         </Modal>
       )}
 
-      {/* 主内容区域 */}
-      <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden">
+      {/* 主内容区域 - PC端显示 */}
+      <div className="relative z-10 hidden md:flex min-h-0 flex-1 overflow-hidden">
         {/* 左侧分类菜单 */}
         <QuestionSidebar
+          ref={sidebarRef}
           key={sidebarKey}
           questions={questions}
           questionsByCategory={questionsByCategory}
           selectedQuestionId={selectedQuestionId}
+          selectedCategoryTag={selectedCategoryTag}
           expandedCategories={expandedCategories}
           onSelectQuestion={handleSelectChange}
           onToggleCategory={toggleCategory}

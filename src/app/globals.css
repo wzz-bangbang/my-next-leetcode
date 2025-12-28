@@ -25,3 +25,225 @@ body {
   font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system,
     BlinkMacSystemFont, sans-serif;
 }
+
+/* Markdown 内容样式 */
+.markdown-content {
+  line-height: 1.7;
+  color: #374151;
+  font-size: 0.8125rem; /* 13px - 移动端默认 */
+}
+
+@media (min-width: 640px) {
+  .markdown-content {
+    font-size: 1rem; /* 16px - PC端 */
+    line-height: 1.75;
+  }
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  font-weight: 600;
+  color: #1f2937;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+}
+
+@media (min-width: 640px) {
+  .markdown-content h1,
+  .markdown-content h2,
+  .markdown-content h3,
+  .markdown-content h4,
+  .markdown-content h5,
+  .markdown-content h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+  }
+}
+
+.markdown-content h1 {
+  font-size: 1.25rem;
+}
+.markdown-content h2 {
+  font-size: 1.125rem;
+}
+.markdown-content h3 {
+  font-size: 1rem;
+}
+.markdown-content h4 {
+  font-size: 0.9375rem;
+}
+
+@media (min-width: 640px) {
+  .markdown-content h1 {
+    font-size: 1.75rem;
+  }
+  .markdown-content h2 {
+    font-size: 1.5rem;
+  }
+  .markdown-content h3 {
+    font-size: 1.25rem;
+  }
+  .markdown-content h4 {
+    font-size: 1.125rem;
+  }
+}
+
+.markdown-content p {
+  margin-bottom: 0.75em;
+}
+
+@media (min-width: 640px) {
+  .markdown-content p {
+    margin-bottom: 1em;
+  }
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-left: 1.25em;
+  margin-bottom: 0.75em;
+}
+
+@media (min-width: 640px) {
+  .markdown-content ul,
+  .markdown-content ol {
+    margin-left: 1.5em;
+    margin-bottom: 1em;
+  }
+}
+
+.markdown-content li {
+  margin-bottom: 0.2em;
+}
+
+@media (min-width: 640px) {
+  .markdown-content li {
+    margin-bottom: 0.25em;
+  }
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* 行内代码 */
+.markdown-content code:not(pre code) {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.2rem;
+  font-size: 0.85em;
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+}
+
+@media (min-width: 640px) {
+  .markdown-content code:not(pre code) {
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+  }
+}
+
+/* 代码块 - 移除默认样式，由 SyntaxHighlighter 控制 */
+.markdown-content pre {
+  background: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.markdown-content pre code,
+.markdown-content pre span {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 高亮标记 - 支持 <mark> 标签 */
+.markdown-content mark {
+  background-color: #fef08a;
+  color: #854d0e;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.125rem;
+}
+
+/* 引用块 */
+.markdown-content blockquote {
+  border-left: 3px solid #8b5cf6;
+  padding-left: 0.75rem;
+  margin: 0.75em 0;
+  color: #6b7280;
+  font-style: italic;
+}
+
+@media (min-width: 640px) {
+  .markdown-content blockquote {
+    border-left: 4px solid #8b5cf6;
+    padding-left: 1rem;
+    margin: 1em 0;
+  }
+}
+
+/* 链接 */
+.markdown-content a {
+  color: #7c3aed;
+  text-decoration: underline;
+}
+
+.markdown-content a:hover {
+  color: #5b21b6;
+}
+
+/* 表格样式 */
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  font-size: 0.75em;
+}
+
+@media (min-width: 640px) {
+  .markdown-content table {
+    margin: 1em 0;
+    font-size: 0.95em;
+  }
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #e5e7eb;
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+}
+
+@media (min-width: 640px) {
+  .markdown-content th,
+  .markdown-content td {
+    padding: 0.75rem 1rem;
+  }
+}
+
+.markdown-content th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  color: #374151;
+}
+
+.markdown-content tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.markdown-content tr:hover {
+  background-color: #f3f4f6;
+}
+
+/* 删除线 */
+.markdown-content del {
+  color: #9ca3af;
+  text-decoration: line-through;
+}

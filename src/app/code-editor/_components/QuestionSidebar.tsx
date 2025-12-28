@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, forwardRef } from 'react';
 import { Collapse, Tooltip } from '@mantine/core';
 import { CategoryTag, CategoryTagLabel, Difficulty, DifficultyLabel, DifficultyColor } from '@/types/question';
 
@@ -62,19 +62,21 @@ interface QuestionSidebarProps {
   questions: Question[];
   questionsByCategory: Map<CategoryTag, Question[]>;
   selectedQuestionId: string | null;
+  selectedCategoryTag: CategoryTag | null;
   expandedCategories: Set<CategoryTag>;
-  onSelectQuestion: (id: string) => void;
+  onSelectQuestion: (id: string, categoryTag: CategoryTag) => void;
   onToggleCategory: (tag: CategoryTag) => void;
 }
 
-const QuestionSidebar: React.FC<QuestionSidebarProps> = ({
+const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
   questions,
   questionsByCategory,
   selectedQuestionId,
+  selectedCategoryTag,
   expandedCategories,
   onSelectQuestion,
   onToggleCategory,
-}) => {
+}, ref) => {
   const [statusMap, setStatusMap] = useState<Record<string, QuestionStatus>>({});
 
   // 加载状态数据
@@ -113,7 +115,7 @@ const QuestionSidebar: React.FC<QuestionSidebarProps> = ({
       <div className="px-4 py-3 border-b border-purple-200/50 bg-white/20 flex-shrink-0">
         <h2 className="text-sm font-semibold text-purple-700">📚 题目分类</h2>
       </div>
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div ref={ref} className="flex-1 min-h-0 overflow-y-auto">
         <div className="py-1">
           {Object.values(CategoryTag).filter(v => typeof v === 'number').map((tag) => {
             const categoryQuestions = questionsByCategory.get(tag as CategoryTag) || [];
@@ -125,7 +127,7 @@ const QuestionSidebar: React.FC<QuestionSidebarProps> = ({
                 {/* 分类标题 */}
                 <button
                   onClick={() => hasQuestions && onToggleCategory(tag as CategoryTag)}
-                  className={`w-full text-left px-4 py-2.5 text-sm font-medium flex items-center justify-between transition-colors ${
+                  className={`w-full text-left px-4 py-2.5 text-sm font-medium flex items-center justify-between transition-colors outline-none focus:outline-none ${
                     hasQuestions 
                       ? 'hover:bg-white/40 cursor-pointer text-gray-700' 
                       : 'text-gray-400 cursor-default'
@@ -147,13 +149,15 @@ const QuestionSidebar: React.FC<QuestionSidebarProps> = ({
                 <Collapse in={isExpanded}>
                   <div className="bg-white/20">
                     {categoryQuestions.map((q) => {
-                      const isSelected = selectedQuestionId === q.id;
+                      const categoryTag = tag as CategoryTag;
+                      const isSelected = selectedQuestionId === q.id && selectedCategoryTag === categoryTag;
                       const status = getStatus(q.id);
                       const statusInfo = StatusIcon[status];
+                      const questionKey = `${categoryTag}-${q.id}`;
                       
                       return (
                         <Tooltip
-                          key={`${tag}-${q.id}`}
+                          key={questionKey}
                           label={q.title}
                           position="right"
                           withArrow
@@ -163,8 +167,10 @@ const QuestionSidebar: React.FC<QuestionSidebarProps> = ({
                           disabled={q.title.length < 15}
                         >
                           <button
-                            onClick={() => onSelectQuestion(q.id)}
-                            className={`w-full text-left pl-10 pr-2 py-2 text-sm transition-all duration-200 flex items-center gap-1 ${
+                            data-question-id={q.id}
+                            data-question-key={questionKey}
+                            onClick={() => onSelectQuestion(q.id, categoryTag)}
+                            className={`w-full text-left pl-10 pr-2 py-2 text-sm transition-all duration-200 flex items-center gap-1 outline-none focus:outline-none ${
                               isSelected
                                 ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
                                 : 'text-gray-600 hover:bg-white/50'
@@ -206,7 +212,9 @@ const QuestionSidebar: React.FC<QuestionSidebarProps> = ({
       </div>
     </div>
   );
-};
+});
+
+QuestionSidebar.displayName = 'QuestionSidebar';
 
 export default QuestionSidebar;
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Preloader from "@/components/Preloader";
 
 export default function Home() {
   return (
@@ -66,10 +67,10 @@ export default function Home() {
           系统练习前端面试常考题，助你斩获心仪 Offer ✨
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Link
             href="/bagu"
-            className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-semibold text-white rounded-full overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 active:scale-95"
+            className="group relative inline-flex items-center justify-center px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white rounded-full overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 active:scale-95"
             style={{
               background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
             }}
@@ -87,13 +88,13 @@ export default function Home() {
 
           <Link
             href="/code-editor"
-            className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-semibold text-white rounded-full overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 active:scale-95"
+            className="group relative inline-flex items-center justify-center px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white rounded-full overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 active:scale-95"
             style={{
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             }}
           >
             <span className="relative z-10 flex items-center gap-2">
-              🚀 刷题
+              🚀 <span className="hidden sm:inline">开始</span>刷题
             </span>
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -109,6 +110,9 @@ export default function Home() {
       <footer className="absolute bottom-6 text-gray-500 text-sm">
         Made with 💖 for Frontend Engineers
       </footer>
+
+      {/* 预加载八股数据 */}
+      <Preloader />
     </div>
   );
 }

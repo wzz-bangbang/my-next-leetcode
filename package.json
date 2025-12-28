@@ -6,17 +6,25 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:bagu": "node scripts/build-bagu.js"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.4",
     "@mantine/core": "^8.3.2",
     "@mantine/hooks": "^8.3.2",
     "@mantine/notifications": "^8.3.2",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@uiw/react-codemirror": "^4.25.2",
+    "katex": "^0.16.27",
     "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.0",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

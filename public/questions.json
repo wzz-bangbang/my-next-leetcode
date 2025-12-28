@@ -133,6 +133,13 @@
     "description": "实现一个异步任务调度器，可以控制同时执行的异步任务数量。当正在执行的任务数小于限制时，立即执行新任务；否则将任务加入等待队列。"
   },
   {
+    "id": "class-scheduler",
+    "title": "并发限制的异步调度器类",
+    "difficulty": 3,
+    "tags": [2],
+    "description": "并发限制的异步调度器:保证同时运行的任务最多有两个，完善代码中Scheduler类，使得以下程序能正确输出"
+  },
+  {
     "id": "handwrite-object-assign",
     "title": "手写 Object.assign",
     "difficulty": 1,
@@ -164,35 +171,35 @@
     "id": "myUseUpdate",
     "title": "手写 useUpdate 强制渲染 Hook",
     "difficulty": 1,
-    "tags": [4, 2],
+    "tags": [4],
     "description": "实现一个 useUpdate Hook，返回一个函数，调用该函数可以强制组件重新渲染。"
   },
   {
     "id": "myUseAsyncEffect",
     "title": "手写 useAsyncEffect Hook",
     "difficulty": 2,
-    "tags": [4, 2],
+    "tags": [4],
     "description": "实现一个支持异步函数的 useAsyncEffect Hook，处理异步操作的清理和竞态条件。"
   },
   {
     "id": "myUseDebounce",
     "title": "手写 useDebounce Hook",
     "difficulty": 2,
-    "tags": [4, 2],
+    "tags": [4],
     "description": "实现一个 useDebounce Hook，对值或函数进行防抖处理，常用于搜索输入等场景。"
   },
   {
     "id": "myUseInterval",
     "title": "手写 useInterval Hook",
     "difficulty": 2,
-    "tags": [4, 2],
+    "tags": [4],
     "description": "实现一个 useInterval Hook，封装 setInterval，支持动态修改间隔时间，正确处理清理逻辑。"
   },
   {
     "id": "myUseState",
     "title": "手写 useState Hook",
     "difficulty": 3,
-    "tags": [4, 2],
+    "tags": [4],
     "description": "模拟实现 React 的 useState Hook，理解闭包、状态管理和触发重渲染的机制。"
   },
   {
@@ -201,5 +208,47 @@
     "difficulty": 2,
     "tags": [2],
     "description": "使用 Proxy 实现数据响应式，当数据变化时自动触发更新。理解 handler 中的 get、set 等捕获器。"
+  },
+  {
+    "id": "prototype-inheritance",
+    "title": "手写原型继承+组合继承",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现原型继承和组合继承两种方式。理解原型链继承的缺陷（引用类型共享问题），以及组合继承如何通过构造函数借用和 Object.create 来解决这些问题。"
+  },
+  {
+    "id": "compose-middleware",
+    "title": "实现 compose 函数（洋葱模型）",
+    "difficulty": 3,
+    "tags": [2],
+    "description": "实现类似 Koa 的中间件洋葱模型 compose 函数。理解 async/await 与递归调用 next() 的执行顺序。"
+  },
+  {
+    "id": "intersection-observer",
+    "title": "Intersection Observer API 使用",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "使用 Intersection Observer API 实现元素可见性检测，常用于懒加载、无限滚动、曝光统计等场景。注意step是从初次调用开始算起的完整时间差。"
+  },
+  {
+    "id": "raf-settimeout",
+    "title": "用 requestAnimationFrame 实现 setTimeout",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "使用 requestAnimationFrame 模拟实现 setTimeout 功能，理解两者的区别和执行时机。"
+  },
+  {
+    "id": "object-create",
+    "title": "手写 Object.create",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "实现 Object.create 方法，创建一个新对象，使用现有的对象作为新对象的原型。同时理解 Object.setPrototypeOf 的作用。"
+  },
+  {
+    "id": "handwrite-instanceof",
+    "title": "手写 instanceof",
+    "difficulty": 1,
+    "tags": [2],
+    "description": "实现 instanceof 操作符，通过遍历原型链检查对象是否是某个构造函数的实例。"
   }
 ]

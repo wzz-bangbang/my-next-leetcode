@@ -34,3 +34,27 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## 后续优化方向
+
+所有问题都校验一遍答案
+增加自己的临时选择列表
+代码解释题
+ts 手写题目
+
+补充一些算法题以及答案和思路解析
+优化编辑器，要不用现成的库或者沙盒
+部署上线
+ssr
+
+爬虫取最新各大平台的数据并解析题目
+代码题优化&增加用例和题目进阶思考
+
+前端系统设计题
+性能&错误监控
+用户 登录 数据表等
+web worker 缓存离线数据
+
+增加题目遇到次数
+增加 ai 解题和 ai 练习入口
+增加用户维护
