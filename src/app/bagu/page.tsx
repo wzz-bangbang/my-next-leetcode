@@ -473,10 +473,9 @@ export default function BaguPage() {
                   )}
                 </div>
 
-                {/* PC端底部导航 */}
+                {/* PC端底部导航 - 只保留翻页和进度 */}
                 <div className="hidden sm:block flex-shrink-0 pt-6 mt-6 border-t border-gray-200/50">
                   <div className="flex items-center justify-between">
-                    {/* 左侧：上一题 */}
                     <Button
                       onClick={goToPrev}
                       variant="light"
@@ -488,34 +487,10 @@ export default function BaguPage() {
                       <span className="text-xs">← 上一题</span>
                     </Button>
 
-                    {/* 中间：完成状态 + 标为完成 + 进度 */}
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          isCurrentCompleted
-                            ? 'bg-green-100 text-green-600'
-                            : 'bg-gray-100 text-gray-500'
-                        }`}
-                      >
-                        {isCurrentCompleted ? '✅ 已完成' : '⏳ 未完成'}
-                      </span>
-                      <Button
-                        onClick={toggleCompleted}
-                        variant="light"
-                        radius="xl"
-                        size="xs"
-                        color={isCurrentCompleted ? 'gray' : 'green'}
-                      >
-                        <span className="text-xs">
-                          {isCurrentCompleted ? '取消完成' : '✅ 标为完成'}
-                        </span>
-                      </Button>
-                      <span className="text-xs text-gray-400">
-                        {currentIndex + 1} / {allQuestions.length}
-                      </span>
-                    </div>
+                    <span className="text-xs text-gray-400">
+                      {currentIndex + 1} / {allQuestions.length}
+                    </span>
 
-                    {/* 右侧：下一题 */}
                     <Button
                       onClick={goToNext}
                       variant="light"

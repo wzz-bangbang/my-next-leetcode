@@ -20,3 +20,4 @@ export interface BaguData {
   generatedAt: string;  // 生成时间
 }
 
+

@@ -246,194 +246,170 @@
       "questions": [
         {
           "id": "typescript-1",
-          "title": "type interface的区别",
-          "content": "interface 接口 可合并可多次定义，更适合定义对象或者api的标准和形状\n\ntype不可多次声明，可以定义任何类型，包括对象、联合类型、交叉类型、原始类型、元组\n\n为什么项目里会引入 TS",
+          "title": "type 和 interface 的区别",
+          "content": "interface 接口 可合并可多次定义，更适合定义对象或者 api 的标准和形状\n\ntype 不可多次声明，可以定义任何类型，包括对象、联合类型、交叉类型、原始类型、元组",
           "hasAnswer": true
         },
         {
           "id": "typescript-2",
-          "title": "TypeScript 与 JavaScript 的主要区别是什么",
-          "content": "ts:  **静态类型**：类型在代码编写时确定。必须通过 **TS 编译器**（或 Babel/SWC 等）编译成 JS 后才能执行；编译时检查，**类型安全**高；JS 的**超集**，包含了 JS 的所有特性\n\njs：动态类型，类型在执行时确定；运行时检查，**类型安全**低（运行时错误多）",
+          "title": "TypeScript 与 JavaScript 的主要区别",
+          "content": "ts: **静态类型**：类型在代码编写时确定。必须通过 **TS 编译器**（或 Babel/SWC 等）编译成 JS 后才能执行；编译时检查，**类型安全**高；JS 的**超集**，包含了 JS 的所有特性\n\njs：动态类型，类型在执行时确定；运行时检查，**类型安全**低（运行时错误多）",
           "hasAnswer": true
         },
         {
           "id": "typescript-3",
           "title": "什么是联合类型 (|) 和交叉类型 (&)",
-          "content": "联合类型  | （或） 表示一个值可以是所列类型中的任意一种。\n\n交叉类型  &   (且)  **表示一个值必须同时满足所列的**所有类型。常用于合并接口或类型，实现 Mixin 效果。一个交叉类型对象必须拥有所有类型的属性。",
+          "content": "联合类型 | （或） 表示一个值可以是所列类型中的任意一种。\n\n交叉类型 & (且) **表示一个值必须同时满足所列的**所有类型。常用于合并接口或类型，实现 Mixin 效果。一个交叉类型对象必须拥有所有类型的属性。",
           "hasAnswer": true
         },
         {
           "id": "typescript-4",
-          "title": "谈谈 any 和 unknown 的区别，推荐使用哪一个",
-          "content": "any **完全禁用**类型检查。可以赋值给任何类型，**破坏**类型安全。可以随意访问属性或调用方法，可能导致运行时错误。\n\nunknow  **严格类型检查**，除非明确类型收窄，否则无法使用。只能赋值给 `any` 或 `unknown` 本身，**保持**类型安全。**必须先进行类型收窄**（如 `if (typeof x === 'string')`），才能操作。\n\n更推荐unknow 提供了一个类型安全的占位符",
+          "title": "any 和 unknown 的区别",
+          "content": "any **完全禁用**类型检查。可以赋值给任何类型，**破坏**类型安全。可以随意访问属性或调用方法，可能导致运行时错误。\n\nunknow **严格类型检查**，除非明确类型收窄，否则无法使用。只能赋值给 `any` 或 `unknown` 本身，**保持**类型安全。**必须先进行类型收窄**（如 `if (typeof x === 'string')`），才能操作。\n\n更推荐 unknow 提供了一个类型安全的占位符",
           "hasAnswer": true
         },
         {
           "id": "typescript-5",
-          "title": "什么是类型断言 (as Type)？什么时候应该避免使用它",
+          "title": "类型断言及其使用场景",
           "content": "类型断言是告诉 TypeScript 编译器“我比你更清楚这个变量的实际类型”的一种方式。它不会改变变量的运行时类型，只在编译时起作用\n\n**应避免使用的场景：**\n\n- **不确定的情况下：** 任何你不 100% 确定类型的时候。错误的断言会**绕过 TS 的保护**，导致在运行时出现错误（这是 TS 极力避免的）。\n\n- **可以进行类型收窄的情况下：** 应优先使用类型保护（`if`, `instanceof` 等）进行收窄，而不是使用断言",
           "hasAnswer": true
         },
         {
           "id": "typescript-6",
           "title": "解释 keyof 和 typeof 的用法",
-          "content": "| **`typeof`** | **值到类型**。获取一个 JavaScript **变量**或**表达式**的类型。   | 常用于获取函数的返回值类型，或从常量对象中提取类型。  |\n| ------------ | --------------------------------------------- | --------------------------- |\n| **`keyof`**  | **键名提取**。获取一个**对象类型**中所有属性名组成的**联合字符串字面量类型**。 | 常用于泛型约束，确保传入的属性名是对象中真实存在的键。 |\n\n```js\nconst User = {\n    name: 'Alice',\n    age: 30\n};\n\n// 1. typeof：获取 User 变量的类型\ntype UserType = typeof User; // 结果: { name: string; age: number; }\n\n// 2. keyof typeof：获取 User 类型的所有键名\ntype UserKeys = keyof typeof User; // 结果: \"name\" | \"age\"\n```",
+          "content": "| **`typeof`** | **值到类型**。获取一个 JavaScript **变量**或**表达式**的类型。                 | 常用于获取函数的返回值类型，或从常量对象中提取类型。   |\n| ------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------ |\n| **`keyof`**  | **键名提取**。获取一个**对象类型**中所有属性名组成的**联合字符串字面量类型**。 | 常用于泛型约束，确保传入的属性名是对象中真实存在的键。 |\n\n```js\nconst User = {\n    name: 'Alice',\n    age: 30\n};\n\n// 1. typeof：获取 User 变量的类型\ntype UserType = typeof User; // 结果: { name: string; age: number; }\n\n// 2. keyof typeof：获取 User 类型的所有键名\ntype UserKeys = keyof typeof User; // 结果: \"name\" | \"age\"\n```",
           "hasAnswer": true
         },
         {
           "id": "typescript-7",
-          "title": "strict 模式在 tsconfig.json 中有什么作用？你认为哪个子选项最重要",
+          "title": "tsconfig.json 中的 strict 模式",
           "content": "**`\"strict\": true`** 是 `tsconfig.json` 中的一个总开关，它同时开启了一系列严格的类型检查规则。它的作用是**最大化地提升代码的类型安全性**。\n\n我认为 **`strictNullChecks`**（严格空值检查）是最重要的子选项。\n\n- **作用：** 默认情况下，`null` 和 `undefined` 可以赋值给任何类型。开启后，`null` 和 `undefined` 只能赋值给它们自己的类型或 `any`，除非类型定义中明确包含它们（如 `string | null`）。",
           "hasAnswer": true
         },
         {
           "id": "typescript-8",
-          "title": "什么是装饰器 (Decorators)？它们在 TypeScript 中有什么典型应用",
-          "content": "饰器是一种特殊的声明，它能够附加到类、方法、属性或参数上，用于**修改或扩展**这些目标的功能或行为。它们是 **ES 阶段性提案**，TS 率先实现。\n\n装饰器本质上就是一个**函数**。这个函数在运行时会被调用，它接收关于被装饰目标的元数据（如目标类、方法名、属性描述符等），并可以通过返回新的值来**修改或替换**被装饰目标的定义。\n\n装饰器允许我们在不修改原有类结构和代码的情况下，通过注入元数据或实现额外逻辑，对现有功能进行扩展。\n\n1. 语法\n\n装饰器使用 `@expression` 的形式，紧挨着要装饰的声明之前。\n\n```ts\n@sealed // 这是一个装饰器\nclass Example {\n    @logMethod // 这是另一个装饰器\n    myMethod() { }\n}\n```\n\n2. 启用\n\n装饰器目前是 ECMAScript 的**阶段性提案**（Stage 3），不是标准的 JS 语法。要在 TypeScript 中使用它，必须在 `tsconfig.json` 中启用：\n\nJSON\n\n```json\n{\n  \"compilerOptions\": {\n    \"experimentalDecorators\": true, // 必须开启\n    \"emitDecoratorMetadata\": true   // 如果需要依赖注入等元数据，也需要开启\n  }\n}\n```\n\n3.类型：类 属性 方法 Getter/Setter 方法参数\n\n作用\n\n1 依赖注入 (DI) 和框架配置，装饰器（或等效的语法）来标记类和处理依赖注入。比如vue-property-decorator\n\n2 混入 (Mixins) 或功能增强（类装饰器）：可以利用类装饰器返回一个新的构造函数，为类添加新方法或属性：\n\n3.运行时 添加通用逻辑（方法装饰器）：方法装饰器常用于不修改原函数体的情况下，在其执行前后添加通用逻辑\n\n当一个声明上有多个装饰器时，它们的执行顺序如下：\n\n1. **参数装饰器 $\\to$ 属性装饰器 $\\to$ 方法/访问器装饰器 $\\to$ 类装饰器**（从内向外，从上到下）。\n\n2. **同一类型装饰器：** 如果同一目标上有多个装饰器，它们会像函数组合一样，**从下到上**（从右到左）执行。",
+          "title": "装饰器及其应用场景",
+          "content": "饰器是一种特殊的声明，它能够附加到类、方法、属性或参数上，用于**修改或扩展**这些目标的功能或行为。它们是 **ES 阶段性提案**，TS 率先实现。\n\n装饰器本质上就是一个**函数**。这个函数在运行时会被调用，它接收关于被装饰目标的元数据（如目标类、方法名、属性描述符等），并可以通过返回新的值来**修改或替换**被装饰目标的定义。\n\n装饰器允许我们在不修改原有类结构和代码的情况下，通过注入元数据或实现额外逻辑，对现有功能进行扩展。\n\n1. 语法\n\n装饰器使用 `@expression` 的形式，紧挨着要装饰的声明之前。\n\n```ts\n@sealed // 这是一个装饰器\nclass Example {\n  @logMethod // 这是另一个装饰器\n  myMethod() {}\n}\n```\n\n2. 启用\n\n装饰器目前是 ECMAScript 的**阶段性提案**（Stage 3），不是标准的 JS 语法。要在 TypeScript 中使用它，必须在 `tsconfig.json` 中启用：\n\nJSON\n\n```json\n{\n  \"compilerOptions\": {\n    \"experimentalDecorators\": true, // 必须开启\n    \"emitDecoratorMetadata\": true // 如果需要依赖注入等元数据，也需要开启\n  }\n}\n```\n\n3.类型：类 属性 方法 Getter/Setter 方法参数\n\n作用\n\n1 依赖注入 (DI) 和框架配置，装饰器（或等效的语法）来标记类和处理依赖注入。比如 vue-property-decorator\n\n2 混入 (Mixins) 或功能增强（类装饰器）：可以利用类装饰器返回一个新的构造函数，为类添加新方法或属性：\n\n3.运行时 添加通用逻辑（方法装饰器）：方法装饰器常用于不修改原函数体的情况下，在其执行前后添加通用逻辑\n\n当一个声明上有多个装饰器时，它们的执行顺序如下：\n\n1. **参数装饰器 $\\to$ 属性装饰器 $\\to$ 方法/访问器装饰器 $\\to$ 类装饰器**（从内向外，从上到下）。\n\n2. **同一类型装饰器：** 如果同一目标上有多个装饰器，它们会像函数组合一样，**从下到上**（从右到左）执行。",
           "hasAnswer": true
         },
         {
           "id": "typescript-9",
-          "title": "如何在 TypeScript 中处理第三方库没有类型定义的问题",
-          "content": "当引入一个没有内置类型定义的第三方 JS 库时，需要手动为其添加类型声明，以让 TS 编译器识别其结构。\n\n**处理步骤：**\n\n1. **检查 `@types/` 库：** 首先尝试npm 生态系统中有没有针对这个第三方 JavaScript 库的**对应的类型定义库**。比如@types/jquery  @types/lodash，有的话安装库就行了\n\n2. **创建自定义声明文件 (`.d.ts`)：** 如果 `@types` 包不存在，需要手动创建声明文件，通常命名为 `custom.d.ts` 或 `library-name.d.ts`。\n   \n   a.**模块声明：** 使用 `declare module` 声明整个模块的类型。\n\n```typescript\n// my-library.d.ts\ndeclare module 'my-library' {\n   // 声明库导出的函数\n   export function initialize(config: object): void;\n   // 声明库导出的类\n   export class AwesomeClient {\n       connect(): Promise<string>;\n   }\n   // 声明默认导出\n   export default AwesomeClient;\n}\n```\n\n    b.全局变量声明：如果库是注入全局变量的（如 jQuery），则使用 `declare var` 或 `declare function`。\n\n这样，TypeScript 编译器就会信任您提供的类型信息，并在您的项目代码中提供类型检查和智能提示。\n\n注意：全局/局部声明：\n如果是declare module xx{...}，就只针对引用这个module的模块，如果是有顶层export就只针对导入这个文件的模块，如果直接declare xx且文件里没有任何顶层export就是全局的\n\n这里的**全局**和**局部（模块）**指的完全是 **TypeScript 编译器**对您的代码和声明文件（`.d.ts`）中**类型和标识符作用域**的认识",
+          "title": "处理第三方库没有类型定义的问题",
+          "content": "当引入一个没有内置类型定义的第三方 JS 库时，需要手动为其添加类型声明，以让 TS 编译器识别其结构。\n\n**处理步骤：**\n\n1. **检查 `@types/` 库：** 首先尝试 npm 生态系统中有没有针对这个第三方 JavaScript 库的**对应的类型定义库**。比如@types/jquery @types/lodash，有的话安装库就行了\n\n2. **创建自定义声明文件 (`.d.ts`)：** 如果 `@types` 包不存在，需要手动创建声明文件，通常命名为 `custom.d.ts` 或 `library-name.d.ts`。\n\n   a.**模块声明：** 使用 `declare module` 声明整个模块的类型。\n\n```typescript\n// my-library.d.ts\ndeclare module 'my-library' {\n  // 声明库导出的函数\n  export function initialize(config: object): void;\n  // 声明库导出的类\n  export class AwesomeClient {\n    connect(): Promise<string>;\n  }\n  // 声明默认导出\n  export default AwesomeClient;\n}\n```\n\nb.全局变量声明：如果库是注入全局变量的（如 jQuery），则使用 `declare var` 或 `declare function`。\n\n这样，TypeScript 编译器就会信任您提供的类型信息，并在您的项目代码中提供类型检查和智能提示。\n\n注意：全局/局部声明：\n如果是 declare module xx{...}，就只针对引用这个 module 的模块，如果是有顶层 export 就只针对导入这个文件的模块，如果直接 declare xx 且文件里没有任何顶层 export 就是全局的\n\n这里的**全局**和**局部（模块）**指的完全是 **TypeScript 编译器**对您的代码和声明文件（`.d.ts`）中**类型和标识符作用域**的认识",
           "hasAnswer": true
         },
         {
           "id": "typescript-10",
-          "title": "Extract pick omit用法",
-          "content": "",
-          "hasAnswer": false
+          "title": "Extract、Exclude、Pick、Omit 的区别与用法",
+          "content": "Extract 提取\n\n- 是一个内置的工具类型，它的作用是**从一个联合类型中，提取出符合特定条件的成员**，并组成一个新的联合类型。\n\n- 可以把它理解为联合类型的“过滤器”。支持**子类型**的匹配\n\n- 原理：遍历 `T` 中的每一个成员。如果该成员能够赋值给 `U`，就保留它（返回 `T`）；否则就丢弃它（返回 `never`）。 `type MyExtract<T, U> = T extends U ? T : never;`\n\n```ts\ntype Result = Extract<Type, Union>;\n\ntype Status = 'success' | 'error' | 'loading' | 'waiting';\n// 我只想从中提取出 'error' 和 'success'\ntype FinalStatus = Extract<Status, 'success' | 'error'>;\n// 结果：'success' | 'error'\n\ntype MyData = string | number | boolean | (() => void);\n// 提取出所有可以赋值给 Function 的类型\ntype OnlyFunction = Extract<MyData, Function>; // 结果：() => void\n```\n\nExclude 排除\n\n**Exclude** 就是 **Extract** 的反义词\n\n`Exclude<T, U>`：排除 `T` 中属于 `U` 的\n\n```ts\ntype Status = 'success' | 'error' | 'loading';\ntype NoError = Exclude<Status, 'error'>; // 结果：'success' | 'loading'\n```\n\nPick（挑选）\n\n`Pick<Type, Keys>` 允许你从一个类型中，选择一组特定的属性来构造新类型。\n\n- **语法**：`Pick<T, K>`，其中 `T` 是源类型，`K` 是由 `T` 的键组成的联合类型。\n\n- **适用场景**：当你只需要一个大型对象中的某几个字段时\n\n- **实现**：它遍历 `K` 中的每一个键，并在 `T` 中找到对应的类型。\n\nOmit（剔除）\n\n`Omit<Type, Keys>` 与 `Pick` 相反，它会从一个类型中剔除指定的属性，剩下的属性组成新类型。\n\n- **语法**：`Omit<T, K>`。\n\n- **适用场景**：当你想复用一个类型，但其中某个字段不需要，或者需要被重新定义时\n\n- **实现**：它结合了 `Exclude` 和 `Pick`。先从 `T` 的所有键中排除掉 `K`，再把剩下的键 `Pick` 出来。\n\n```ts\ntype Hello = { a: string; b: string; c: number };\n\n// 使用 Pick 挑选属性\ntype OnlyAB = Pick<Hello, 'a' | 'b'>;\n// 结果为：\n// type OnlyAB = { a: string; b: string;}\n```\n\n对比：\n\n- **`Extract Exclude`**：操作的是**联合类型**，第二个参数是类型集合。是从一堆类型选项里选出几个\n\n- **`Pick Omit`** 处理的是对象类型, 第二个参数是属性集合，根据属性键进行选择或忽略\n\n- **`Pick`**：可以理解为白名单操作的是**对象接口（Interface/Object Type）**。它是从一个对象的属性里选出几个。 `Pick` 会严格检查选择的键是否存在于原类型中，如果你 Pick 一个不存在的键，编译器会报错\n\n- **Omit**：可以理解为黑名单。在使用 `Omit` 时，TS **不会**检查你剔除的键是否存在于原类型中（因为 `K extends keyof any`）。\n\n```ts\ninterface User {\n  id: string;\n  name: string;\n  age: number;\n}\n// 剔除 id 属性\ntype CreateUserDto = Omit<User, 'id'>;\n/*\n等同于：\ntype CreateUserDto = {\n  name: string;\n  age: number;\n};\n*/\n```",
+          "hasAnswer": true
         },
         {
           "id": "typescript-11",
-          "title": "Extract 提取",
-          "content": "- 是一个内置的工具类型，它的作用是**从一个联合类型中，提取出符合特定条件的成员**，并组成一个新的联合类型。\n\n- 可以把它理解为联合类型的“过滤器”。支持**子类型**的匹配\n\n- 原理：遍历 `T` 中的每一个成员。如果该成员能够赋值给 `U`，就保留它（返回 `T`）；否则就丢弃它（返回 `never`）。 `type MyExtract<T, U> = T extends U ? T : never;`\n\n```ts\ntype Result = Extract<Type, Union>;\n\ntype Status = 'success' | 'error' | 'loading' | 'waiting';\n// 我只想从中提取出 'error' 和 'success'\ntype FinalStatus = Extract<Status, 'success' | 'error'>;\n// 结果：'success' | 'error'\n\n\ntype MyData = string | number | boolean | (() => void);\n// 提取出所有可以赋值给 Function 的类型\ntype OnlyFunction = Extract<MyData, Function>; // 结果：() => void\n```",
+          "title": "TypeScript 基本数据类型",
+          "content": "- boolean（布尔类型）\n- number（数字类型）\n- string（字符串类型）\n- array（数组类型）\n- null 和 undefined 类型\n- object 对象类型\n- tuple（元组类型） 允许表示一个已知元素数量和类型的数组，各元素的类型不必相同\n- enum（枚举类型）\n- void 类型 用于标识方法返回值的类型，表示该方法没有返回值\n- any（任意类型）可以指定任何类型的值，不进行类型检查而是通过编译阶段的检查\n- unknow 不确定的类型 ：**严格类型检查**，除非明确类型收窄，否则无法使用。\n- never 类型 代表从不会出现的值，是其他所有类型的子类型，可以赋值给任何类型\n\n```\nlet tupleArr:[number, string, boolean];\ntupleArr = [12, '34', true]; //ok\ntypleArr = [12, '34'] // no ok\n\nenum Color {Red, Green, Blue}\nlet c: Color = Color.Green;\n```",
           "hasAnswer": true
         },
         {
           "id": "typescript-12",
-          "title": "Exclude 排除",
-          "content": "**Exclude** 就是 **Extract** 的反义词\n\n`Exclude<T, U>`：排除 `T` 中属于 `U` 的\n\n```ts\ntype Status = 'success' | 'error' | 'loading';\ntype NoError = Exclude<Status, 'error'>; // 结果：'success' | 'loading'\n```",
+          "title": "TypeScript 类与修饰符",
+          "content": "形式跟`ES6`十分的相似，`typescript`在此基础上添加了修饰符：\n\n- 公共 public：可以自由的访问类程序里定义的成员\n- 私有 private：只能够在该类的内部进行访问（ ES6 私有字段用#表示（ES2022））\n- 受保护 protected：除了在该类的内部可以访问，还可以在子类中仍然可以访问\n- 只读属性`readonly`：只读属性必须在声明时或构造函数里被初始化\n- static (ES6 也有) ：静态属性/方法：是类的属性而不是实例的属性，直接通过类调用\n\n```ts\nclass Square {\n    static width: number // 类的属性\n    public static height: number\n    public name: string;     // 公开（默认）\n    private secret: string;  // 仅类内访问\n    protected age: number;   // 类和子类访问\n    readonly id: number;     // 只读属性\n    public readonly publicReadonly: string  // 只读\n    static readonly PI: number = 3.14159; // static + readonly\n    public static readonly staticPublicReadonly: string = \"\";\n    // 方法类似\n```",
           "hasAnswer": true
         },
         {
           "id": "typescript-13",
-          "title": "Pick（挑选）",
-          "content": "`Pick<Type, Keys>` 允许你从一个类型中，选择一组特定的属性来构造新类型。\n\n- **语法**：`Pick<T, K>`，其中 `T` 是源类型，`K` 是由 `T` 的键组成的联合类型。\n\n- **适用场景**：当你只需要一个大型对象中的某几个字段时\n\n- **实现**：它遍历 `K` 中的每一个键，并在 `T` 中找到对应的类型。",
+          "title": "抽象类",
+          "content": "抽象类做为其它派生类的基类使用，它们一般不会直接被实例化，不同于接口，抽象类可以包含成员的实现细节\n\n`abstract`关键字是用于定义抽象类和在抽象类内部定义抽象方法，如下所示：\n\n```ts\nabstract class Animal {\n  abstract makeSound(): void;\n  move(): void {\n    console.log('roaming the earch...');\n  }\n}\n\nclass Cat extends Animal {\n  makeSound() {\n    console.log('miao miao');\n  }\n}\nconst cat = new Cat();\ncat.makeSound(); // miao miao\ncat.move(); // roaming the earch...\n```",
           "hasAnswer": true
         },
         {
           "id": "typescript-14",
-          "title": "Omit（剔除）",
-          "content": "`Omit<Type, Keys>` 与 `Pick` 相反，它会从一个类型中剔除指定的属性，剩下的属性组成新类型。\n\n- **语法**：`Omit<T, K>`。\n\n- **适用场景**：当你想复用一个类型，但其中某个字段不需要，或者需要被重新定义时\n\n- **实现**：它结合了 `Exclude` 和 `Pick`。先从 `T` 的所有键中排除掉 `K`，再把剩下的键 `Pick` 出来。\n\n```ts\ntype Hello = { a: string; b: string; c: number };\n\n// 使用 Pick 挑选属性\ntype OnlyAB = Pick<Hello, 'a' | 'b'>;\n// 结果为：\n// type OnlyAB = { a: string; b: string;}\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-15",
-          "title": "对比：",
-          "content": "- **`Extract Exclude`**：操作的是**联合类型**，第二个参数是类型集合。是从一堆类型选项里选出几个\n\n- **`Pick Omit`** 处理的是对象类型,  第二个参数是属性集合，根据属性键进行选择或忽略\n\n- **`Pick`**：可以理解为白名单操作的是**对象接口（Interface/Object Type）**。它是从一个对象的属性里选出几个。 `Pick` 会严格检查选择的键是否存在于原类型中，如果你 Pick 一个不存在的键，编译器会报错\n\n- **Omit**：可以理解为黑名单。在使用 `Omit` 时，TS **不会**检查你剔除的键是否存在于原类型中（因为 `K extends keyof any`）。\n\n```ts\ninterface User {\n  id: string;\n  name: string;\n  age: number;\n}\n// 剔除 id 属性\ntype CreateUserDto = Omit<User, 'id'>;\n/*\n等同于：\ntype CreateUserDto = {\n  name: string;\n  age: number;\n};\n*/\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-16",
-          "title": "typeof keyof 用法",
-          "content": "`typeof` 和 `keyof` 通常结合使用来实现“从值推导类型”或“从类型提取键”。\n\n**`typeof obj`** 将 **JS 变量** 转为 **TS 类型**\n\n**`keyof Type`**  操作的是类型，不是值，获取**TS 类型** 的所有 **键的合集**。 所以 `keyof U` 是一个联合类型，它包含了 `U` 类型的所有键名（字符串字面量类型）\n\n**`keyof typeof obj`** 直接获取一个 **JS 变量** 的所有 **键名**\n\n```ts\nconst Config = {\n  endpoint: \"https://api.example.com\",\n  timeout: 5000,\n  retries: 3\n};\n\n// 1. 先用 typeof 把值转成类型\ntype ConfigType = typeof Config; \n// 结果: { endpoint: string; timeout: number; retries: number }\n\n// 2. 再用 keyof 拿到所有的键，这里typeof Config就是类型\ntype ConfigKeys = keyof typeof Config; \n// 结果: \"endpoint\" | \"timeout\" | \"retries\"\n\n// 3. 结合你的需求：获取特定的部分类型\ntype NetworkConfig = Pick<typeof Config, 'endpoint' | 'timeout'>;\n\n\n// keyof操作类型别名（也是类型）\ntype Point = {\n  x: number;\n  y: number;\n};\ntype PointKeys = keyof Point;  // \"x\" | \"y\"\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-17",
-          "title": "ts数据类型",
-          "content": "- boolean（布尔类型）\n- number（数字类型）\n- string（字符串类型）\n- array（数组类型）\n- null 和 undefined 类型\n- object 对象类型\n- tuple（元组类型） 允许表示一个已知元素数量和类型的数组，各元素的类型不必相同\n- enum（枚举类型）\n- void 类型  用于标识方法返回值的类型，表示该方法没有返回值\n- any（任意类型）可以指定任何类型的值，不进行类型检查而是通过编译阶段的检查\n- unknow 不确定的类型 ：**严格类型检查**，除非明确类型收窄，否则无法使用。\n- never 类型 代表从不会出现的值，是其他所有类型的子类型，可以赋值给任何类型\n\n```\nlet tupleArr:[number, string, boolean];\ntupleArr = [12, '34', true]; //ok\ntypleArr = [12, '34'] // no ok\n\nenum Color {Red, Green, Blue}\nlet c: Color = Color.Green;\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-18",
-          "title": "ts类",
-          "content": "形式跟`ES6`十分的相似，`typescript`在此基础上添加了修饰符：\n\n- 公共 public：可以自由的访问类程序里定义的成员\n- 私有 private：只能够在该类的内部进行访问（ ES6私有字段用#表示（ES2022））\n- 受保护 protected：除了在该类的内部可以访问，还可以在子类中仍然可以访问\n- 只读属性`readonly`：只读属性必须在声明时或构造函数里被初始化\n- static (ES6 也有) ：静态属性/方法：是类的属性而不是实例的属性，直接通过类调用\n\n```ts\nclass Square {\n    static width: number // 类的属性\n    public static height: number\n    public name: string;     // 公开（默认）\n    private secret: string;  // 仅类内访问\n    protected age: number;   // 类和子类访问\n    readonly id: number;     // 只读属性 \n    public readonly publicReadonly: string  // 只读\n    static readonly PI: number = 3.14159; // static + readonly\n    public static readonly staticPublicReadonly: string = \"\";\n    // 方法类似\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-19",
-          "title": "抽象类",
-          "content": "抽象类做为其它派生类的基类使用，它们一般不会直接被实例化，不同于接口，抽象类可以包含成员的实现细节\n\n`abstract`关键字是用于定义抽象类和在抽象类内部定义抽象方法，如下所示：\n\n```ts\nabstract class Animal {\n    abstract makeSound(): void;\n    move(): void {\n        console.log('roaming the earch...');\n    }\n}\n\nclass Cat extends Animal {\n    makeSound() {\n        console.log('miao miao')\n    }\n}\nconst cat = new Cat()\ncat.makeSound() // miao miao\ncat.move() // roaming the earch...\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-20",
-          "title": "和ES6对比",
+          "title": "和 ES6 对比",
           "content": "TypeScript 类在 ES6 类的基础上增加了**静态类型系统**和**面向对象增强特性**。主要区别有：\n\n1. **类型注解**：属性、方法、参数都有明确类型\n\n2. **访问修饰符**：`public/private/protected/readonly`\n\n3. **抽象类和抽象方法**：不会直接被实例化，不同于接口，抽象类可以包含成员的实现细节\n\n4. **额外语法**：装饰器、泛型等\n\n**关键理解**：TypeScript 类是带类型的 ES6 类，大部分特性在编译后会被移除，最终生成标准的 JavaScript 类。",
           "hasAnswer": true
         },
         {
+          "id": "typescript-15",
+          "title": "TypeScript 函数特性",
+          "content": "默认参数：es6 写法\n\n剩余参数：es6 写法\n\n可选参数：ts\n\n和 ES6 对比：TypeScript 函数在 ES6 函数的基础上增加了**静态类型系统**。主要区别有：\n\n1. **类型注解+更严格的编译时检查**：参数、返回值都有明确类型\n\n2. **函数重载**：支持多个函数签名，提高类型安全\n\n3. **泛型函数**：支持类型参数化，创建可复用的函数模板\n\n4. **可选参数语法**：使用  `?`  明确表示可选参数",
+          "hasAnswer": true
+        },
+        {
+          "id": "typescript-16",
+          "title": "泛型的定义与使用",
+          "content": "泛型允许编写代码时使用一些以后才指定的类型，在实例化时作为参数指明这些类型\n\n在`typescript`中，定义函数，接口或者类的时候，不预先定义好具体的类型，而在使用的时候在指定类型的一种特性\n\n泛型通过`<>`的形式进行表述，可以声明：函数 接口 类\n\n```\nfunction returnItem<T>(para: T): T {\n    return para\n}\ninterface ReturnItemFn<T> {\n    (para: T): T\n}\nclass Stack<T> {\n    private arr: T[] = []\n\n    public push(item: T) {\n        this.arr.push(item)\n    }\n}\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "typescript-17",
+          "title": "高级类型",
+          "content": "- 交叉类型 `T & U`\n\n- 联合类型 `T | U`\n\n- 条件类型 `T extends U ? X : Y`\n\n- 类型别名 ,可以是泛型 ,也可以使用类型别名来在属性里引用自己：\n\n  ```ts\n  type some = boolean | string;\n  type Container<T> = { value: T };\n  type Tree<T> = {\n    value: T;\n    left: Tree<T>;\n  };\n  ```\n\n- 类型索引：keyof，类似于  `Object.keys` ，用于获取一个接口中 Key 的联合类型。\n\n- 类型约束：通过关键字  `extend`  进行约束，泛型内使用的主要作用是对泛型加以约束\n\n  ```ts\n  type BaseType = string | number | boolean;\n  // 这里表示 copy 的参数\n  // 只能是字符串、数字、布尔这几种基础类型\n  function copy<T extends BaseType>(arg: T): T {\n    return arg;\n  }\n  ```\n\n- 映射类型：通过  `in`  关键字做类型的映射，遍历已有接口的  `key`  或者是遍历联合类型\n\n  ```ts\n  type Readonly<T> = {\n    readonly [P in keyof T]: T[P];\n  };\n  interface Obj {\n    a: string;\n    b: string;\n  }\n  type ReadOnlyObj = Readonly<Obj>;\n  // 等同于\n  interface ReadOnlyObj {\n    readonly a: string;\n    readonly b: string;\n  }\n  ```",
+          "hasAnswer": true
+        },
+        {
+          "id": "typescript-18",
+          "title": "命名空间 namespace",
+          "content": "解决命名污染，使用  `namespace`  来定义，类似模块化\n\n```ts\nnamespace SomeNameSpaceName {\n  export interface ISomeInterfaceName {}\n  export class SomeClassName {}\n}\n// 使用\nSomeNameSpaceName.SomeClassName;\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "typescript-19",
+          "title": "条件类型中的 extends 判断",
+          "content": "T extends U ：是 TypeScript 的条件类型语法，用于判断类型  `T`  是否可以赋值给类型  `U`，类似于判断  `T`  是否为  `U`  的子类型（或相同类型）。在分布式条件下，如果  `T`  是联合类型，那么会拆开每个成员分别判断。\n\n```ts\ntype A = 'a' | 'b' | 'c';\ntype B = 'a' | 'b';\n\n// 判断 'a' 是否可以赋值给 B？可以，因为 'a' 在 B 中。\n// 判断 'b' 是否可以赋值给 B？可以。\n// 判断 'c' 是否可以赋值给 B？不可以。\n\n// 所以 Exclude<A, B> 会计算：\n// 'a' extends B ? never : 'a' → never\n// 'b' extends B ? never : 'b' → never\n// 'c' extends B ? never : 'c' → 'c'\n// 合并：never | never | 'c' → 'c'\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "typescript-20",
+          "title": "为什么  string | null extends null  是  false？",
+          "content": "**理解  `extends`  的含义**：在 TypeScript 中，`T extends U`  表示：\n\n- **类型 T 的值可以安全地赋值给类型 U 的变量**\n\n- 或者说：**类型 T 是类型 U 的子类型**",
+          "hasAnswer": true
+        },
+        {
           "id": "typescript-21",
-          "title": "ts 函数",
-          "content": "默认参数：es6写法\n\n剩余参数：es6写法\n\n可选参数：ts\n\n和ES6对比：TypeScript 函数在 ES6 函数的基础上增加了**静态类型系统**。主要区别有：\n\n1. **类型注解+更严格的编译时检查**：参数、返回值都有明确类型\n\n2. **函数重载**：支持多个函数签名，提高类型安全\n\n3. **泛型函数**：支持类型参数化，创建可复用的函数模板\n\n4. **可选参数语法**：使用 `?` 明确表示可选参数",
+          "title": "infer 关键字的用法",
+          "content": "只能在 **条件类型 (Conditional Types)** 的 `extends` 子句中使用。在类型的条件判断中，“声明”一个变量来捕获（提取）某个特定的类型。\n\n可以理解为：infer 告诉编译器：不要让我手动指定这个类型，请你根据当前的上下文，帮我**推断**出这里的具体类型并挂载到变量名下。\n\n我不需要知道 R 是什么，我让 TS 自己去“挖”，不是开发者指定的，是编译器“猜”出来的。\n\n对比泛型：本质上是**参数**，调用时具体什么类型是明确的\n\n可以像正则表达式一样拆分字符串。\n\n```ts\n// 不需要知道 R 是什么，我让 TS 自己去“挖”\ntype MyReturnType<T> = T extends (...args: any[]) => infer R ? R : any;\n// 使用时：\ntype Result = MyReturnType<() => string>;\n// TS 就像做“填空题”一样，把 () => string 和 (...args: any[]) => R 对齐，\n// 发现 R 的位置刚好是 string，于是 R 就被赋值为 string。\n\n// 拆分字符串\ntype GetColor<T> = T extends `color:${infer C}` ? C : 'unknown';\ntype MyColor = GetColor<'color:red'>; // \"red\"\n```",
           "hasAnswer": true
         },
         {
           "id": "typescript-22",
-          "title": "泛型",
-          "content": "泛型允许编写代码时使用一些以后才指定的类型，在实例化时作为参数指明这些类型\n\n在`typescript`中，定义函数，接口或者类的时候，不预先定义好具体的类型，而在使用的时候在指定类型的一种特性\n\n泛型通过`<>`的形式进行表述，可以声明：函数  接口  类\n\n```\nfunction returnItem<T>(para: T): T {\n    return para\n}\ninterface ReturnItemFn<T> {\n    (para: T): T\n}\nclass Stack<T> {\n    private arr: T[] = []\n\n    public push(item: T) {\n        this.arr.push(item)\n    }\n}\n```",
+          "title": "映射类型中的 - + 修饰符",
+          "content": "- `-`  只能用于  `readonly`  和  `?`，**不能用于  `private`/`protected`!**\n\n- 这些操作只能在映射类型（`[P in keyof T]`）中使用\n\n- 可以组合使用：`-readonly -?`\n\n- 可以递归应用以处理嵌套对象\n\n添加修饰符（默认或显式使用  `+`）\n\n```ts\n// 显式添加（可选写法）\ntype ExplicitReadonly<T> = {\n  +readonly [P in keyof T]: T[P];  // 显式添加 readonly\n};\n\ntype ExplicitPartial<T> = {\n  +? [P in keyof T]: T[P];  // 显式添加 ?\n};\n```\n\n移除修饰符（使用  `-`）\n\n```ts\n// 移除 readonly\ntype Mutable<T> = {\n  -readonly [P in keyof T]: T[P];\n};\n\n// 移除可选（?）\ntype Required<T> = {\n  [P in keyof T]-?: T[P];\n};\n\n// 同时移除 readonly 和 ?\ntype MutableRequired<T> = {\n  -readonly [P in keyof T]-?: T[P];\n};\n```",
           "hasAnswer": true
         },
         {
           "id": "typescript-23",
-          "title": "高级类型",
-          "content": "- 交叉类型 `T & U`\n\n- 联合类型 `T | U`\n\n- 条件类型 `T extends U ? X : Y`\n\n- 类型别名 ,可以是泛型 ,也可以使用类型别名来在属性里引用自己：\n  \n  ```ts\n  type some = boolean | string\n  type Container<T> = { value: T }\n  type Tree<T> = {\n      value: T;\n      left: Tree<T>;\n  }\n  ```\n\n- 类型索引：keyof，类似于 `Object.keys` ，用于获取一个接口中 Key 的联合类型。\n\n- 类型约束：通过关键字 `extend` 进行约束，泛型内使用的主要作用是对泛型加以约束\n  \n  ```ts\n  type BaseType = string | number | boolean\n  // 这里表示 copy 的参数\n  // 只能是字符串、数字、布尔这几种基础类型\n  function copy<T extends BaseType>(arg: T): T {\n    return arg\n  }\n  ```\n\n- 映射类型：通过 `in` 关键字做类型的映射，遍历已有接口的 `key` 或者是遍历联合类型\n  \n  ```ts\n  type Readonly<T> = {\n      readonly [P in keyof T]: T[P];\n  };\n  interface Obj {\n    a: string\n    b: string\n  }\n  type ReadOnlyObj = Readonly<Obj>\n  // 等同于\n  interface ReadOnlyObj {\n      readonly a: string;\n      readonly b: string;\n  }\n  ```",
+          "title": "映射类型",
+          "content": "遍历一个类型的属性，并对每个属性应用某种转换，生成新的类型。注意不能遍历私有属性\n\n核心语法：`{ [K in Keys]: Type }`\n\n常用场景：批量修改修饰符；批量转换属性；批量改变键名\n\n语法支持：条件过滤，as 断言\n\n注意：\n\n- **一个类型内部只能有一个映射类型**\n- **映射不处理私有和受保护属性**\n- **映射类型会保留索引签名**\n- `keyof any = string | number | symbol`",
           "hasAnswer": true
         },
         {
           "id": "typescript-24",
-          "title": "命名空间",
-          "content": "解决命名污染，使用 `namespace` 来定义，类似模块化\n\n```ts\nnamespace SomeNameSpaceName {\n   export interface ISomeInterfaceName {      }\n   export class SomeClassName {      }\n}\n// 使用\nSomeNameSpaceName.SomeClassName\n```",
+          "title": "类型收窄（Type Narrowing）",
+          "content": "类型收窄是指 TypeScript 通过代码流分析，在特定代码块中将变量的类型从较宽泛的类型缩小到更具体的类型。\n\n**常见的类型收窄方式：**\n\n1. **typeof 类型守卫**：\n\n```ts\nfunction print(x: string | number) {\n  if (typeof x === 'string') {\n    console.log(x.toUpperCase()); // x 被收窄为 string\n  } else {\n    console.log(x.toFixed(2)); // x 被收窄为 number\n  }\n}\n```\n\n2. **instanceof 类型守卫**：\n\n```ts\nfunction logDate(x: Date | string) {\n  if (x instanceof Date) {\n    console.log(x.toISOString()); // x 是 Date\n  }\n}\n```\n\n3. **in 操作符**：\n\n```ts\ntype Fish = { swim: () => void };\ntype Bird = { fly: () => void };\nfunction move(animal: Fish | Bird) {\n  if ('swim' in animal) {\n    animal.swim(); // animal 是 Fish\n  }\n}\n```\n\n4. **自定义类型守卫（is 关键字）**：\n\n```ts\nfunction isString(x: unknown): x is string {\n  return typeof x === 'string';\n}\n```\n\n5. **真值收窄**：`if (x)` 排除 `null`、`undefined`、`0`、`''` 等\n\n6. **相等性收窄**：`if (x === y)` 或 `if (x !== null)`",
           "hasAnswer": true
         },
         {
           "id": "typescript-25",
-          "title": "ts条件判断",
-          "content": "T extends U ：是 TypeScript 的条件类型语法，用于判断类型 `T` 是否可以赋值给类型 `U`，类似于判断 `T` 是否为 `U` 的子类型（或相同类型）。在分布式条件下，如果 `T` 是联合类型，那么会拆开每个成员分别判断。\n\n```ts\ntype A = 'a' | 'b' | 'c';\ntype B = 'a' | 'b';\n\n// 判断 'a' 是否可以赋值给 B？可以，因为 'a' 在 B 中。\n// 判断 'b' 是否可以赋值给 B？可以。\n// 判断 'c' 是否可以赋值给 B？不可以。\n\n// 所以 Exclude<A, B> 会计算：\n// 'a' extends B ? never : 'a' → never\n// 'b' extends B ? never : 'b' → never\n// 'c' extends B ? never : 'c' → 'c'\n// 合并：never | never | 'c' → 'c'\n```",
+          "title": "tsconfig.json 重要配置",
+          "content": "| 配置项              | 作用                              |\n| ------------------- | --------------------------------- |\n| `strict`            | 总开关，开启所有严格类型检查      |\n| `strictNullChecks`  | null/undefined 不能赋值给其他类型 |\n| `noImplicitAny`     | 禁止隐式 any 类型                 |\n| `target`            | 编译目标版本（ES5/ES6/ESNext）    |\n| `module`            | 模块系统（CommonJS/ESNext/AMD）   |\n| `moduleResolution`  | 模块解析策略（node/bundler）      |\n| `baseUrl` + `paths` | 路径别名配置                      |\n| `outDir`            | 输出目录                          |\n| `rootDir`           | 源码根目录                        |\n| `declaration`       | 生成 `.d.ts` 声明文件             |\n| `esModuleInterop`   | 兼容 CommonJS 和 ES Module        |\n| `skipLibCheck`      | 跳过声明文件类型检查，加快编译    |\n| `resolveJsonModule` | 允许导入 JSON 文件                |\n| `jsx`               | JSX 编译方式（react/preserve）    |",
           "hasAnswer": true
         },
         {
           "id": "typescript-26",
-          "title": "为什么 string | null extends null 是 false？",
-          "content": "**理解 `extends` 的含义**：在 TypeScript 中，`T extends U` 表示：\n\n- **类型 T 的值可以安全地赋值给类型 U 的变量**\n\n- 或者说：**类型 T 是类型 U 的子类型**",
+          "title": "TypeScript 模块化",
+          "content": "TypeScript 完全支持 ES Module 语法，同时兼容 CommonJS。\n\n**ES Module 语法**：\n\n```ts\n// 导出\nexport const name = 'hello';\nexport default function () {}\nexport type { MyType };\nexport { value as alias };\n\n// 导入\nimport defaultExport from './module';\nimport { name } from './module';\nimport type { MyType } from './module';\nimport * as all from './module';\n```\n\n**模块解析**：\n\n- `moduleResolution: \"node\"` - Node.js 风格解析\n- `moduleResolution: \"bundler\"` - 现代打包器风格（推荐）\n\n**路径别名**：\n\n```json\n{\n  \"compilerOptions\": {\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"@/*\": [\"src/*\"]\n    }\n  }\n}\n```\n\n**命名空间 vs 模块**：现代 TS 项目推荐使用 ES Module，命名空间主要用于全局脚本环境。",
           "hasAnswer": true
         },
         {
           "id": "typescript-27",
-          "title": "infer",
-          "content": "只能在 **条件类型 (Conditional Types)** 的 `extends` 子句中使用。在类型的条件判断中，“声明”一个变量来捕获（提取）某个特定的类型。\n\n可以理解为：infer告诉编译器：不要让我手动指定这个类型，请你根据当前的上下文，帮我**推断**出这里的具体类型并挂载到变量名下。\n\n我不需要知道 R 是什么，我让 TS 自己去“挖”，不是开发者指定的，是编译器“猜”出来的。\n\n对比泛型：本质上是**参数**，调用时具体什么类型是明确的\n\n可以像正则表达式一样拆分字符串。\n\n```ts\n// 不需要知道 R 是什么，我让 TS 自己去“挖”\ntype MyReturnType<T> = T extends (...args: any[]) => infer R ? R : any;\n// 使用时：\ntype Result = MyReturnType<() => string>; \n// TS 就像做“填空题”一样，把 () => string 和 (...args: any[]) => R 对齐，\n// 发现 R 的位置刚好是 string，于是 R 就被赋值为 string。\n\n// 拆分字符串\ntype GetColor<T> = T extends `color:${infer C}` ? C : \"unknown\";\ntype MyColor = GetColor<\"color:red\">; // \"red\"\n```",
+          "title": "TypeScript 中的异步处理",
+          "content": "TypeScript 为异步操作提供了完整的类型支持：\n\n**1. Promise 类型**：\n\n```ts\nfunction fetchData(): Promise<string> {\n  return fetch('/api').then((res) => res.text());\n}\n\n// 泛型指定返回值类型\nconst promise: Promise<number> = Promise.resolve(42);\n```\n\n**2. async/await**：\n\n```ts\nasync function getData(): Promise<User[]> {\n  const response = await fetch('/api/users');\n  return response.json(); // 自动推断返回 Promise<User[]>\n}\n```\n\n**3. 错误处理类型**：\n\n```ts\nasync function safeFetch<T>(url: string): Promise<T | null> {\n  try {\n    const res = await fetch(url);\n    return res.json();\n  } catch {\n    return null;\n  }\n}\n```\n\n**4. 并发处理**：\n\n```ts\n// Promise.all 自动推断元组类型\nconst [user, posts] = await Promise.all([\n  fetchUser(), // Promise<User>\n  fetchPosts(), // Promise<Post[]>\n]); // user: User, posts: Post[]\n```",
           "hasAnswer": true
         },
         {
           "id": "typescript-28",
-          "title": "映射",
-          "content": "映射类型是一种语法结构，它允许我们通过遍历键来创建新类型。在类型定义中，我们只能有一个映射类型，因为映射类型本身就是一个完整的类型定义。\n\n- **映射类型不能重复**：一个类型定义中只能有一个 `[P in ...]` 映射\n- 映射类型的本质是**遍历键集合并生成属性**。如果有两个映射类型，会产生冲突",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-29",
-          "title": "\\- + 用法",
-          "content": "- `-` 只能用于 `readonly` 和 `?`，**不能用于 `private`/`protected`!**\n\n- 这些操作只能在映射类型（`[P in keyof T]`）中使用\n\n- 可以组合使用：`-readonly -?`\n\n- 可以递归应用以处理嵌套对象\n\n添加修饰符（默认或显式使用 `+`）\n\n```ts\n// 显式添加（可选写法）\ntype ExplicitReadonly<T> = {\n  +readonly [P in keyof T]: T[P];  // 显式添加 readonly\n};\n\ntype ExplicitPartial<T> = {\n  +? [P in keyof T]: T[P];  // 显式添加 ?\n};\n```\n\n移除修饰符（使用 `-`）\n\n```ts\n// 移除 readonly\ntype Mutable<T> = {\n  -readonly [P in keyof T]: T[P];\n};\n\n// 移除可选（?）\ntype Required<T> = {\n  [P in keyof T]-?: T[P];\n};\n\n// 同时移除 readonly 和 ?\ntype MutableRequired<T> = {\n  -readonly [P in keyof T]-?: T[P];\n};\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-30",
-          "title": "映射类型",
-          "content": "遍历一个类型的属性，并对每个属性应用某种转换，生成新的类型。注意不能遍历私有属性\n\n核心语法：`{ [K in Keys]: Type }`\n\n常用场景：批量修改修饰符；批量转换属性；批量改变键名\n\n语法支持：条件过滤，as 断言\n\n注意：\n\n **一个类型内部只能有一个映射类型**\n\n**映射不处理私有和受保护属性**\n\n**映射类型会保留索引签名**\n\nkeyof any = string | number | symbol",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-31",
-          "title": "手写题目：",
-          "content": "1. 实现一个 `Partial<T>` 类型，将 T 中的所有属性变为可选。\n\n2. 实现一个 `Required<T>` 类型，将 T 中的所有属性变为必选。\n\n3. 实现一个 `Readonly<T>` 类型，将 T 中的所有属性变为只读。\n\n4. 实现一个 `Pick<T, K>` 类型，从 T 中选取一组属性 K。\n\n5. 实现一个 `Record<K, T>` 类型，构造一个对象类型，其键名为 K，键值为 T。\n\n6. 实现一个 `Exclude<T, U>` 类型，从 T 中排除那些可以赋值给 U 的类型。\n\n7. 实现一个 `Extract<T, U>` 类型，从 T 中提取那些可以赋值给 U 的类型。\n\n8. 实现一个 `Omit<T, K>` 类型，从 T 中排除一组属性 K。\n\n9. 实现一个 `NonNullable<T>` 类型，从 T (联合类型) 中排除 null 和 undefined。\n\n10. 实现一个 `Merge<T, U>` 类型，将 U 的类型合并到 T 中，如果有重复则覆盖。\n\n11. 实现一个 `Mutable<T>` 类型，移除 T 中所有属性的只读修饰符。\n\n12. 实现 `TupleToUnion<T>` 元祖转为联合类型\n\n13. 实现深度`DeepReadonly<T>`类型，将 T 中的所有属性（深度遍历）变为只读。\n\n14. 实现`ReturnType<T>`获取函数返回值类型\n\n15. 实现 `Parameters<T>` 获取函数参数类型\n\n16. 实现`ConstructorParameters<T>` - 获取构造函数参数\n\n```ts\ntype MyPartial<T> = {\n  [K in keyof T]?: T[K];\n};\n\ntype MyRequired<T> = {\n  [K in keyof T]-?: T[K];\n};\n\ntype MyReadonly<T> = {\n  readonly [K in keyof T]-?: T[K];\n};\n\ntype MyPick<T, K extends keyof T> = {\n  [P in K]: T[P];\n};\n\ntype MyOmit1<T, K extends keyof T> = {\n  [P in keyof T as P extends K ? never : P]: T[P];\n};\ntype MyOmit2<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;\n\ntype MyRecord<K extends keyof any, V> = {\n  [P in K]: V;\n};\n\ntype MyExclude<T, U> = T extends U ? never : T;\n\ntype MyExtract<T, U> = T extends U ? T : never;\n\n// 对象类型的 移除恰好是 null/undefined 的属性\ntype RemoveNull<T> = {\n  [P in keyof T as T[P] extends null | undefined ? never : P]: T[P];\n};\n// 如果属性值类型中包含 null 或 undefined 就移除\ntype RemoveAnyNullable<T> = {\n  [P in keyof T as null extends T[P]\n    ? never\n    : undefined extends T[P]\n    ? never\n    : P]: T[P];\n};\n// 联合类型的\ntype MyNonNullable<T> = T extends null | undefined ? never : T;\n// 常这么用\ntype MakeNonNullable<T> = {\n  [P in keyof T]: MyNonNullable<T[P]>;\n};\n\ntype MyMerge<T, U> = Omit<T, keyof U> & U;\ntype MyMerge2<T, U> = {\n  [K in keyof T | keyof U]: K extends keyof U\n    ? U[K]\n    : K extends keyof T\n    ? T[K]\n    : never;\n};\n\ntype Mutable<T> = {\n  -readonly [P in keyof T]: T[P];\n};\n\ntype TupleToUnion<T extends any[]> = T[number];\n\ntype MyReturnType<T extends (...args) => any> = T extends (...args) => infer R\n  ? R\n  : never;\n\n// prettier-ignore\ntype MyParametersType<T extends (...args) => any> =\n  T extends (...args: infer R) => any ? R : never;\n\ntype MyConstructorParameters<T extends new (...args: any) => any> =\n  T extends new (...args: infer R) => any ? R : never;\n\ntype DeepReadonly<T> = {\n  readonly [P in keyof T]: P extends object ? DeepReadonly<T[P]> : T[P];\n};\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "typescript-32",
-          "title": "其他题目：",
-          "content": "什么是类型收窄（Type Narrowing）\n\nTypeScript中的tsconfig.json重要配置有哪些？\n\n联合类型和交叉类型的区别是什么？\n\nTypeScript项目中如何处理模块化？\n\n什么是条件类型？如何使用？\n\n如何在TypeScript中处理异步操作？\n\nTypeScript中如何实现接口继承？\n\n装饰器是什么？如何使用？\n\n什么是泛型？为什么要使用泛型？\n\n什么是类型断言？如何使用？\n\nTypeScript中的基本类型有哪些？\n\nTypeScript与JavaScript的区别是什么？",
+          "title": "接口继承",
+          "content": "**单继承**：\n\n```ts\ninterface Animal {\n  name: string;\n}\ninterface Dog extends Animal {\n  breed: string;\n}\n// Dog 拥有 name 和 breed 两个属性\n```\n\n**多继承**：\n\n```ts\ninterface Flyable {\n  fly(): void;\n}\ninterface Swimmable {\n  swim(): void;\n}\ninterface Duck extends Flyable, Swimmable {\n  quack(): void;\n}\n```\n\n**接口继承类**：\n\n```ts\nclass Point {\n  x: number = 0;\n  y: number = 0;\n}\ninterface Point3D extends Point {\n  z: number;\n}\n```\n\n**interface vs type 继承对比**：\n\n- interface 用 `extends` 继承\n- type 用 `&` 交叉类型实现类似效果\n- interface 可以被多次声明并自动合并，type 不行",
           "hasAnswer": true
         }
       ]
@@ -810,80 +786,80 @@
       "questions": [
         {
           "id": "vue-1",
-          "title": "描述一下 Vuex 的核心概念（State、Getter、Mutation、Action、Module）及其工作流程。",
-          "content": "**Mutation**唯一允许修改 State 的方法。必须是**同步**函数。\n\n**Action**负责提交 (`commit`) Mutation，可以包含**异步**操作或复杂的业务逻辑。\n\n**Module**将 Store 分割成模块，每个模块拥有自己的 State、Getter、Mutation、Action。\n\nVuex 的数据流是**单向**的，遵循以下流程：\n\n1. **View (视图)**：用户在组件中触发一个操作。\n\n2. **Dispatch (分发)**：组件通过 `store.dispatch('actionName', payload)` 提交一个 **Action**。\n\n3. **Action (动作)**：Action 执行异步逻辑（如 API 调用）。一旦数据准备好，Action 会通过 `store.commit('mutationName', payload)` 提交一个 **Mutation**。\n\n4. **Commit (提交)**：**Mutation** 是唯一能修改 **State** 的地方。它同步地修改状态。\n\n5. **State (状态)**：状态被更新。\n\n6. **Render (渲染)**：由于 State 是响应式的，所有依赖此 State 的 **View** 组件会自动更新。",
+          "title": "Vuex 的核心概念和工作流程",
+          "content": "**State** 单一状态树，存储应用的全部状态，作为\"唯一数据源\"。\n\n**Getter** 类似于计算属性，用于从 State 派生出新状态，具有缓存特性。\n\n**Mutation** 唯一允许修改 State 的方法。必须是**同步**函数，便于 DevTools 追踪状态变化。\n\n**Action** 负责提交 (`commit`) Mutation，可以包含**异步**操作或复杂的业务逻辑。\n\n**Module** 将 Store 分割成模块，每个模块拥有自己的 State、Getter、Mutation、Action，支持命名空间 (`namespaced: true`)。\n\nVuex 的数据流是**单向**的，遵循以下流程：\n\n1. **View (视图)**：用户在组件中触发一个操作。\n\n2. **Dispatch (分发)**：组件通过 `store.dispatch('actionName', payload)` 提交一个 **Action**。\n\n3. **Action (动作)**：Action 执行异步逻辑（如 API 调用）。一旦数据准备好，Action 会通过 `store.commit('mutationName', payload)` 提交一个 **Mutation**。\n\n4. **Commit (提交)**：**Mutation** 是唯一能修改 **State** 的地方。它同步地修改状态。\n\n5. **State (状态)**：状态被更新。\n\n6. **Render (渲染)**：由于 State 是响应式的，所有依赖此 State 的 **View** 组件会自动更新。",
           "hasAnswer": true
         },
         {
           "id": "vue-2",
-          "title": "vuex pinia 对比",
-          "content": "pinia：\n\n扁平化，去掉了 Mutation，核心概念是 State, Getter, Action。\n\n在 Action 中直接修改 State 即可（更简洁）。\n\n**原生且出色**的 TypeScript 支持，Store 类型是自动推导的。\n\n默认就是**独立的 Store 实例**，无需命名空间，结构更清晰。\n\n使用 `defineStore()` 创建 Store，在组件中使用时直接解构（如 `store.counter`）。\n\n**更轻量**，API 极简，学习曲线平缓。",
+          "title": "对比 Vuex 和 Pinia",
+          "content": "**Vuex** 是 Vue 2 时代的官方状态管理库，采用 Flux 架构，强调**单向数据流**和**严格的状态修改规范**（必须通过 Mutation）。适合大型项目，但模板代码较多，TS 支持需要额外配置。\n\n**Pinia** 是 Vue 3 官方推荐的状态管理库，可视为 Vuex 5。设计更简洁，去掉了 Mutation，原生支持 TypeScript，每个 Store 独立无需命名空间。\n\n| 特性         | Vuex                            | Pinia                               |\n| ---------- | ------------------------------- | ----------------------------------- |\n| 核心概念       | State, Getter, Mutation, Action | State, Getter, Action (去掉 Mutation) |\n| 修改状态       | 必须通过 Mutation（同步）               | Action 中直接修改 State                  |\n| TypeScript | 需要额外类型声明，配置繁琐                   | **原生支持**，类型自动推导                     |\n| 模块化        | 嵌套 Module，需要 `namespaced: true` | **独立 Store 实例**，按需导入，无需命名空间         |\n| 体积         | ~10KB                           | **~1KB**，更轻量                        |\n| DevTools   | 支持                              | 支持，体验更好                             |\n| SSR        | 需要额外配置                          | 开箱即用                                |\n| API 风格     | Options API 风格                  | 同时支持 Options 和 Composition API      |\n\n**选型建议**：新项目直接用 Pinia；Vue 2 老项目可继续用 Vuex，按需迁移。",
           "hasAnswer": true
         },
         {
           "id": "vue-3",
-          "title": "vue的响应式开发比命令式有什么好处",
-          "content": "您只需要描述**应用状态 (State) 和视图 (View) 之间的映射关系** (`template`)。当状态改变时，框架（Vue）会自动处理 DOM 的更新\n\nVue 的响应式系统配合 Virtual DOM 和 Diff 算法，能够**高效、精确地找到需要更新的最小 DOM 变化集**，避免了不必要的 DOM 操作，从而提高了应用性能。",
+          "title": "响应式开发比命令式开发有什么优势？",
+          "content": "1. **声明式编程**：只需描述**状态与视图的映射关系**，无需手动操作 DOM，代码更易读易维护。\n\n2. **自动更新**：状态变化时，框架自动处理 DOM 更新，开发者无需关心\"何时更新、更新哪里\"。\n\n3. **高效渲染**：Virtual DOM + Diff 算法，**精确计算最小 DOM 变化集**，避免不必要的 DOM 操作。\n\n4. **减少 Bug**：手动 DOM 操作容易遗漏或出错，响应式系统保证状态与视图一致性。\n\n5. **组件化开发**：状态封装在组件内部，提高代码复用性和可测试性。",
           "hasAnswer": true
         },
         {
           "id": "vue-4",
-          "title": "说说装饰器",
-          "content": "",
-          "hasAnswer": false
+          "title": "什么是装饰器？在 Vue 中怎么用？",
+          "content": "装饰器 (Decorator) 是一种特殊的声明，用于**修改类或类成员的行为**，本质是一个函数。\n\n**在 Vue 中的应用**（主要是 Vue 2 + TypeScript）：\n\n```typescript\nimport { Component, Prop, Watch } from 'vue-property-decorator';\n\n@Component\nexport default class MyComponent extends Vue {\n  @Prop({ default: '' }) readonly title!: string; // 声明 props\n\n  @Watch('title') // 监听属性变化\n  onTitleChange(val: string) {}\n}\n```\n\n**Vue 3 现状**：Composition API 已取代装饰器方案，官方不再推荐使用装饰器。原因：\n\n- Composition API 提供更好的类型推导\n- 装饰器提案尚未稳定\n- 函数式组合比类继承更灵活",
+          "hasAnswer": true
         },
         {
           "id": "vue-5",
-          "title": "Vue 中如何保持组件状态，避免重复渲染（比如在路由切换时）？",
-          "content": "主要通过 Vue 的内置抽象组件 **`<keep-alive>`** 来实现。\n\n作用： ` <keep-alive>` 包裹动态组件或路由组件时，会**缓存不活动的组件实例**，而不是销毁它们。这可以避免组件在切换时被重复创建和渲染，从而**保持组件的状态**（如表单输入内容、滚动位置等），并提升性能。\n\n实现原理与钩子函数\n\n1. **缓存**：当组件被 `<keep-alive>` 缓存后，其 `destroy` 生命周期钩子不会触发。\n\n2. **新增钩子**：被缓存的组件会新增两个特殊的生命周期钩子：\n   \n   - **`activated()`**：组件被激活时（切换进来）触发。\n   \n   - **`deactivated()`**：组件被停用时（切换出去）触发。",
+          "title": "如何保持组件状态、避免重复渲染？（keep-alive）",
+          "content": "主要通过 Vue 的内置抽象组件 **`<keep-alive>`** 来实现。\n\n作用： ` <keep-alive>` 包裹动态组件或路由组件时，会**缓存不活动的组件实例**，而不是销毁它们。这可以避免组件在切换时被重复创建和渲染，从而**保持组件的状态**（如表单输入内容、滚动位置等），并提升性能。\n\n实现原理与钩子函数\n\n1. **缓存机制**：内部使用 `Map` 缓存 VNode，key 为组件名或自定义 key。\n\n2. **生命周期变化**：缓存后 `unmounted`/`destroyed` 不会触发，新增两个钩子：\n   \n   - **`activated()`**：组件被激活时（切换进来）触发\n   - **`deactivated()`**：组件被停用时（切换出去）触发\n\n3. **常用属性**：\n   \n   - `include`：只缓存匹配的组件（字符串/正则/数组）\n   - `exclude`：排除匹配的组件\n   - `max`：最大缓存数量，超出时使用 **LRU 算法**淘汰最久未使用的\n\n```html\n<keep-alive :include=\"['Home', 'List']\" :max=\"10\">\n  <router-view />\n</keep-alive>\n```",
           "hasAnswer": true
         },
         {
           "id": "vue-6",
-          "title": "Vue 2 和 Vue 3 在数据响应式原理上有哪些主要的区别？为什么 Vue 3 要改用 Proxy？",
-          "content": "vue2 递归地为所有嵌套属性添加 getter/setter，初始化时开销较大。\nvue3 proxy **惰性**地进行响应式处理，只在访问时才递归处理，初始化更快",
+          "title": "Vue 2 和 Vue 3 响应式原理的区别？为什么改用 Proxy？",
+          "content": "| 对比项  | Vue 2 (Object.defineProperty) | Vue 3 (Proxy)   |\n| ---- | ----------------------------- | --------------- |\n| 初始化  | 递归遍历所有属性，开销大                  | **惰性处理**，访问时才递归 |\n| 新增属性 | ❌ 无法检测，需用 `$set`              | ✅ 自动响应          |\n| 删除属性 | ❌ 无法检测，需用 `$delete`           | ✅ 自动响应          |\n| 数组索引 | ❌ 无法检测 `arr[0] = x`           | ✅ 自动响应          |\n| 数组长度 | ❌ 无法检测 `arr.length = 0`       | ✅ 自动响应          |\n\n**Vue 3 改用 Proxy 的原因**：\n\n1. **功能更全面**：Proxy 可拦截 13 种操作（get/set/delete/has/ownKeys 等）\n2. **性能更优**：惰性响应式，减少初始化开销\n3. **代码更简洁**：无需为数组方法打补丁",
           "hasAnswer": true
         },
         {
           "id": "vue-7",
-          "title": "描述一下 Vue 的渲染过程（从模板到最终的 DOM）",
-          "content": "总结：\n\n初次：1编译模板（解析AST+标记+生成渲染函数）2执行渲染函数生成VDOM 3 渲染\n\n后续数据更新：1 执行渲染函数生成新VDOM 2 diff获得patch 3 更新DOM\n\n阶段一：模板编译 (Template Compilation)\n\n1. **解析 (Parse)**：将 HTML 模板字符串解析成抽象语法树 (AST - Abstract Syntax Tree)。AST 是一种用 JavaScript 对象来描述模板结构的树形结构。\n\n2. **优化 (Optimize)**：遍历 AST，标记静态节点 (Static nodes)。静态节点是指内容不会变化的节点。Vue 在后续的 Diff 过程中会跳过这些节点，**大幅提高性能**。\n\n3. **代码生成 (Generate)**：将优化后的 AST 转换成 **Render Function (渲染函数)**。渲染函数返回的就是 VNode (Virtual Node) 树。\n\n阶段二：创建虚拟 DOM (Virtual DOM Creation)\n\n1. **首次渲染**：执行第一步生成的 **Render Function**，它返回一棵 **VNode Tree (虚拟 DOM 树)**。\n\n阶段三：渲染和更新 (Patching & DOM Update)\n\n1. **首次渲染**：将 VNode Tree 转换成真实的 DOM 元素，并插入到页面中。同时，Vue 将这棵 VNode Tree 保存为 `oldVNode`。\n\n2. **数据更新**：响应式数据发生变化时，会触发组件的 Watcher，重新执行 Render Function，生成一棵 **`newVNode` Tree**。\n\n3. **比对 (Patch)**：Vue 运行 **Diff 算法**（Patch 过程），将 `newVNode` 与 `oldVNode` 进行递归比对。\n\n4. **最小化 DOM 操作**：Diff 算法找出两棵树之间**最小的差异集**。\n\n5. **更新 DOM**：Vue 只对这些有差异的真实 DOM 节点进行必要的创建、更新、移动或删除操作，从而完成视图更新。",
+          "title": "Vue 的渲染过程（模板 → DOM）",
+          "content": "总结：\n\n初次：1 编译模板（解析 AST+标记+生成渲染函数）2 执行渲染函数生成 VDOM 3 渲染\n\n后续数据更新：1 执行渲染函数生成新 VDOM 2 diff 获得 patch 3 更新 DOM\n\n阶段一：模板编译 (Template Compilation)\n\n1. **解析 (Parse)**：将 HTML 模板字符串解析成抽象语法树 (AST - Abstract Syntax Tree)。AST 是一种用 JavaScript 对象来描述模板结构的树形结构。\n\n2. **优化 (Optimize)**：遍历 AST，标记静态节点 (Static nodes)。静态节点是指内容不会变化的节点。Vue 在后续的 Diff 过程中会跳过这些节点，**大幅提高性能**。\n\n3. **代码生成 (Generate)**：将优化后的 AST 转换成 **Render Function (渲染函数)**。渲染函数返回的就是 VNode (Virtual Node) 树。\n\n阶段二：创建虚拟 DOM (Virtual DOM Creation)\n\n1. **首次渲染**：执行第一步生成的 **Render Function**，它返回一棵 **VNode Tree (虚拟 DOM 树)**。\n\n阶段三：渲染和更新 (Patching & DOM Update)\n\n1. **首次渲染**：将 VNode Tree 转换成真实的 DOM 元素，并插入到页面中。同时，Vue 将这棵 VNode Tree 保存为 `oldVNode`。\n\n2. **数据更新**：响应式数据发生变化时，会触发组件的 Watcher，重新执行 Render Function，生成一棵 **`newVNode` Tree**。\n\n3. **比对 (Patch)**：Vue 运行 **Diff 算法**（Patch 过程），将 `newVNode` 与 `oldVNode` 进行递归比对。\n\n4. **最小化 DOM 操作**：Diff 算法找出两棵树之间**最小的差异集**。\n\n5. **更新 DOM**：Vue 只对这些有差异的真实 DOM 节点进行必要的创建、更新、移动或删除操作，从而完成视图更新。",
           "hasAnswer": true
         },
         {
           "id": "vue-8",
-          "title": "Vue Router 的工作原理是什么？常用的路由模式（Hash 和 History）有什么区别？",
-          "content": "Vue Router 的核心是监听 URL 的变化，并根据配置的路由映射表，动态地渲染对应的组件。\n\n1. **路由映射 (Route Mapping)**：定义 URL 路径 (`path`) 与组件 (`component`) 的映射关系。\n\n2. **监听 URL 变化**：根据配置的模式（Hash 或 History），监听浏览器地址栏 URL 的变化事件。\n\n3. **匹配路由**：当 URL 变化时，Router 捕获新 URL，并在路由映射表中查找匹配的配置。\n\n4. **渲染组件**：将匹配到的组件渲染到 `<router-view>` 占位符的位置上。\n\nhash 依赖 URL 中的 **Hash 变化**，使用 `window.onhashchange` 事件监听。利用 `#` 变化不会触发页面加载和服务器请求的特性实现SPA内部跳转\n\nhistory 依赖 HTML5 的 **History API** (`pushState`, `replaceState`)。SPA内部跳转用history.pushState实现",
+          "title": "Vue Router 原理？Hash 和 History 模式的区别？",
+          "content": "Vue Router 的核心是监听 URL 的变化，并根据配置的路由映射表，动态地渲染对应的组件。\n\n1. **路由映射 (Route Mapping)**：定义 URL 路径 (`path`) 与组件 (`component`) 的映射关系。\n\n2. **监听 URL 变化**：根据配置的模式（Hash 或 History），监听浏览器地址栏 URL 的变化事件。\n\n3. **匹配路由**：当 URL 变化时，Router 捕获新 URL，并在路由映射表中查找匹配的配置。\n\n4. **渲染组件**：将匹配到的组件渲染到 `<router-view>` 占位符的位置上。\n\n| 对比项    | Hash 模式               | History 模式                       |\n| ------ | --------------------- | -------------------------------- |\n| URL 形式 | `example.com/#/user`  | `example.com/user`               |\n| 原理     | `window.onhashchange` | `history.pushState/replaceState` |\n| 服务器配置  | 无需配置                  | **需要配置回退**（所有路由返回 index.html）    |\n| SEO    | 不友好（爬虫忽略 # 后内容）       | 友好                               |\n| 兼容性    | 所有浏览器                 | IE10+                            |\n\n**导航守卫**（补充高频考点）：\n\n- `beforeEach`：全局前置守卫，常用于登录验证\n- `beforeResolve`：全局解析守卫\n- `afterEach`：全局后置钩子\n- `beforeEnter`：路由独享守卫\n- `beforeRouteEnter/Update/Leave`：组件内守卫",
           "hasAnswer": true
         },
         {
           "id": "vue-9",
-          "title": "如何自定义一个 Vue 指令 (directive)？请举例说明其常用的钩子函数",
-          "content": "自定义指令用于对 DOM 元素进行**底层操作**，实现可复用的 DOM 行为。例如：自动获取焦点、权限控制、拖拽功能等。\n\n```js\n// main.js\nimport { createApp } from 'vue'\nimport App from './App.vue'\nconst app = createApp(App)\n\n// 注册一个全局自定义指令 v-focus\napp.directive('focus', {\n  // 元素挂载到 DOM 时调用\n  mounted(el) {\n    el.focus() // 使元素自动获取焦点\n  }\n})\n\napp.mount('#app')\n\n//组件内用directives注册\n```",
+          "title": "如何自定义 Vue 指令？有哪些钩子函数？",
+          "content": "自定义指令用于对 DOM 元素进行**底层操作**，实现可复用的 DOM 行为。例如：自动获取焦点、权限控制、拖拽功能等。\n\n```js\n// main.js\nimport { createApp } from 'vue';\nimport App from './App.vue';\nconst app = createApp(App);\n\n// 注册一个全局自定义指令 v-focus\napp.directive('focus', {\n  // 元素挂载到 DOM 时调用\n  mounted(el) {\n    el.focus(); // 使元素自动获取焦点\n  },\n});\n\napp.mount('#app');\n\n//组件内用directives注册\n```\n\n**Vue 3 指令钩子函数**：\n\n- `created`：元素属性/事件监听器应用前\n- `beforeMount`：挂载前\n- `mounted`：挂载后（常用）\n- `beforeUpdate`：更新前\n- `updated`：更新后\n- `beforeUnmount`：卸载前\n- `unmounted`：卸载后\n\n**常见应用场景**：自动聚焦、权限控制（v-permission）、防抖点击、图片懒加载、拖拽",
           "hasAnswer": true
         },
         {
           "id": "vue-10",
-          "title": "如何对 Vue 应用进行性能优化？",
-          "content": "运行时性能优化 (Runtime Performance)\n\n1. **合理使用 `v-if` 和 `v-show`**：\n   \n   - **`v-if`**：真正销毁/重建组件，适用于不频繁切换的场景。\n   \n   - **`v-show`**：仅切换 CSS `display` 属性，适用于频繁切换的场景。\n\n2. **`v-for` 必须使用 `key`**：帮助 Vue Diff 算法更高效地进行元素追踪和复用。\n\n3. **使用 `v-once`**：对于内容不依赖数据的静态子树，使用 `v-once` 只渲染一次，避免了后续的更新开销。\n\n4. **组件拆分和懒加载 (Async Components)**：将大组件拆分为小组件，并使用动态 `import()` 实现组件的按需加载。\n\n5. 精准依赖，对store或外部属性，精准引入，依靠vue对响应式数据的优化\n\n6. **大列表优化 (虚拟滚动/Virtual Scrolling)**：对于包含数千个项目的长列表，只渲染可见区域的 DOM，大幅减少 DOM 节点数量。\n\n7. **合理使用 `computed` vs `watch`**：`computed` 具有缓存机制，只有依赖项变化时才会重新计算，比 `watch` 更高效。\n\n8. **使用 Vue 3 的 `shallowRef` (如果可以)**：对于嵌套层级很深但我们只关心顶层引用的数据，使用 `shallowRef` 来减少不必要的深度响应式处理。\n\n加载性能优化 (Loading Performance)\n\n1. **路由懒加载**：使用 `const route = () => import('./components/Path')`，将不同路由组件的代码分割成不同的 chunk，实现按需加载。\n\n2. **第三方库按需引入**：如使用 Babel 插件或 Vite 插件，对 Element-UI/Plus、Ant Design Vue 等库进行按需导入，而不是全量导入。\n\n3. 以及其他性能优化手段",
+          "title": "Vue 应用性能优化有哪些方向？",
+          "content": "- **运行时性能优化 (Runtime Performance)**\n  \n  - **合理使用 `v-if` 和 `v-show`**：\n    \n    - **`v-if`**：真正销毁/重建组件，适用于不频繁切换的场景。\n    \n    - **`v-show`**：仅切换 CSS `display` 属性，适用于频繁切换的场景。\n  \n  - **`v-for` 必须使用 `key`**：帮助 Vue Diff 算法更高效地进行元素追踪和复用。\n  \n  - **使用 `v-once`**：对于内容不依赖数据的静态子树，使用 `v-once` 只渲染一次，避免了后续的更新开销。\n  \n  - **组件拆分和懒加载 (Async Components)**：将大组件拆分为小组件，并使用动态 `import()` 实现组件的按需加载。\n  \n  - 精准依赖，对 store 或外部属性，精准引入，依靠 vue 对响应式数据的优化\n  \n  - **大列表优化 (虚拟滚动/Virtual Scrolling)**：对于包含数千个项目的长列表，只渲染可见区域的 DOM，大幅减少 DOM 节点数量。\n  \n  - **合理使用 `computed` vs `watch`**：`computed` 具有缓存机制，只有依赖项变化时才会重新计算，比 `watch` 更高效。\n  \n  - **使用 Vue 3 的 `shallowRef` (如果可以)**：对于嵌套层级很深但我们只关心顶层引用的数据，使用 `shallowRef` 来减少不必要的深度响应式处理。\n\n- **加载性能优化 (Loading Performance)**\n  \n  - **图片优化**：WebP 格式、懒加载、响应式图片\n  \n  - **路由懒加载**：使用 `const route = () => import('./components/Path')`，将不同路由组件的代码分割成不同的 chunk，实现按需加载。\n  \n  - **第三方库按需引入**：如使用 Babel 插件或 Vite 插件，对 Element-UI/Plus、Ant Design Vue 等库进行按需导入，而不是全量导入。\n\n- **工程化优化**\n  \n  - **Tree Shaking**：确保使用 ES Module，移除未使用代码\n  \n  - **代码分割**：Webpack/Vite 的 splitChunks，合理拆分 vendor 和业务代码\n  \n  - **Gzip 压缩**：服务端开启压缩，减少传输体积\n  \n  - **CDN 加速**：静态资源上 CDN，利用边缘节点加速\n  \n  - **预加载/预获取**：`<link rel=\"prefetch/preload\">` 提前加载关键资源\n  \n  - **缓存策略**：合理配置 HTTP 缓存头，利用浏览器缓存",
           "hasAnswer": true
         },
         {
           "id": "vue-11",
-          "title": "谈谈你在项目中遇到的 Vue 相关的挑战或难题，以及你是如何解决的？",
-          "content": "",
-          "hasAnswer": false
+          "title": "项目中遇到过哪些 Vue 相关的难题？如何解决？",
+          "content": "**示例回答框架**（根据实际经验调整）：\n\n**场景 1：大列表性能问题**\n\n- 问题：渲染上万条数据导致页面卡顿\n- 方案：引入虚拟滚动（vue-virtual-scroller），只渲染可视区域 DOM\n- 效果：DOM 节点从 10000+ 降到 ~50，滚动流畅\n\n**场景 2：组件通信复杂**\n\n- 问题：多层嵌套组件间状态共享困难，props 层层传递\n- 方案：引入 Pinia 管理全局状态 + provide/inject 处理局部共享\n- 效果：代码解耦，维护性提升\n\n**场景 3：内存泄漏**\n\n- 问题：组件卸载后定时器/事件监听未清理\n- 方案：在 `onUnmounted` 中统一清理，封装 `useInterval` 等 hooks\n- 效果：内存占用稳定\n\n**回答技巧**：描述具体场景 → 分析原因 → 解决方案 → 量化效果",
+          "hasAnswer": true
         },
         {
           "id": "vue-12",
-          "title": "nexttick原理",
-          "content": "在下次 DOM 更新循环结束之后执行延迟回调，以确保您在回调中操作的是最新的 DOM。利用js的时间循环，当调用 `this.$nextTick(callback)` 时，Vue 会将 `callback` 作为一个**微任务**推入微任务队列。\n\n（**VUE的DOM更新也是在微任务里完成的，数据变化 —> 触发 Setter —> 派发更新—> 收集到 Watcher —> watcher将渲染更新任务推入浏览器的微任务队列**）",
+          "title": "nextTick 的作用和原理？",
+          "content": "**作用**：在下次 DOM 更新循环结束之后执行回调，确保操作的是最新 DOM。\n\n**原理**：\n\n1. Vue 的数据变化触发 DOM 更新是**异步批量**的（同一事件循环内的多次修改合并为一次更新）\n2. DOM 更新任务被推入**微任务队列**（优先使用 `Promise.then`，降级用 `MutationObserver`、`setImmediate`、`setTimeout`）\n3. `nextTick(callback)` 将回调推入同一个微任务队列，排在 DOM 更新之后执行\n\n**执行顺序**：数据变化 → Setter → 派发更新 → 收集 Watcher → **微任务队列**（DOM 更新 → nextTick 回调）\n\n**常见使用场景**：\n\n```javascript\nthis.show = true;\nthis.$nextTick(() => {\n  this.$refs.input.focus(); // 确保 DOM 已渲染\n});\n```",
           "hasAnswer": true
         },
         {
           "id": "vue-13",
-          "title": "Vue3 的 Composition API setup() 里响应式丢失是什么原因，怎么解决",
-          "content": "常发生在解构（Destructuring）**或**展开（Spreading）响应式对象时。\n\n```javascript\nconst state = reactive({\n  count: 0, // 这是一个被 Proxy 追踪的属性\n  name: 'Alice'\n});\n\n// --- ❌ 错误做法：响应式丢失 ---\n// 解构：将 state.count 的原始值赋给了新的局部变量 count。\n// 这两个变量已经没有任何关联。\nconst { count, name } = state;\n```\n\n解决方案：`toRefs` 或直接引用\n\n```javascript\nconst { count, name } = toRefs(state) \n// 或者直接用\nstate.count\n```",
+          "title": "Vue 3 响应式丢失的原因和解决方案？",
+          "content": "常发生在解构（Destructuring）**或**展开（Spreading）响应式对象时。\n\n```javascript\nconst state = reactive({\n  count: 0, // 这是一个被 Proxy 追踪的属性\n  name: 'Alice',\n});\n\n// --- ❌ 错误做法：响应式丢失 ---\n// 解构：将 state.count 的原始值赋给了新的局部变量 count。\n// 这两个变量已经没有任何关联。\nconst { count, name } = state;\n```\n\n**解决方案**：\n\n```javascript\n// 方案1：使用 toRefs 保持响应式\nconst { count, name } = toRefs(state); // count.value 是响应式的\n\n// 方案2：直接引用，不解构\nstate.count;\n\n// 方案3：使用 toRef 获取单个属性\nconst count = toRef(state, 'count');\n```\n\n**延伸：ref vs reactive**\n\n- `ref`：用于基本类型，通过 `.value` 访问，解构不丢失响应式\n- `reactive`：用于对象/数组，直接访问属性，解构会丢失响应式\n\n**最佳实践**：统一使用 `ref`，或始终用 `toRefs` 解构 `reactive` 对象。",
           "hasAnswer": true
         }
       ]
@@ -1249,18 +1225,6 @@
       ]
     },
     {
-      "id": "code-explain",
-      "name": "代码解释题",
-      "questions": [
-        {
-          "id": "code-explain-1",
-          "title": "规则：",
-          "content": "1. **变量提升**：函数声明 > var声明\n2. **暂时性死区**：let/const声明前访问报错\n3. **箭头函数this**：定义时确定，不会改变\n4. **闭包循环**：使用let或IIFE解决\n5. **null vs undefined**：默认参数的区别\n6. `typeof null === 'object'`（历史遗留问题）\n7. 箭头函数没有 `arguments` 对象\n8. `bind` 绑定的 `this` 无法被覆盖\n9. 默认参数只有 `undefined` 会触发\n10. `let` 在 `for` 循环中会为每次迭代创建独立的词法环境，因此闭包捕获的是不同的 i，而不是同一个变量。\n11. 只要满足这两点，就是闭包：有函数 + 函数访问了外层作用域里的变量\n```\nconsole.log(foo); // ƒ foo() { return 1; }\nconsole.log(bar); // undefined\n\nfunction foo() { return 1; }\nvar bar = function() { return 2; };\n\n// 易错：认为 bar 也会提升为函数\n// 解释：函数声明整体提升，函数表达式只提升变量声明\n```\n```\n// 产生方式\nlet a;                    // undefined (未赋值)\nlet b = null;            // null (主动赋空值)\nfunction c() {}          // 返回 undefined\nlet d = void 0;          // undefined\n\n// 相等性判断\nnull == undefined;       // true (抽象相等)\nnull === undefined;      // false (严格相等)\n\n// 类型检查\ntypeof null;            // \"object\" (历史bug)\ntypeof undefined;       // \"undefined\"\n\n// 默认参数行为\nfunction foo(a = 1) {\n  console.log(a);\n}\nfoo(undefined); // 1 (触发默认值)\nfoo(null);      // null (不触发默认值)\n```\n```\n// 函数声明（整体提升）\nfunction foo() {}      // 可以在声明前调用\n\n// 函数表达式（只提升变量）\nvar bar = function() {} // 声明前调用会报错\nlet baz = () => {}      // 同上\n```\n```\nconsole.log(typeof a); // function\n\nvar a;\nfunction a() {}\nvar a = 1;\n\nconsole.log(typeof a); // number\n// 易错：认为第二次输出还是 function\n// 规则：函数提升优先于变量提升，但赋值会覆盖\n```\n```\nfunction createFunctions() {\n  var result = [];\n  for (var i = 0; i < 3; i++) {\n    result[i] = function() {\n      return i; // 捕获的是变量i，不是i的值\n    };\n  }\n  return result;\n}\n\nvar funcs = createFunctions();\nconsole.log(funcs[0]()); // 3\nconsole.log(funcs[1]()); // 3\nconsole.log(funcs[2]()); // 3\n// 易错：认为会输出 0,1,2\n```\n```\nvar a = 10;\nfunction foo() {\n  console.log(a);\n  var a = 20;\n}\nfoo(); // undefined\n\n// 相当于：\nfunction foo() {\n  var a; // 变量提升\n  console.log(a); // undefined\n  a = 20;\n}\n```\n```\nvar name = 'Global';\nvar obj = {\n  name: 'Object',\n  sayName: function() {\n    console.log(this.name);\n  }\n};\n\nobj.sayName(); // 'Object'\nvar fn = obj.sayName;\nfn(); // 'Global'（非严格模式）或 undefined（严格模式）\n\n// 易错：认为 fn() 也会输出 'Object'\n// 规则：this 指向调用者，fn() 相当于 window.fn()\n```\n```\nfunction foo() {\n  console.log(this.value);\n}\n\nvar obj1 = { value: 'obj1' };\nvar obj2 = { value: 'obj2' };\n\nvar bound = foo.bind(obj1);\nbound(); // 'obj1'\n\nbound.call(obj2); // 'obj1'，不是 'obj2'！\n// 易错：认为 call 可以覆盖 bind 的绑定\n// 规则：bind 绑定的 this 不可更改\n```\n```\nvar name = 'Global';\nvar obj = {\n  name: 'Object',\n  handleClick: function() {\n    console.log(this.name);\n  }\n};\n\n// 情况1：直接调用\nobj.handleClick(); // 'Object'\n\n// 情况2：作为回调\nsetTimeout(obj.handleClick, 0); // 'Global'\n\n// 情况3：使用箭头函数解决\nsetTimeout(() => obj.handleClick(), 0); // 'Object'\n\n// 易错点：认为情况2也会输出 'Object'\n// 规则：回调函数丢失原始绑定\n```\n```\nfunction foo(a = 1, b = 2) {\n  console.log(a, b);\n}\n\nfoo(undefined, null);\n// 输出：1, null\n\n// 易错点：认为 null 也会触发默认值\n// 规则：只有 undefined 会触发默认值，null 被视为有效值\n```\n```\nlet x = 1;\nfunction foo(x, y = x + 1) {\n  console.log(y);\n}\n\nfoo(2); // 3，不是 2！\n// 易错：认为 y = x + 1 中的 x 是外层的 x\n// 规则：默认参数的作用域是独立的，先有的参数可用于后面参数的默认值\n```\n```\nfunction foo(a, b = 2) {\n  console.log(arguments.length);\n  console.log(a === arguments[0]);\n  console.log(b === arguments[1]);\n}\n\nfoo(1); \n// 输出：1, true, false\n// 易错：认为 arguments[1] 会是 2\n// 规则：默认参数不会填充 arguments\n```\n```\n'use strict';\nfunction foo() {\n  console.log(this);\n}\n\nfoo(); // undefined\nwindow.foo(); // window（浏览器）\n\n// 非严格模式：foo() → window\n// 严格模式：foo() → undefined\n```\n```\nfunction Person(name) {\n  this.name = name;\n  return { name: 'fake' };\n}\n\nconst p = new Person('real');\nconsole.log(p.name); // 'fake'\n// 解释：构造函数如果返回对象，则new表达式返回该对象\n```\n```\nvar a = 10\n\nfunction foo() {\n  console.log(this.a)\n}\n\nfunction bar(fn) {\n  var a = 20\n  fn()\n}\n\nbar(foo) // 10 \n// bar只是一个执行上下文，但调用方式是普通函数调用，因此 this 指向 window\n```",
-          "hasAnswer": true
-        }
-      ]
-    },
-    {
       "id": "open-questions",
       "name": "开放题&场景题",
       "isFolder": true,
@@ -1345,7 +1309,37 @@
       "questions": [
         {
           "id": "ai-1",
-          "title": "用过的 AI大模型，使用方式，用了他们那些功能，觉得AI大模型他们存在有什么样的缺点",
+          "title": "用过的 AI 大模型，使用方式，用了他们那些功能，觉得 AI 大模型他们存在有什么样的缺点",
+          "content": "",
+          "hasAnswer": false
+        },
+        {
+          "id": "ai-2",
+          "title": "你对 AI Coding 的理解？",
+          "content": "",
+          "hasAnswer": false
+        },
+        {
+          "id": "ai-3",
+          "title": "有没有 最佳实践？",
+          "content": "",
+          "hasAnswer": false
+        },
+        {
+          "id": "ai-4",
+          "title": "平时的 AI 工作流 是怎样的？",
+          "content": "",
+          "hasAnswer": false
+        },
+        {
+          "id": "ai-5",
+          "title": "用过哪些 AI IDE？差异在哪？",
+          "content": "",
+          "hasAnswer": false
+        },
+        {
+          "id": "ai-6",
+          "title": "对 Agent / MCP / Tab 补全模型 的理解？",
           "content": "",
           "hasAnswer": false
         }
@@ -1400,72 +1394,6 @@
       ]
     },
     {
-      "id": "projects",
-      "name": "项目经验",
-      "questions": [
-        {
-          "id": "projects-1",
-          "title": "B端项目",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "projects-2",
-          "title": "核心技术流程详解",
-          "content": "A. 编辑器初始化与回显\n\n当用户编辑一个已存在的页面时：\n\n1. 配置解析: 遍历后端返回的 JSON 配置 (configList)。\n\n2. 实例化: 通过 KitController.getKit(name) 获取组件类，并调用 .instance() 生成带有唯一 guid 的实例。\n\n3. 动态注入: 关键代码 injectReducer(guid, KitController.initKitStore(guid, state))。这行代码动态创建了该组件实例的 Redux reducer，并用历史数据初始化它。\n\n4. 渲染: 更新 kitRenderList 并触发 renderKit()。\n\nB. 拖拽添加组件流程\n\n这是一个典型的 \"占位符\" 交互模式：\n\n1. 开始拖拽: 用户从左侧面板拖拽组件。\n\n2. 创建占位: 调用 a_createPlaceHolderKit 或 a_addPlaceHolderKit，在 kitRenderList 中插入一个类型为 COMP_DROP_PLACEHOLDER 的特殊组件。\n\n3. 放置 (Drop): 当用户释放鼠标时，调用 a_createKit(kitName)。\n\n4. 替换逻辑:  特殊规则的校验，找到占位符，实例化真实组件，注入Redux Store，将占位符替换为真实组件。\n\nC. 跨窗口渲染同步：数据快照的生成。将 Redux 中扁平化的数据聚合为渲染所需的",
-          "hasAnswer": true
-        },
-        {
-          "id": "projects-3",
-          "title": "难点",
-          "content": "1. 复杂的拖拽交互体验\n\n问题: 用户在拖拽过程中需要知道组件将落在哪，且支持 \"插入前\"、\"插入后\" 和 \"取消\"。\n\n解决方案:  虚拟占位符+原子化操作，提供向前向后插入\n\n2. 复杂的业务逻辑校验与特殊定位\n\n问题: 某些组件（如弹窗）不能随意排序，或者某些组件有数量限制（如 \"倒计时\" 只能有一个）。\n\n解决方案: 配置化约束，组件定义中包含特殊校验的 属性\n\n3. 组件的多实例状态隔离\n   \n   问题: 如果页面上有两个 \"轮播图\" 组件，如何在 Redux 中区分它们的数据？\n   \n   解决方案:  GUID 生成，基于ID创建store以及移除时清理removeReducer",
-          "hasAnswer": true
-        },
-        {
-          "id": "projects-4",
-          "title": "已有的性能优化：",
-          "content": "createSlice避免不必要的重复渲染\n组件表单修改加防抖，减少频繁更新\n各组件表单配置部分keepalive，避免重新渲染",
-          "hasAnswer": true
-        },
-        {
-          "id": "projects-5",
-          "title": "以后的优化方向：",
-          "content": "有修改时增量更新，之前不支持增量更新，每次都全部传数据并重新算所有组件的位置，可以针对修改的组件给C端发消息，C端也根据组件类型只返回需要重新渲染的组件位置，这样既避免全量发消息，也避免每次全量重新渲染蒙层（好像渲染蒙层收益不算很大？",
-          "hasAnswer": true
-        },
-        {
-          "id": "projects-6",
-          "title": "C端项目",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "projects-7",
-          "title": "已有的性能优化：",
-          "content": "图片懒加载，结合Intersection Observer API\n\n第三方库异步加载\n\n页面级代码分割\n\n以后的优化方向：\n\n动态加载组件，组件用动态 import() 语法，配合vue的动态加载组件。API 非常强大。当 :is 绑定的是一个返回 Promise 的函数时，Vue 会自动等待 Promise resolve，然后渲染解析出的组件\n\n配合B端支持增量更新，目前是为了简化逻辑每次都全部重新渲染，但是需要给修改后的组件创建新的唯一key\n\n开启splitChunks配置 代码拆分\n// splitChunks: {\n // chunks: 'all', // 对所有类型的 chunks 进行分割\n // cacheGroups: {\n // //公用模块抽离\n // common: {\n // chunks: 'initial',\n // minSize: 0, //大于0个字节\n // minChunks: 2 //抽离公共代码时，这个代码块最小被引用的次数\n // },\n // }\n // }",
-          "hasAnswer": true
-        },
-        {
-          "id": "projects-8",
-          "title": "设计师项目",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "projects-9",
-          "title": "性能瓶颈",
-          "content": "在使用 framer-motion 的 AnimatePresence 进行全页路由切换时，是前端性能的一个潜在瓶颈。\n简单来说，AnimatePresence 的 mode=\"sync\"（默认模式）会导致新旧两个页面同时存在于 DOM 中。旧页面正在执行退出动画（exit）。新页面已经被挂载（Mount）并执行进入动画（initial -> animate）。\n这意味着在转场的几秒钟内，浏览器需要同时处理两倍的 DOM 节点、两倍的样式计算和布局重排。如果页面包含大量图片或复杂组件，卡顿（Jank）风险极高。\n\n优化思路\n\n1 交互锁 防止“雪上加霜”，动画过程中全局存储状态，禁止用户交互、页面滚动、导航栏跳转等交互\n2 懒加载策略 利用 IntersectionObserver 监听图片是否进入视口。当转场遮罩褪去、用户真正看到页面时，图片才开始请求和渲染。这极大地减少了转场瞬间的内存和网络压力。\n3 减少重排和利用 GPU 加速：使用 transform 代替 top/left，使用will-change\n4 优先webp，校验并限制图片大小",
-          "hasAnswer": true
-        },
-        {
-          "id": "projects-10",
-          "title": "面向非技术人员的构建时数据管道和文件系统",
-          "content": "维护者是非技术人员, 维护json成本太高\n设计了一套基于文件系统和 Excel 的构建时 文件系统架构\n\n1. 数据清洗与解析：Excel 的数据是非结构化的（比如合并单元格）。我在 Node.js 脚本中处理了复杂的解析逻辑，把二维的表格数据转换成前端组件需要的树状 JSON 结构。同时做了强校验：检查对应目录下是否存在该文件，如果不存在会抛出警告或错误，防止部署上去出现 404\n2. 封装了 Shell 脚本。用户更新完 Excel 后，双击脚本即可完成 git add/commit/push 并触发 CI/CD 流程\n\n思路：\n\n基于excel的低代码维护流程，使用者维护excel更容易\n读多写少，不需要数据库，通过excel的数据处理来保证前端拿到的数据是规范的 JSON\n封装了 Shell 脚本支持一键部署，不需要后台也可以完成一键部署发布\n缺点是 每次修改内容必须重新构建部署",
-          "hasAnswer": true
-        }
-      ]
-    },
-    {
       "id": "teamwork",
       "name": "工作协作",
       "questions": [
@@ -1488,127 +1416,7 @@
           "hasAnswer": false
         }
       ]
-    },
-    {
-      "id": "interview-tips",
-      "name": "面试技巧",
-      "questions": [
-        {
-          "id": "interview-tips-1",
-          "title": "看机会的原因",
-          "content": "目前的工作偏业务驱动，更多是在既有框架下交付需求，业务形态也相对稳定，更多是在既有模式下做功能迭代，对复杂度的提升有限。 \n\n我希望下一阶段能参与更复杂的业务场景，比如更大的数据量、更复杂的交互状态、或者更高的性能和工程化要求，技术上有更深入的成长，所以开始关注新的机会。",
-          "hasAnswer": true
-        },
-        {
-          "id": "interview-tips-2",
-          "title": "ai对前端发展的影响",
-          "content": "平时会用 AI，主要把它当成效率工具，比如快速验证思路、补全代码、解释不熟的 API、接口类型定义，或者在用ai帮我梳理几种方案的优缺点，以及快速阅读不熟悉的项目等。  但核心逻辑和关键设计我还是会自己想，尤其涉及状态管理、性能瓶颈、复杂业务场景等情况。\n\n 我觉得 AI 对前端的影响更多是放大工程师能力，而不是替代。简单重复性的工作会被压缩，但对架构理解、业务抽象和工程判断的要求会更高，所以我更愿意把精力放在这些长期不会被替代的能力上。\n\n未来前端更偏向解决复杂交互、工程化和性能问题，这些反而更依赖人的判断。工程师的核心还是对复杂问题的理解和技术方案的大局观以及取舍能力。",
-          "hasAnswer": true
-        },
-        {
-          "id": "interview-tips-3",
-          "title": "期望在以后的工作获得什么",
-          "content": "我希望在接下来的工作中，能在业务中持续提升技术深度。 \n\n以及在合适的场景下接触一些 Node 相关的工作，更好的理解前的协作关系，希望能站在更系统的视角去做前端，而不是单点完成页面。 \n\n希望能进一步参与更大体量项目的建设，包括复杂场景下的模块边界的设计、状态隔离、监控和问题回溯机制，线上异常的快速定位等",
-          "hasAnswer": true
-        }
-      ]
-    },
-    {
-      "id": "career-plan",
-      "name": "长期规划",
-      "questions": [
-        {
-          "id": "career-plan-1",
-          "title": "后端基础",
-          "content": "- 请求在服务器怎么流动\n\n- 多级代理、CDN\n\n- TCP 连接生命周期\n\n- 网关 → 服务 → DB 的请求链路\n\n- 鉴权流程（JWT、Session、OAuth）\n\n- 服务之间怎么通信（RPC、消息队列）\n\n- 日志与监控是什么\n\n- 后端怎么部署\n\n- 用 Node.js + Express 写一个简单的 CRUD：\n  \n  - 注册登录（session / jwt 两种）\n  \n  - 任务列表 CRUD\n    \n    - 日志打印\n  \n  - 错误处理\n  \n  - 简单的 SQL 查询",
-          "hasAnswer": true
-        },
-        {
-          "id": "career-plan-2",
-          "title": "代码层面的高级能力",
-          "content": "- 代码\n  \n  - 我要写的组件是否有复用性？\n  \n  - 状态在哪里管理更合理？\n  \n  - 逻辑能不能分层？分文件？\n  \n  - API 调用是不是应该封装？\n  \n  - 错误处理有统一方式吗？\n  \n  - 这个地方的代码能不能更稳健？边界条件处理了吗？\n\n- 看一个需求时，你要能拆成：\n  \n  - 视图组件层\n  \n  - 状态与数据流\n  \n  - 逻辑与服务调用\n  \n  - API 接口约束\n  \n  - 错误处理\n  \n  - loading & UX\n  \n  - 边界情况\n  \n  - 性能考量\n  \n  - 埋点与日志\n\n- 项目：你要能把一个项目设计得：\n  \n  - 目录结构清晰\n  \n  - 模块清晰\n  \n  - 业务逻辑与 UI 隔离\n    \n    API 与状态集中管理\n  \n  - 通用函数模块化\n\n- 工程化包含：\n  \n  - Webpack / Rollup / Vite 原理\n  \n  - Tree-shaking、代码拆分\n  \n  - 性能优化（你已经整理过）\n  \n  - Monorepo、模块化设计\n  \n  - CI/CD\n  \n  - lint 格式化\n  \n  - 测试（至少单测）\n\n-",
-          "hasAnswer": true
-        }
-      ]
-    },
-    {
-      "id": "history",
-      "name": "历史记录",
-      "questions": [
-        {
-          "id": "history-1",
-          "title": "12.1懂车帝一轮",
-          "content": "1分析代码问题，答案是子组件无限循环\n\n2循环握手题目分析\n\n3不用循环实现数组，用递归\n\n模块的局部变量和useref的区别",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-2",
-          "title": "12.2 携程，useRequest在覆盖前面结果的问题上出现分歧",
-          "content": "uniapp如何多端编译\n\n手写useRequest",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-3",
-          "title": "12.2滴滴，盘人效暂停",
-          "content": "讲讲fiber\n\n说说模块化CJS ESM区别\n\nwebpack打包jsx tsx：\n\n    真正让 JSX/TSX 能被解析的是 loader —— 常用方案是 `babel-loader` 或 `ts-loader`。会按 loader 配置把其当成源码输入给 Babel/TS 编译器，由它们完成语法解析（AST）和转译。  使用 parser解析代码为 AST+使用 transformer 将 AST 转换成 JS\n\nuniapp跨端的不一致性如何解决：\n\n        代码层面条件编译+架构层面的抽象与封装（**创建统一 API 文件和封装跨端组件：** 将所有平台差异大的 API 封装到一个服务文件中）+结合运行时判断（通过判断当前环境或ua或环境变量等）\n\n支持多环境支付的代码修改部分链路如何保证全局稳定性：\n\n        模块化修改减少涉及的影响面，充分观测，灰度发布，报警监控，快速回滚\n\n自己项目的性能瓶颈 如何解决\n\n计算最大子字符串长度\n\n手写eventbus",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-4",
-          "title": "12.4阿里夸克，结局面试官认为基础可以但是和岗位不匹配",
-          "content": "uniapp跨端如何实现\n\n优化方向\n\n上线后关注哪些业务数据\n\nuniapp taro对比和选型",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-5",
-          "title": "12.8懂车帝二轮，挂了，但讲真我怎么觉得还凑合呢",
-          "content": "三种动画实现方式的性能比较：settimeout  transform  canvas\n\n- setTimeout / setInterval JS 主线程定时器，不跟渲染同步，延迟不稳定容易丢帧，容易卡顿，尽量不用来做 UI 动画\n\n- CSS transform / opacity 有GPU加速，执行开销低，不触发布局/重绘，帧率高且稳定，性能最好，最适合 UI 动画\n\n- Canvas 每帧重新绘制像素，CPU（2D）/GPU（WebGL）渲染，重绘成本高，复杂动画时 CPU/GPU 很吃力。优势是最自由的“画布”，可以完成复杂的效果。适合大量图形、游戏场景、像素级处理，WebGL 是 GPU 渲染\n\ncanvas做动画的优势\n\n实现一个函数，每次调用返回下一个质数，注意不能用全局变量，第一次调用返回2第二次返回3 以此类推\n\n一个升序数组查找某值的最小最大index，比如[1,1,2,2,3]查找2 结果[2,3]\n\n分析下面大打印结果是什么\nvar f1=x=>x\nvar f2=x=>{x}\nvar f3=x=>({x})\nconsole.log(f1(1)) // 1\nconsole.log(f2(1))  // undefined\nconsole.log(f3(1)) // 对象{x:1}",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-6",
-          "title": "12.10 小米汽车一轮",
-          "content": "项目技术细节\n\nreact和vue 对比\n\nfiber过程\n\n为什么选react（技术选型标准？\n\nreact的类组件和函数组件对比\n\nwebpack基础配置项\n\nloder和plugin区别\n\nwebpack和vite对比\n\nbabel过程\n\nvue3proxy原理\n\nvue的ref和reactive区别\n\n为什么ref要.value\n\n虚拟DOM作用\n\n自己写一个类似vue的库需要考虑哪些\n\n无限画布如何实现，为什么要用canvas\n\n说说项目的难点和如何解决\n\n代码题：\n\n{a:{n1:1,n2:2},b:{n1:2,n2:3},{c:{n1:3,n2:4}} 转为{n1:{a:1,b:2,c:3},n2:{a:2,b:3,c:4}}\n\n判断() {} [] 组成的字符串是否有效",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-7",
-          "title": "12.10高德一轮，一轮挂，这次确实感觉基础答得不太好",
-          "content": "小程序和H5的性能差异，结合小程序分包和SPA对比\n\nuniapp taro技术选型\n\nSPA MPA对比\n\nSPA路由原理\n\n项目用hash还是history，用history怎么处理路由（nginx层面）\n\nnextjs 近期漏洞\n\nswift怎么看\n\nreact项目用的几？为什么B端用react多？\n\n有没有用微前端？对微前端了解多少\n\n项目难点\n\n代码题：\n\n手写深克隆（不考虑函数 循环引用） 注意 null 和 for in \n\n二维数组把重叠数组合并起来，比如[[1,3],[2,6],[8,10],[11,12]]合并为[[1,6],[8,10],[11,12]]",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-8",
-          "title": "12.15小米汽车二轮，见鬼两个算法题都做出来了没后续了",
-          "content": "项目，为什么离职，薪资水平\n\n两道算法题\n\n两个字符串s1和s2，判断s2是否包含任何s1的形变（s1任意修改顺序的字符串）\n\n数字数组，计算最大连续和",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-9",
-          "title": "12.19 zoom一轮",
-          "content": "redux，为什么单独创建store\n\n**redux的connect**\n\nreact的优化：usecallback usememo react.memo\n\nuselayouteffect区别\n\nhook原理\n\nuseeffect更新值的原理\n\n**react  fiber如何检测浏览器空闲**\n\nreact的事件委托原理，原生和react事件哪个先触发？为什么\n\nfiber如何降低卡顿\n\n常见的性能指标，如何监控？**performanceAPI怎么用？**\n\n怎么做监控？sentry，怎么定位源码位置？sourcemap，**安全问题？**\n\npromise如何实现链式\n\ntry catch能不能捕获promise？不能因为trycatch是同步的\n\n**axios如何拦截已发出的请求**\n\n竞态场景  如何丢弃前面的无用请求\n\nnextjs 的SSR 用过吗？用得少就没问了\n\n**ts的pick omit**\n\n代码题：**如何取type Hello{a:string,b:string,c:number}其中的a|b的类型**\n\n代码题 实现useInterval\n\n代码题实现isValidStr  isValidHTML\n\n```\nisValidHTML('<span></span>'); // true\nisValidHTML('<div><span></span></div>'); // true\nisValidHTML('<div><span></div></span>'); // false\nisValidHTML('<div><span></span>'); // false\nisValidHTML('<div></div><span>'); // false\n\nconsole.log(isValidStr('（）')); // true\nconsole.log(isValidStr('[()]')); // true\nconsole.log(isValidStr('[(])')); // false\nconsole.log(isValidStr('[()')); // false\nconsole.log(isValidStr('[]（')); // false\n```\n\n最后问用不用ai，对以后有ai的前端开发怎么看",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-10",
-          "title": "12.19 bilibili一轮，答得确实不太好，简单的题但我答得都不系统不全面",
-          "content": "**iframe除了postmessage还有什么事件传输的方式？customEvent?**\n\njs事件循环\n\nhttp2.0区别\n\ncookie能不能设置多个域名\n\n前端存储 localstorage session indexdb\n\ncss如何居中\n\ngrid用的多吗\n\ntransition animation动画对比\n\n说说webworker\n\n做了哪些性能优化\n\n如果页面一进入就绘制或者计算很大量的数据，怎么办？\n\n题目：事件循环说输出顺序，就一堆settimeout  promise 自执行函数 混着看输出顺序\n\n手写：并发控制, 实现Schedual\n\n```javascript\nclass Schedual {\n  add(promiseMaker) {\n\n  }\n}\nconst timeOut = (time, val) =>\n  new Promise((resolve) => setTimeout(() => resolve(val), time));\n\nconst sch = new Schedual();\nconst addTask = (time, val) => {\n  sch.add(() => timeOut(time, val).then((res) => console.log(res)));\n};\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-11",
-          "title": "12.19 虾皮一轮",
-          "content": "介绍项目\n\n第一题：用闭包\n\n```javascript\nconst fetchFn = () => {\n  console.log('fetching...');\n  return new Promise((resolve) => {\n    setTimeout(() => {\n      resolve('123');\n    }, 1000);\n  });\n};\nconst main = (fn) => {\n  Promise.all(new Array(10).fill(0).map(fn)).then((res) => {\n    console.log(res);\n  });\n};\nmain(fetchFn); // 输出10遍fetching... 和 ['123', '123', '123','123', '123', '123','123', '123', '123','123']\n// 实现一个newFn，参数fetchFn，\nconst newFn = (fetchFn) => {\n  //\n};\n// 要求输出1遍fetching... 和 ['123', '123', '123','123', '123', '123','123', '123', '123','123']\nmain(newFn);\n```\n\n第二题：深度遍历，我用的递归\n\n实现一个模糊搜索，比如查找某个字符或多个字符，返回所有包含的三级地区\n比如搜索'宁'，返回['江苏省-南京市-江宁区’，‘江苏省-宁波市-区1’,‘江苏省-宁波市-区2’]\n\n```javascript\nconst dataSource = [\n  {\n    name: '江苏省',\n    children: [\n      {\n        name: '南京市',\n        children: [\n          {\n            name: '玄武区',\n          },\n          {\n            name: '江宁区',\n          },\n        ],\n        //... 这里还有多个\n      },\n      {\n        name: '无锡市',\n        children: [\n          {\n            name: 'xx区',\n          },\n        ], // ...有多个\n      },\n      {\n        name: '宁波市',\n        children: [\n          {\n            name: '区1',\n          },\n          {\n            name: '区2',\n          },\n        ],\n      },\n    ],\n  },\n];\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "history-12",
-          "title": "12.24小红书一面",
-          "content": "项目介绍\n\n个人项目性能难点\n\n配置平台项目介绍\n\n**业界低码平台的实现方案**\n\n做了哪些性能优化\n\n项目性能指标？我说目前没做监控\n\n打包优化\n\n**动态import原理，webpack如何处理？**\n\nfiber介绍\n\n**fiber是树还是链表？我说是树，问是树的话如何确定执行顺序**\n\n用ai吗，怎么看ai对前端发展的影响\n\n以后想了解的技术方向",
-          "hasAnswer": true
-        }
-      ]
     }
   ],
-  "generatedAt": "2025-12-27T13:19:05.896Z"
+  "generatedAt": "2025-12-29T16:52:40.728Z"
 }

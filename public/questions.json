@@ -250,5 +250,215 @@
     "difficulty": 1,
     "tags": [2],
     "description": "实现 instanceof 操作符，通过遍历原型链检查对象是否是某个构造函数的实例。"
+  },
+  {
+    "id": "ts-partial",
+    "title": "实现 Partial<T> 类型",
+    "difficulty": 1,
+    "tags": [3],
+    "description": "实现一个 Partial<T> 类型，将 T 中的所有属性变为可选。这是 TypeScript 内置工具类型之一，理解映射类型和可选修饰符 ? 的使用。"
+  },
+  {
+    "id": "ts-required",
+    "title": "实现 Required<T> 类型",
+    "difficulty": 1,
+    "tags": [3],
+    "description": "实现一个 Required<T> 类型，将 T 中的所有属性变为必选。理解 -? 修饰符如何移除可选标记。"
+  },
+  {
+    "id": "ts-readonly",
+    "title": "实现 Readonly<T> 类型",
+    "difficulty": 1,
+    "tags": [3],
+    "description": "实现一个 Readonly<T> 类型，将 T 中的所有属性变为只读。理解 readonly 修饰符在映射类型中的应用。"
+  },
+  {
+    "id": "ts-pick",
+    "title": "实现 Pick<T, K> 类型",
+    "difficulty": 1,
+    "tags": [3],
+    "description": "实现一个 Pick<T, K> 类型，从类型 T 中选取一组属性 K 构造新类型。理解 keyof 和 extends 约束的配合使用。"
+  },
+  {
+    "id": "ts-record",
+    "title": "实现 Record<K, T> 类型",
+    "difficulty": 1,
+    "tags": [3],
+    "description": "实现一个 Record<K, T> 类型，构造一个对象类型，其键名类型为 K，键值类型为 T。常用于创建字典/映射类型。"
+  },
+  {
+    "id": "ts-exclude",
+    "title": "实现 Exclude<T, U> 类型",
+    "difficulty": 2,
+    "tags": [3],
+    "description": "实现一个 Exclude<T, U> 类型，从联合类型 T 中排除那些可以赋值给 U 的类型。理解条件类型的分布式特性。"
+  },
+  {
+    "id": "ts-extract",
+    "title": "实现 Extract<T, U> 类型",
+    "difficulty": 2,
+    "tags": [3],
+    "description": "实现一个 Extract<T, U> 类型，从联合类型 T 中提取那些可以赋值给 U 的类型。与 Exclude 相反，理解条件类型中 extends 的判断逻辑。"
+  },
+  {
+    "id": "ts-omit",
+    "title": "实现 Omit<T, K> 类型",
+    "difficulty": 2,
+    "tags": [3],
+    "description": "实现一个 Omit<T, K> 类型，从类型 T 中排除一组属性 K。可以基于 Pick 和 Exclude 组合实现，理解工具类型的复合使用。"
+  },
+  {
+    "id": "ts-nonnullable",
+    "title": "实现 NonNullable<T> 类型",
+    "difficulty": 1,
+    "tags": [3],
+    "description": "实现一个 NonNullable<T> 类型，从联合类型 T 中排除 null 和 undefined。常用于处理可能为空的类型。"
+  },
+  {
+    "id": "ts-merge",
+    "title": "实现 Merge<T, U> 类型",
+    "difficulty": 2,
+    "tags": [3],
+    "description": "实现一个 Merge<T, U> 类型，将类型 U 的属性合并到类型 T 中，如果有相同的键则 U 的类型覆盖 T。理解交叉类型与映射类型的区别。"
+  },
+  {
+    "id": "ts-mutable",
+    "title": "实现 Mutable<T> 类型",
+    "difficulty": 2,
+    "tags": [3],
+    "description": "实现一个 Mutable<T> 类型，移除 T 中所有属性的 readonly 只读修饰符。理解 -readonly 修饰符的使用，与 Readonly 相反。"
+  },
+  {
+    "id": "ts-tuple-to-union",
+    "title": "实现 TupleToUnion<T> 类型",
+    "difficulty": 2,
+    "tags": [3],
+    "description": "实现一个 TupleToUnion<T> 类型，将元组类型转换为联合类型。例如 [string, number] 转为 string | number。理解元组的索引访问类型。"
+  },
+  {
+    "id": "ts-deep-readonly",
+    "title": "实现 DeepReadonly<T> 类型",
+    "difficulty": 3,
+    "tags": [3],
+    "description": "实现一个 DeepReadonly<T> 类型，递归地将 T 中的所有属性（包括嵌套对象）变为只读。理解递归类型和条件类型的结合使用。"
+  },
+  {
+    "id": "ts-return-type",
+    "title": "实现 ReturnType<T> 类型",
+    "difficulty": 2,
+    "tags": [3],
+    "description": "实现一个 ReturnType<T> 类型，获取函数类型 T 的返回值类型。理解 infer 关键字在条件类型中推断类型的用法。"
+  },
+  {
+    "id": "ts-parameters",
+    "title": "实现 Parameters<T> 类型",
+    "difficulty": 2,
+    "tags": [3],
+    "description": "实现一个 Parameters<T> 类型，获取函数类型 T 的参数类型，返回一个元组类型。理解 infer 如何推断函数参数。"
+  },
+  {
+    "id": "ts-constructor-parameters",
+    "title": "实现 ConstructorParameters<T> 类型",
+    "difficulty": 2,
+    "tags": [3],
+    "description": "实现一个 ConstructorParameters<T> 类型，获取构造函数类型 T 的参数类型元组。理解 new (...args) => any 构造签名的类型表示。"
+  },
+  {
+    "id": "js-hoisting-function-vs-var",
+    "title": "函数声明 vs 函数表达式提升",
+    "difficulty": 1,
+    "tags": [1],
+    "description": "console.log(foo);\nconsole.log(bar);\n\nfunction foo() { return 1; }\nvar bar = function() { return 2; };\n\n// 输出什么？"
+  },
+  {
+    "id": "js-null-vs-undefined",
+    "title": "null 和 undefined 的区别",
+    "difficulty": 1,
+    "tags": [1],
+    "description": "let a;\nlet b = null;\nfunction c() {}\nlet d = void 0;\n\nconsole.log(null == undefined);\nconsole.log(null === undefined);\nconsole.log(typeof null);\nconsole.log(typeof undefined);\n\nfunction foo(a = 1) {\n  console.log(a);\n}\nfoo(undefined);\nfoo(null);\n\n// 分别输出什么？"
+  },
+  {
+    "id": "js-hoisting-priority",
+    "title": "函数提升优先于变量提升",
+    "difficulty": 2,
+    "tags": [1],
+    "description": "console.log(typeof a);\n\nvar a;\nfunction a() {}\nvar a = 1;\n\nconsole.log(typeof a);\n\n// 两次输出分别是什么？"
+  },
+  {
+    "id": "js-closure-loop-var",
+    "title": "闭包与 var 循环变量",
+    "difficulty": 2,
+    "tags": [1],
+    "description": "function createFunctions() {\n  var result = [];\n  for (var i = 0; i < 3; i++) {\n    result[i] = function() {\n      return i;\n    };\n  }\n  return result;\n}\n\nvar funcs = createFunctions();\nconsole.log(funcs[0]());\nconsole.log(funcs[1]());\nconsole.log(funcs[2]());\n\n// 输出什么？为什么？"
+  },
+  {
+    "id": "js-var-hoisting-in-function",
+    "title": "函数内变量提升",
+    "difficulty": 1,
+    "tags": [1],
+    "description": "var a = 10;\nfunction foo() {\n  console.log(a);\n  var a = 20;\n}\nfoo();\n\n// 输出什么？"
+  },
+  {
+    "id": "js-this-method-vs-function",
+    "title": "this 指向：方法调用 vs 普通调用",
+    "difficulty": 2,
+    "tags": [1],
+    "description": "var name = 'Global';\nvar obj = {\n  name: 'Object',\n  sayName: function() {\n    console.log(this.name);\n  }\n};\n\nobj.sayName();\nvar fn = obj.sayName;\nfn();\n\n// 两次输出分别是什么？"
+  },
+  {
+    "id": "js-bind-cannot-override",
+    "title": "bind 绑定的 this 不可覆盖",
+    "difficulty": 2,
+    "tags": [1],
+    "description": "function foo() {\n  console.log(this.value);\n}\n\nvar obj1 = { value: 'obj1' };\nvar obj2 = { value: 'obj2' };\n\nvar bound = foo.bind(obj1);\nbound();\nbound.call(obj2);\n\n// 两次输出分别是什么？"
+  },
+  {
+    "id": "js-callback-this-lost",
+    "title": "回调函数中 this 丢失",
+    "difficulty": 2,
+    "tags": [1],
+    "description": "var name = 'Global';\nvar obj = {\n  name: 'Object',\n  handleClick: function() {\n    console.log(this.name);\n  }\n};\n\nobj.handleClick();\nsetTimeout(obj.handleClick, 0);\nsetTimeout(() => obj.handleClick(), 0);\n\n// 三次输出分别是什么？"
+  },
+  {
+    "id": "js-default-param-null-undefined",
+    "title": "默认参数：null vs undefined",
+    "difficulty": 1,
+    "tags": [1],
+    "description": "function foo(a = 1, b = 2) {\n  console.log(a, b);\n}\n\nfoo(undefined, null);\n\n// 输出什么？"
+  },
+  {
+    "id": "js-default-param-scope",
+    "title": "默认参数的作用域",
+    "difficulty": 2,
+    "tags": [1],
+    "description": "let x = 1;\nfunction foo(x, y = x + 1) {\n  console.log(y);\n}\n\nfoo(2);\n\n// 输出什么？为什么？"
+  },
+  {
+    "id": "js-arguments-default-param",
+    "title": "arguments 与默认参数",
+    "difficulty": 2,
+    "tags": [1],
+    "description": "function foo(a, b = 2) {\n  console.log(arguments.length);\n  console.log(a === arguments[0]);\n  console.log(b === arguments[1]);\n}\n\nfoo(1);\n\n// 三次输出分别是什么？"
+  },
+  {
+    "id": "js-strict-mode-this",
+    "title": "严格模式下的 this",
+    "difficulty": 1,
+    "tags": [1],
+    "description": "'use strict';\nfunction foo() {\n  console.log(this);\n}\n\nfoo();\nwindow.foo();\n\n// 两次输出分别是什么？"
+  },
+  {
+    "id": "js-constructor-return-object",
+    "title": "构造函数返回对象",
+    "difficulty": 2,
+    "tags": [1],
+    "description": "function Person(name) {\n  this.name = name;\n  return { name: 'fake' };\n}\n\nconst p = new Person('real');\nconsole.log(p.name);\n\n// 输出什么？为什么？"
+  },
+  {
+    "id": "js-callback-context-this",
+    "title": "回调函数执行上下文中的 this",
+    "difficulty": 2,
+    "tags": [1],
+    "description": "var a = 10;\n\nfunction foo() {\n  console.log(this.a);\n}\n\nfunction bar(fn) {\n  var a = 20;\n  fn();\n}\n\nbar(foo);\n\n// 输出什么？为什么？"
   }
 ]

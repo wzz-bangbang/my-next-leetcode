@@ -59,3 +59,4 @@ export function getCachedBaguData(): BaguData | null {
   return cachedData;
 }
 
+

@@ -645,7 +645,7 @@ function CodeEditorPage() {
               {selectedQuestion?.description ? (
                 <div className="text-gray-600 text-sm leading-relaxed">
                   <h4 className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">📝 题目描述</h4>
-                  <p>{selectedQuestion.description}</p>
+                  <pre className="whitespace-pre-wrap font-sans text-gray-600">{selectedQuestion.description}</pre>
                 </div>
               ) : (
                 <div className="text-gray-400 text-sm">

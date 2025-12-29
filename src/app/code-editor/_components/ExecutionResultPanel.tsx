@@ -36,3 +36,4 @@ export default function ExecutionResultPanel({ result, onExecute, isReady }: Exe
   );
 }
 
+

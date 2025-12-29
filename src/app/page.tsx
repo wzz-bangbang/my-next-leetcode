@@ -94,7 +94,7 @@ export default function Home() {
             }}
           >
             <span className="relative z-10 flex items-center gap-2">
-              🚀 <span className="hidden sm:inline">开始</span>刷题
+              🚀 手写题
             </span>
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
