@@ -38,9 +38,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## 后续优化方向
 
 所有问题都校验一遍答案
-增加自己的临时选择列表
-代码解释题
-ts 手写题目
+
+todo 手写题增加实现 useUpdate 方法，调用时强制组件重新渲染
+实现-个 useTimeoutHook
 
 补充一些算法题以及答案和思路解析
 优化编辑器，要不用现成的库或者沙盒

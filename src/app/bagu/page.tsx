@@ -6,6 +6,7 @@ import { notifications } from '@mantine/notifications';
 import Header from '@/components/Header';
 import { getBaguData, getCachedBaguData } from '@/lib/bagu-data';
 import { useQuestionRoute, scrollToSelected } from '@/hooks/useQuestionRoute';
+import { getFavorites, toggleFavorite, loadFavoritesFromServer } from '@/lib/favorites';
 import MarkdownContent from './_components/MarkdownContent';
 import QuestionList from './_components/QuestionList';
 import type { BaguData, BaguQuestion } from '@/types/bagu';
@@ -61,6 +62,7 @@ export default function BaguPage() {
   const [selectedQuestion, setSelectedQuestion] = useState<BaguQuestion | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
+  const [favoriteQuestions, setFavoriteQuestions] = useState<Set<string>>(new Set());
   const sidebarRef = useRef<HTMLDivElement>(null);
   const sidebarTouchRef = useRef<HTMLDivElement>(null);
   
@@ -153,6 +155,10 @@ export default function BaguPage() {
   useEffect(() => {
     // 加载完成状态
     setCompletedQuestions(getCompletedQuestions());
+    
+    // 加载收藏状态
+    setFavoriteQuestions(getFavorites('bagu'));
+    loadFavoritesFromServer('bagu').then(setFavoriteQuestions);
 
     // 如果没有缓存数据，异步加载
     if (!getCachedBaguData()) {
@@ -253,6 +259,35 @@ export default function BaguPage() {
   const isCurrentCompleted = selectedQuestion
     ? completedQuestions.has(selectedQuestion.id)
     : false;
+
+  // 当前题目是否已收藏
+  const isCurrentFavorited = selectedQuestion
+    ? favoriteQuestions.has(selectedQuestion.id)
+    : false;
+
+  // 切换收藏状态
+  const handleToggleFavorite = useCallback(() => {
+    if (!selectedQuestion) return;
+
+    const newStatus = toggleFavorite('bagu', selectedQuestion.id);
+    
+    setFavoriteQuestions((prev) => {
+      const next = new Set(prev);
+      if (newStatus) {
+        next.add(selectedQuestion.id);
+      } else {
+        next.delete(selectedQuestion.id);
+      }
+      return next;
+    });
+
+    notifications.show({
+      autoClose: 1500,
+      title: newStatus ? '⭐ 已收藏' : '已取消收藏',
+      message: newStatus ? '题目已添加到收藏' : '题目已从收藏中移除',
+      color: newStatus ? 'yellow' : 'gray',
+    });
+  }, [selectedQuestion]);
 
   // 当前题目索引
   const currentIndex = useMemo(() => {
@@ -419,29 +454,29 @@ export default function BaguPage() {
               {/* 题目标题栏 - PC端 */}
               <div className="hidden md:block flex-shrink-0 px-6 py-4 border-b border-gray-200/50 bg-white/50 backdrop-blur-sm">
                 <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-600">
+                    {selectedCategory?.name}
+                  </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-600">
-                      {selectedCategory?.name}
-                    </span>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        isCurrentCompleted
-                          ? 'bg-green-100 text-green-600'
-                          : 'bg-gray-100 text-gray-500'
-                      }`}
+                    <Button
+                      onClick={handleToggleFavorite}
+                      variant="light"
+                      radius="xl"
+                      size="xs"
+                      color={isCurrentFavorited ? 'yellow' : 'gray'}
                     >
-                      {isCurrentCompleted ? '✅ 已完成' : '⏳ 未完成'}
-                    </span>
+                      {isCurrentFavorited ? '⭐ 已收藏' : '☆ 收藏'}
+                    </Button>
+                    <Button
+                      onClick={toggleCompleted}
+                      variant="light"
+                      radius="xl"
+                      size="xs"
+                      color={isCurrentCompleted ? 'green' : 'gray'}
+                    >
+                      {isCurrentCompleted ? '✅ 已完成' : '⏳ 标为完成'}
+                    </Button>
                   </div>
-                  <Button
-                    onClick={toggleCompleted}
-                    variant="light"
-                    radius="xl"
-                    size="xs"
-                    color={isCurrentCompleted ? 'gray' : 'green'}
-                  >
-                    {isCurrentCompleted ? '取消完成' : '✅ 标为完成'}
-                  </Button>
                 </div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl font-bold text-gray-800">
@@ -506,7 +541,7 @@ export default function BaguPage() {
               </div>
 
               {/* 移动端底部固定导航 */}
-              <div className="sm:hidden absolute bottom-0 left-0 right-0 z-10 px-3 py-3 bg-white/95 backdrop-blur-sm border-t border-gray-200/50 flex items-center justify-between">
+              <div className="sm:hidden absolute bottom-0 left-0 right-0 z-10 px-2 py-2.5 bg-white/95 backdrop-blur-sm border-t border-gray-200/50 flex items-center justify-between gap-1">
                 <Button
                   onClick={goToPrev}
                   variant="light"
@@ -514,8 +549,23 @@ export default function BaguPage() {
                   size="xs"
                   color="violet"
                   disabled={isFirstQuestion}
+                  className="!px-2 flex-shrink-0"
                 >
-                  <span className="text-[11px]">← 上一题</span>
+                  <span className="text-[10px]">←</span>
+                </Button>
+
+                <Button
+                  onClick={handleToggleFavorite}
+                  variant="light"
+                  radius="xl"
+                  size="xs"
+                  color={isCurrentFavorited ? 'yellow' : 'gray'}
+                  className="!px-2 flex-shrink-0"
+                >
+                  <span className="text-[10px] whitespace-nowrap flex items-center gap-0.5">
+                    <span>{isCurrentFavorited ? '⭐' : '☆'}</span>
+                    <span>{isCurrentFavorited ? '已收藏' : '收藏'}</span>
+                  </span>
                 </Button>
 
                 <Button
@@ -523,10 +573,12 @@ export default function BaguPage() {
                   variant="light"
                   radius="xl"
                   size="xs"
-                  color={isCurrentCompleted ? 'green' : 'pink'}
+                  color={isCurrentCompleted ? 'green' : 'gray'}
+                  className="!px-2 flex-shrink-0"
                 >
-                  <span className="text-[11px]">
-                    {isCurrentCompleted ? '已完成' : '未完成'}
+                  <span className="text-[10px] whitespace-nowrap flex items-center gap-0.5">
+                    <span>{isCurrentCompleted ? '✅' : '⏳'}</span>
+                    <span>{isCurrentCompleted ? '完成' : '待完成'}</span>
                   </span>
                 </Button>
 
@@ -537,8 +589,9 @@ export default function BaguPage() {
                   size="xs"
                   color="violet"
                   disabled={isLastQuestion}
+                  className="!px-2 flex-shrink-0"
                 >
-                  <span className="text-[11px]">下一题 →</span>
+                  <span className="text-[10px]">→</span>
                 </Button>
               </div>
             </>

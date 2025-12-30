@@ -26,6 +26,17 @@ body {
     BlinkMacSystemFont, sans-serif;
 }
 
+/* 重置 button 基础样式，确保 Tailwind 类能覆盖 UI 库 */
+button:where(:not(.mantine-Button-root):not([class*='mantine'])) {
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  border: none;
+}
+
 /* Markdown 内容样式 */
 .markdown-content {
   line-height: 1.7;

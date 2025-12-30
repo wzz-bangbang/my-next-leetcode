@@ -10,6 +10,7 @@ import ExecutionResultPanel from './_components/ExecutionResultPanel';
 import QuestionSidebar, { QuestionStatus, setQuestionStatus, getQuestionStatusMap } from './_components/QuestionSidebar';
 import { CategoryTag, Difficulty, DifficultyLabel, DifficultyColor, CategoryTagLabel } from '@/types/question';
 import { useQuestionRoute, scrollToSelected } from '@/hooks/useQuestionRoute';
+import { getFavorites, toggleFavorite, loadFavoritesFromServer } from '@/lib/favorites';
 
 interface Question {
   id: string;
@@ -36,6 +37,9 @@ function CodeEditorPage() {
   // 展开的分类
   const [expandedCategories, setExpandedCategories] = useState<Set<CategoryTag>>(new Set());
   const sidebarRef = useRef<HTMLDivElement>(null);
+  
+  // 收藏状态
+  const [favoriteQuestions, setFavoriteQuestions] = useState<Set<string>>(new Set());
   
   // 拖拽分隔条相关状态
   const [descWidthPercent, setDescWidthPercent] = useState(28); // 描述区域占比
@@ -239,6 +243,10 @@ function CodeEditorPage() {
       
       // 同步已有答案的题目状态
       syncQuestionStatus();
+      
+      // 加载收藏状态
+      setFavoriteQuestions(getFavorites('code'));
+      loadFavoritesFromServer('code').then(setFavoriteQuestions);
     }
   }, [isClient, syncQuestionStatus]);
 
@@ -423,6 +431,38 @@ function CodeEditorPage() {
     setSidebarKey(prev => prev + 1);
     notifications.show({ autoClose: 1500, title: '🎉 恭喜', message: '已标记为完成！', color: 'green' });
   };
+
+  // 当前题目是否已收藏
+  const isCurrentFavorited = selectedQuestionId
+    ? favoriteQuestions.has(selectedQuestionId)
+    : false;
+
+  // 切换收藏状态
+  const handleToggleFavorite = useCallback(() => {
+    if (!selectedQuestionId) {
+      notifications.show({ autoClose: 1500, title: '提示', message: '请先选择一个题目', color: 'yellow' });
+      return;
+    }
+
+    const newStatus = toggleFavorite('code', selectedQuestionId);
+    
+    setFavoriteQuestions((prev) => {
+      const next = new Set(prev);
+      if (newStatus) {
+        next.add(selectedQuestionId);
+      } else {
+        next.delete(selectedQuestionId);
+      }
+      return next;
+    });
+
+    notifications.show({
+      autoClose: 1500,
+      title: newStatus ? '⭐ 已收藏' : '已取消收藏',
+      message: newStatus ? '题目已添加到收藏' : '题目已从收藏中移除',
+      color: newStatus ? 'yellow' : 'gray',
+    });
+  }, [selectedQuestionId]);
 
   const onCodeChange = useCallback((value: string) => {
     setCode(value);
@@ -636,6 +676,9 @@ function CodeEditorPage() {
                 </Button>
                 <Button onClick={handleMarkAsSolved} variant="light" radius="xl" size="xs" color="green">
                   ✅ 标为完成
+                </Button>
+                <Button onClick={handleToggleFavorite} variant="light" radius="xl" size="xs" color={isCurrentFavorited ? 'yellow' : 'gray'}>
+                  {isCurrentFavorited ? '⭐ 已收藏' : '☆ 收藏'}
                 </Button>
               </div>
             </div>

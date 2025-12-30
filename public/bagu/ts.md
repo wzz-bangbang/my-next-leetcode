@@ -36,8 +36,8 @@ unknow **严格类型检查**，除非明确类型收窄，否则无法使用。
 
 #### 解释 `keyof` 和 `typeof` 的用法
 
-| **`typeof`** | **值到类型**。获取一个 JavaScript **变量**或**表达式**的类型。                 | 常用于获取函数的返回值类型，或从常量对象中提取类型。   |
-| ------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------ |
+| **`typeof`** | **值到类型**。获取一个 JavaScript **变量**或**表达式**的类型。   | 常用于获取函数的返回值类型，或从常量对象中提取类型。  |
+| ------------ | --------------------------------------------- | --------------------------- |
 | **`keyof`**  | **键名提取**。获取一个**对象类型**中所有属性名组成的**联合字符串字面量类型**。 | 常用于泛型约束，确保传入的属性名是对象中真实存在的键。 |
 
 ```js
@@ -121,7 +121,7 @@ JSON
 1. **检查 `@types/` 库：** 首先尝试 npm 生态系统中有没有针对这个第三方 JavaScript 库的**对应的类型定义库**。比如@types/jquery @types/lodash，有的话安装库就行了
 
 2. **创建自定义声明文件 (`.d.ts`)：** 如果 `@types` 包不存在，需要手动创建声明文件，通常命名为 `custom.d.ts` 或 `library-name.d.ts`。
-
+   
    a.**模块声明：** 使用 `declare module` 声明整个模块的类型。
 
 ```typescript
@@ -374,7 +374,7 @@ class Stack<T> {
 - 条件类型 `T extends U ? X : Y`
 
 - 类型别名 ,可以是泛型 ,也可以使用类型别名来在属性里引用自己：
-
+  
   ```ts
   type some = boolean | string;
   type Container<T> = { value: T };
@@ -387,7 +387,7 @@ class Stack<T> {
 - 类型索引：keyof，类似于  `Object.keys` ，用于获取一个接口中 Key 的联合类型。
 
 - 类型约束：通过关键字  `extend`  进行约束，泛型内使用的主要作用是对泛型加以约束
-
+  
   ```ts
   type BaseType = string | number | boolean;
   // 这里表示 copy 的参数
@@ -398,7 +398,7 @@ class Stack<T> {
   ```
 
 - 映射类型：通过  `in`  关键字做类型的映射，遍历已有接口的  `key`  或者是遍历联合类型
-
+  
   ```ts
   type Readonly<T> = {
     readonly [P in keyof T]: T[P];
@@ -593,22 +593,22 @@ function isString(x: unknown): x is string {
 
 #### tsconfig.json 重要配置
 
-| 配置项              | 作用                              |
-| ------------------- | --------------------------------- |
-| `strict`            | 总开关，开启所有严格类型检查      |
-| `strictNullChecks`  | null/undefined 不能赋值给其他类型 |
-| `noImplicitAny`     | 禁止隐式 any 类型                 |
+| 配置项                 | 作用                        |
+| ------------------- | ------------------------- |
+| `strict`            | 总开关，开启所有严格类型检查            |
+| `strictNullChecks`  | null/undefined 不能赋值给其他类型  |
+| `noImplicitAny`     | 禁止隐式 any 类型               |
 | `target`            | 编译目标版本（ES5/ES6/ESNext）    |
-| `module`            | 模块系统（CommonJS/ESNext/AMD）   |
+| `module`            | 模块系统（CommonJS/ESNext/AMD） |
 | `moduleResolution`  | 模块解析策略（node/bundler）      |
-| `baseUrl` + `paths` | 路径别名配置                      |
-| `outDir`            | 输出目录                          |
-| `rootDir`           | 源码根目录                        |
-| `declaration`       | 生成 `.d.ts` 声明文件             |
-| `esModuleInterop`   | 兼容 CommonJS 和 ES Module        |
-| `skipLibCheck`      | 跳过声明文件类型检查，加快编译    |
-| `resolveJsonModule` | 允许导入 JSON 文件                |
-| `jsx`               | JSX 编译方式（react/preserve）    |
+| `baseUrl` + `paths` | 路径别名配置                    |
+| `outDir`            | 输出目录                      |
+| `rootDir`           | 源码根目录                     |
+| `declaration`       | 生成 `.d.ts` 声明文件           |
+| `esModuleInterop`   | 兼容 CommonJS 和 ES Module   |
+| `skipLibCheck`      | 跳过声明文件类型检查，加快编译           |
+| `resolveJsonModule` | 允许导入 JSON 文件              |
+| `jsx`               | JSX 编译方式（react/preserve）  |
 
 #### TypeScript 模块化
 
