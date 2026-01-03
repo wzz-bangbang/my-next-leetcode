@@ -9,6 +9,7 @@ import { useQuestionRoute, scrollToSelected } from '@/hooks/useQuestionRoute';
 import { getFavorites, toggleFavorite, loadFavoritesFromServer } from '@/lib/favorites';
 import MarkdownContent from './_components/MarkdownContent';
 import QuestionList from './_components/QuestionList';
+import SimulationModal from './_components/SimulationModal';
 import type { BaguData, BaguQuestion } from '@/types/bagu';
 
 // localStorage key
@@ -323,6 +324,14 @@ export default function BaguPage() {
     selectQuestion(question, categoryId);
   }, [allQuestions, currentIndex, expandedCategories, toggleCategory, selectQuestion]);
 
+  // 展开分类（供 SimulationModal 调用）
+  const expandCategory = useCallback((categoryId: string) => {
+    setExpandedCategories((prev) => {
+      if (prev.has(categoryId)) return prev;
+      return new Set([...prev, categoryId]);
+    });
+  }, []);
+
   return (
     <div
       className="h-screen flex flex-col relative overflow-hidden"
@@ -403,6 +412,13 @@ export default function BaguPage() {
                 ✕
               </button>
             </div>
+            {/* 随机模拟按钮 */}
+            <SimulationModal
+              data={data}
+              onSelectQuestion={selectQuestion}
+              onExpandCategory={expandCategory}
+              expandedCategories={expandedCategories}
+            />
           </div>
 
           {/* 分类列表 */}
@@ -606,6 +622,7 @@ export default function BaguPage() {
           )}
         </div>
       </div>
+
     </div>
   );
 }

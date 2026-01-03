@@ -40,7 +40,6 @@ this指的是函数执行时所关联的对象，取决于函数在运行时**�
 
 3. this 指向与调用 `setTimeout` 的上下文无关
 
-#### 作用域
 
 #### 原型与原型链
 
@@ -58,13 +57,41 @@ this指的是函数执行时所关联的对象，取决于函数在运行时**�
 
 #### <mark>继承</mark>
 
-原型链继承**原型链** 是 JS 继承的**唯一底层机制**
+核心：原型链继承**原型链** 是 JS 继承的**唯一底层机制**
 
-1.原型继承，核心：让子类原型对象指向父类实例。当父类的原型上包含**引用类型**的属性时，所有子类实例都会**共享**这个属性。一个实例修改，所有实例都受影响
+1.原型继承，核心：让子类原型对象指向父类实例。
 
-2.组合继承：【核心优化】：创建父类原型对象的副本，并赋值给子类原型+【构造器指针修正】：将子类构造器指向自身。特点：独立属性+原型共享
+- **做法**：`Child.prototype = new Parent()`
+- **缺点**：**引用类型属性共享**。当父类的原型上包含**引用类型**的属性时（比如一个数组），其中一个子类改了数组，所有子类都会跟着变。
 
-es6的class extend super
+2.组合继承：【核心优化】：创建父类原型对象的副本，并赋值给子类原型+【构造器指针修正】：将子类构造器指向自身。特点：独立属性+原型共享。缺点是`Parent` 构造函数被调用了两次
+
+```
+function Child(name, age) { 
+	// 【核心步骤 A】：继承属性 
+	// 通过 call 调用父类构造函数，将 Parent 的属性绑定到 Child 的实例上 
+	Parent.call(this, name); 
+	this.age = age; 
+}
+
+// 【核心步骤 B】：继承方法: 将 Child 的原型指向 Parent 的一个实例，从而接入原型链 Child.prototype = new Parent(); 
+// 4. 修复 constructor 指向 
+// 因为重写了原型，Child.prototype.constructor 现在指向的是 Parent，需要手动改回来 Child.prototype.constructor = Child; 
+```
+
+3.终极方案：寄生组合式继承（必杀技）
+
+**这是面试官最想听到的答案，也是 ES6 `class` 背后的核心原理。**
+
+- **核心思想**：不 `new Parent()` 了，直接造一个父类原型的副本。    
+- **优势**：只调用一次父类构造函数，原型链保持完整，效率最高。
+
+```
+Child.prototype = Object.create(Parent.prototype);
+Child.prototype.constructor = Child;
+```
+
+3.es6的class extend super,  **本质**是寄生组合继承的**语法糖**。
 
 `class` 关键字**并没有改变底层原型继承的机制**，它只是提供了一套更清晰的 API 来定义构造函数、原型方法和静态方法。
 
@@ -74,15 +101,34 @@ es6的class extend super
 
 2. **构造函数关联：** 自动将 `Child.__proto__` 设置为 `Parent`，实现了**静态属性和方法的继承**。
 
-`super` 关键字
-
-`super` 是在 `class` 继承中最核心、最关键的机制，它在两个场景下工作：
+`super` 关键字： `super` 是在 `class` 继承中最核心、最关键的机制，它在两个场景下工作：
 
 1. **在 `constructor` 中：** 必须调用 `super()`。它负责调用父类的构造函数，并**将子类实例的 `this` 绑定到父类**。在子类构造函数中，必须在引用 `this` 之前调用 `super()`。
 
 2. **在方法中：** 用于调用父类原型上的同名方法（如 `super.methodName()`）。
 
-#### new操作符
+```
+class Child extends Parent {
+    constructor(name, age) {
+        // 【核心】：必须先调用 super()，它负责执行父类的构造函数并创建 this
+        super(name); 
+        this.age = age;
+    }
+
+    // 子类自己的方法
+    sayAge() {
+        console.log(`我今年 ${this.age} 岁了`);
+    }
+
+    // 【重写/多态】：子类可以覆盖父类的方法
+    sayName() {
+        // 也可以通过 super 调用父类被覆盖的方法
+        super.sayName(); 
+        console.log('这是子类重写后的逻辑');
+    }
+}
+```
+#### new操作符做了什么
 
 1创建新对象
 
@@ -92,9 +138,9 @@ es6的class extend super
 
 4如果构造函数有返回就直接返回，否则返回新对象
 
-#### 事件循环
+#### 讲讲js的事件循环
 
-宏任务和微任务的区分是为了做什么?优先级?
+宏任务和微任务的区分是为了做什么? 优先级有什么区别?
 
 答：是为了保证异步代码执行的**确定性、优先级和性能**。微任务享有绝对的**插队权**。
 
@@ -104,9 +150,18 @@ es6的class extend super
 
 宏任务 (Macrotasks) 的目的：低优先级，调度 I/O 和 UI 渲染。不阻塞渲染
 
+注意：初始同步脚本执行完毕，**执行上下文栈（ECS）清空时**，事件循环机制才真正开始接管，并进入检查队列的循环。
+
+所有的异步事件一定是当前浏览器执行完同步任务空闲了才做的
 #### 全局对象
 
-#### 普函通数和箭函头数有么什区别
+在不同的环境下，全局对象的名字和表现有所不同：
+
+- **浏览器环境**：全局对象是 `window`。
+- **Node.js 环境**：全局对象是 `global`。
+- **统一规范**：为了跨环境兼容，ES11 引入了 **`globalThis`**，无论在哪个环境下，它都指向当前环境的全局对象。
+
+> **面试避坑指南：** 在全局作用域下用 `var` 声明的变量会挂载到全局对象上，但用 `let` 或 `const` 声明的变量**不会**。这是因为 ES6 之后，全局作用域内部还存在一个“块级作用域”的顶层环境。
 
 #### js类型转换
 
@@ -140,27 +195,27 @@ let closureFunc = outerFunc(); // 创建闭包
 closureFunc = null; // 手动解除引用，帮助 GC 回收内存
 ```
 
-#### call  apply bind
 
-#### 严格模式
+#### for..in for..of区别
 
-严格模式是 ES5 引入的一种特殊模式，旨在选择性地限制 JavaScript 的某些不安全、低效或有缺陷的行为
+记忆：KEY in OBJECT, VALUE of ITERABLE，`in` 拿 Key（下标），`of` 拿 Value（内容）
 
-- **全局模式：** 在脚本文件顶部添加 `"use strict";`。
+| **特性**   | **for..in**          | **for..of (ES6)**                      |
+| -------- | -------------------- | -------------------------------------- |
+| **迭代内容** | 迭代的是 **Key (键名/索引)** | 迭代的是 **Value (键值)**                    |
+| **适用范围** | 主要用于**对象**，也可用于数组    | 只要部署了 **Iterator 接口** (数组、Map、Set、字符串) |
+| **原型链**  | **会**遍历原型链上的可枚举属性    | **不会**遍历原型链                            |
+| **顺序**   | 顺序不确定（对象属性无序）        | 按迭代器的顺序执行（数组是有序的）                      |
 
-- **函数模式：** 在函数体内部顶部添加 `"use strict";`
+#### call  apply bind 区别
 
-严格模式是保证代码质量和项目维护性的要求
+这三个方法都是为了**改变函数执行时的 `this` 指向**。
 
-重要规则：
+- **`call(context, arg1, arg2...)`**：立即执行。参数是一个个传进去的。
 
-禁止隐式全局变量：尝试给未声明的变量赋值时，将不再自动在全局对象 (`window` 或 `global`) 上创建该变量，而是**直接抛出 `ReferenceError`**。
+- **`apply(context, [args])`**：立即执行。参数是以**数组**形式传进去的。
 
-规范 `this` 默认绑定（上下文可预测性）：独立函数调用 `this` 为 `undefined`
-
-静默失败转为抛出错误 (代码健壮性)
-
-禁用堆栈调用属性，禁止函数动态获取调用栈信息，（严重阻碍了js 引擎进行即时编译优化
+- **`bind(context, arg1...)`**：**不会立即执行**。它会返回一个新的函数，并永久绑定了 `this`，后续调用时再传入剩余参数。
 
 #### 导致js里this指向混乱的原因是什么?
 
@@ -169,6 +224,18 @@ closureFunc = null; // 手动解除引用，帮助 GC 回收内存
 `this` 的值高度依赖于**调用函数时的上下文**，这种运行时（Runtime）绑定机制与 JS 的词法作用域规则形成了鲜明对比，造成了巨大的认知负担。
 
 ES6 的解决方案：箭头函数，没有自己的动态 `this`，`this` 变得可预测、不可变，不再受调用方式的影响
+
+#### 你觉得js里this的设计怎么样?有没有什么缺点
+
+`this` 的设计初衷是为了实现高度的**灵活性**和**代码复用**。通过显式绑定隐式绑定可以更加灵活
+
+`this` 的所有缺点都源于一个核心问题：**它的值是动态绑定（Runtime Dynamic Binding）的，依赖于函数的调用点 (Call Site)，而不是定义点。**
+
+有严重的上下文丢失陷阱：回调函数问题： 当一个对象的方法被作为参数传递给异步函数（如 `setTimeout`、`Promise.then()`）或事件处理器时，它通常会失去其隐式绑定，退化为**默认绑定（指向全局对象或 `undefined`）**。
+
+违反词法作用域原则 ：JavaScript 的变量（使用 `let/const`）是词法作用域（静态确定）的，但 `this` 却是动态作用域的。这种不一致性打破了语言的统一性，使得在阅读嵌套代码时很难预测 `this` 的值。
+
+es6通过箭头函数和class弥补了这个问题，开发者应当尽可能利用箭头函数和 `class` 语法来避免直接依赖普通函数的动态 `this` 机制
 
 #### 运算符
 
@@ -240,15 +307,75 @@ JavaScript 引擎在运行代码时，会维护一个 **执行上下文栈 (Exec
 
 `let` 在 `for` 循环中会为每次迭代创建独立的词法环境，因此闭包捕获的是不同的 i，而不是同一个变量。
 
-#### 作用域
+#### 说说js的作用域
 
-js讨论词法作用域，**词法作用域 (Lexical Scope)** 是一个**抽象的、静态的编程原则或规则**。
+ A. 三种作用域：
+
+1. **全局作用域**：代码任何地方都能访问。
+2. **函数作用域**：变量只在函数内部可见。
+3. **块级作用域 (ES6+)**：由 `{}` 包裹的区域（配合 `let` / `const` 使用）。
+
+B. 作用域链 (Scope Chain)：
+
+当 JS 引擎寻找一个变量时，会先在当前作用域找。如果找不到，就去**父级作用域**找，直到找到全局作用域为止。这种链式查找机制就是作用域链。
+
+C. JS 采用的是**静态作用域**（即词法作用域）。
+
+**词法作用域 (Lexical Scope)** 是一个**抽象的、静态的编程原则或规则**。
 
 - **性质：** 它只取决于代码在 **哪里被编写 (定义)**，与代码在运行时 **哪里被调用** 无关。
-
 - **作用：** 它决定了变量的可访问性范围。
+- 这意味着函数的作用域在**函数定义的时候**就决定了，而不是在函数调用的时候。
+ 
+#### <mark>Object.create(proto) 方法</mark>
 
-词法环境是 JavaScript 引擎用来**记录和追踪**变量，严格遵守**词法作用域**规则
+其中 *proto* 是新对象的原型对象
+
+`Object.create()` 的主要目的**不是复制 (Clone)** 一个现有对象，而是创建一个**新对象**，并精确控制新对象的**原型 (Prototype)**。
+
+`Object.create()` 的第一个参数是 **强制要求** 传入的，它就是新创建对象的 **`[[Prototype]]` (即 `__proto__`)**。
+
+核心能力是作为 **ECMAScript 官方提供的、创建指定原型对象**的方法，它是实现纯净原型继承的最佳实践。
+
+#### <mark>Object.assign()</mark>
+
+`Object.assign(target, ...sources)` 方法用于将所有**可枚举 (enumerable) 的自有属性 (own properties)** 的值，从一个或多个**源对象 (source)** 复制到**目标对象 (target)**。
+
+返回值： 返回修改后的目标对象 `target`。
+
+仅执行浅拷贝 (Shallow Copy Only)
+
+只复制可枚举的自有属性
+
+一般用于**合并配置对象 (Merging)：** 将默认配置与用户提供的配置合并。
+
+
+#### Object.defineProperties 的作用
+
+把参数2的属性赋值给参数1，特点是不仅复制属性，还复制属性的属性，比如是否可枚举、可修改这些属性
+
+- 不仅仅是赋值，而是**使用属性描述符定义属性**
+
+- 可以控制属性的可写性、可枚举性、可配置性
+
+- 可以定义访问器属性（getter/setter）
+
+- 默认属性特性与普通赋值不同
+
+
+
+#### <mark>es6新特性</mark>
+
+1. 作用域与变量管理 (Scope & Mutability)
+- **`let` 和 `const`：** 引入**块级作用域 (Block Scoping)**，彻底解决了 `var` 导致的变量提升和作用域污染问题，增强了代码的稳定性和可预测性。
+2. 异步编程基石 (Async Foundation)
+- **Promises：** 提供了结构化、可链式调用的异步处理方案，解决了传统回调函数的**回调地狱 (Callback Hell)**，是 `async/await` 的底层基础。
+3. 函数与上下文 (Functions & Context)
+- **箭头函数 (`=>`)：** 语法简洁。核心价值在于使用**词法 `this`**，消除了普通函数中 `this` 绑定不明确的痛点，使上下文指向更加可靠。
+4. 数据结构与模块化 (Data & Structure)
+- **`class` 语法：** 基于原型继承的**语法糖**，使面向对象编程（OOP）更接近传统语言模式，提高了可读性。
+- **解构赋值/扩展运算符 (`...`)：** 极大地简化了数据操作，如数组合并、对象浅拷贝、函数参数收集等，提高了代码简洁性。
+- **`Map` 和 `Set`：** 提供了更高效的数据结构，解决了传统 JS 对象作为键的限制 (`Map`) 和快速去重 (`Set`) 的需求。
 
 #### Set、Map、WeakSet、weakMap 的区别
 
@@ -288,20 +415,17 @@ B. WeakSet：跟踪对象状态或成员资格
 
 总结来说，`Set` 和 `Map` 是通用的数据结构，用于**核心数据存储**；而 `WeakSet` 和 `WeakMap` 是用于**关联辅助数据、解决内存泄漏问题**的**工具**。
 
-#### <mark>es6新特性</mark>
+#### 箭头函数与普通函数的差异
 
-1. 作用域与变量管理 (Scope & Mutability)
-- **`let` 和 `const`：** 引入**块级作用域 (Block Scoping)**，彻底解决了 `var` 导致的变量提升和作用域污染问题，增强了代码的稳定性和可预测性。
-2. 异步编程基石 (Async Foundation)
-- **Promises：** 提供了结构化、可链式调用的异步处理方案，解决了传统回调函数的**回调地狱 (Callback Hell)**，是 `async/await` 的底层基础。
-3. 函数与上下文 (Functions & Context)
-- **箭头函数 (`=>`)：** 语法简洁。核心价值在于使用**词法 `this`**，消除了普通函数中 `this` 绑定不明确的痛点，使上下文指向更加可靠。
-4. 数据结构与模块化 (Data & Structure)
-- **`class` 语法：** 基于原型继承的**语法糖**，使面向对象编程（OOP）更接近传统语言模式，提高了可读性。
+没有自己的this, 继承外层作用域的 `this`。
 
-- **解构赋值/扩展运算符 (`...`)：** 极大地简化了数据操作，如数组合并、对象浅拷贝、函数参数收集等，提高了代码简洁性。
+不能new
 
-- **`Map` 和 `Set`：** 提供了更高效的数据结构，解决了传统 JS 对象作为键的限制 (`Map`) 和快速去重 (`Set`) 的需求。
+不能call bind apply
+
+没有 `arguments` 对象
+
+不支持 `yield` 关键字
 
 #### <mark>ES6模块和Common]S模块的区别</mark>
 
@@ -324,40 +448,6 @@ B. WeakSet：跟踪对象状态或成员资格
   - 这意味着导入方和导出方共享同一个变量。如果导出方在后续代码中修改了该变量，导入方可以观察到这种变化。
 
 **ESM 的优势：** 由于 ESM 采用 `import` / `export` 这种**静态语法**，JS 引擎或构建工具（如 Webpack/Rollup）可以在不执行代码的情况下，分析出模块之间的依赖关系。这使得 **Tree-Shaking（摇树优化）**成为可能，即只打包实际用到的代码，极大地减小了最终产物大小。
-
-#### <mark>Object.create(proto) 方法</mark>
-
-其中 *proto* 是新对象的原型对象
-
-`Object.create()` 的主要目的**不是复制 (Clone)** 一个现有对象，而是创建一个**新对象**，并精确控制新对象的**原型 (Prototype)**。
-
-`Object.create()` 的第一个参数是 **强制要求** 传入的，它就是新创建对象的 **`[[Prototype]]` (即 `__proto__`)**。
-
-核心能力是作为 **ECMAScript 官方提供的、创建指定原型对象**的方法，它是实现纯净原型继承的最佳实践。
-
-#### <mark>Object.assign()</mark>
-
-`Object.assign(target, ...sources)` 方法用于将所有**可枚举 (enumerable) 的自有属性 (own properties)** 的值，从一个或多个**源对象 (source)** 复制到**目标对象 (target)**。
-
-返回值： 返回修改后的目标对象 `target`。
-
-仅执行浅拷贝 (Shallow Copy Only)
-
-只复制可枚举的自有属性
-
-一般用于**合并配置对象 (Merging)：** 将默认配置与用户提供的配置合并。
-
-#### 箭头函数与普通函数的差异
-
-没有this, 继承外层作用域的 `this`。
-
-不能new
-
-不能call bind apply
-
-没有 `arguments` 对象
-
-不支持 `yield` 关键字
 
 #### arguments 的定义与作用
 
@@ -400,18 +490,6 @@ function sumAll(...args) {
 // 3. 语法更清晰。
 ```
 
-#### for..in for..of区别：
-
-KEY in OBJECT, VALUE of ITERABLE
-
-#### <mark> async/await 的实现原理是什么?它和Promise、Generator之间有什么关系?</mark>
-
-`async/await` 是对 **Promise** 和 **Generator** 的一种**语法糖 (Syntactic Sugar)**。
-
-- **Promise** 是 `async/await` 的**外部接口**（输入和输出）。
-
-- **Generator** 是 `async/await` 实现**暂停和恢复**的**内部引擎**。
-
 #### let/const/var 的底层区别
 
 1.作用域 
@@ -432,9 +510,7 @@ var 可以重复声明，在全局作用域声明时，会挂载到 `window` 或
 
 let、const **不允许重复声明**。在同一作用域内重复声明会抛出 `SyntaxError`。也不会挂载到全局对象上。
 
-#### <mark>Proxy 和 Reflect 的应用场景</mark>
-
-1.Proxy ： 对象操作拦截
+#### <mark>说说Proxy</mark>
 
 `Proxy` 的核心价值在于**对对象的操作进行非侵入式（Non-invasive）的拦截和定制**。它提供了一个代理层，允许我们在对象操作的 13 个内部方法（如 `get`, `set`, `apply`, `construct`）被调用时介入。
 
@@ -446,17 +522,47 @@ let、const **不允许重复声明**。在同一作用域内重复声明会抛�
 
 实现私有属性：在 `get` 或 `has` 拦截器中，对特定前缀（如 `_` 开头的属性）返回 undefined` 或 `false`，模拟私有属性效果。
 
-<mark>2.`Reflect` </mark>
+写法：
+```javascript
+const handler = {
+    // 陷阱 (Trap)：拦截属性的读取操作
+    get(target, prop, receiver) {
+        if (prop === 'message3') {
+            return `[${target.message1} ${target.message2}]`;
+        }
+        // 默认行为：返回目标对象的属性值
+        return Reflect.get(target, prop, receiver); 
+    },
+    // ... 比如 set(target, prop, value, receiver) { ... }
+}
+const target = {
+    message1: "Hello",
+    message2: "World"
+};
+const proxy = new Proxy(target, handler);
+```
 
-不是一个函数，而是一个静态对象，它提供了 13 个静态方法，这些方法与 `Proxy` 的 13 个拦截器方法一一对应。
+#### Reflect 是什么？怎么用
 
-#### 事件循环
+`Reflect` 是一个内置对象，它提供了一系列静态方法，这些方法与 `Proxy` 陷阱的方法**同名且参数一致**。它提供了 13 个静态方法，这些方法与 `Proxy` 的 13 个拦截器方法一一对应。
 
-初始同步脚本执行完毕，**执行上下文栈（ECS）清空时**，事件循环机制才真正开始接管，并进入检查队列的循环。
+例如：
 
-所有的异步事件一定是当前浏览器执行完同步任务空闲了才做的
+- 以前获取对象属性：`obj.prop` 或 `Object.getOwnPropertyDescriptor(obj, prop)`
 
-#### promise
+- 现在通过 `Reflect`：`Reflect.get(obj, prop)`
+
+- `'prop' in obj` $\rightarrow$ `Reflect.has(obj, 'prop')`
+
+- `delete obj.prop` $\rightarrow$ `Reflect.deleteProperty(obj, 'prop')`
+
+在 `Proxy` 的 `handler` 中，我们经常需要执行目标对象上的默认操作。使用 `Reflect` 可以干净、安全地实现这一点。
+
+`Reflect` 将一些命令式的操作符（如 `delete`）或命令式的方法调用（如 `new`）转换成了函数式的调用，使得代码更易于维护和理解。
+
+Reflect 能提供操作失败的明确反馈，返回一个**布尔值**表示成功或失败，代码更简洁。一般的 `Object` 上的方法（例如 `Object.defineProperty`），在执行失败时会抛出异常，这需要用 `try...catch` 捕获。
+
+#### 说说promise怎么用和优缺点
 
 优点：
 
@@ -480,31 +586,23 @@ let、const **不允许重复声明**。在同一作用域内重复声明会抛�
 
 错误静默，没有catch的话，不会在运行时立即抛出执行时才捕获
 
-#### 异步
+#### js有哪些异步方法
 
-计时器 settimeout setInterval，宏任务
-
-网络请求与文件操作：
-
+1. 计时器 settimeout setInterval，属于宏任务
+2. 异步流程控制与状态管理：Promise async/await，属于微任务
+3. 网络请求与文件操作：
 - **`fetch(url)` (现代标准):** 微任务
-  
   - 返回一个 Promise 对象，用于发起网络请求。
-  
   - 是最常用的网络请求 API，取代了大部分 XHR 用法。
-
 - **`XMLHttpRequest` (XHR) (传统方法):** 特指基于事件监听而不是promise的，是宏任务
-  
   - 传统的回调式 API，现在主要用于文件上传等特定场景，或需要浏览器底层控制的场合。
-
 - **`FileReader` / 各种 I/O 操作:** 也是通过回调或 Promise返回，宏任务
-
-异步流程控制与状态管理：Promise async/await，微任务
 
 #### <mark>Generator是什么怎么用</mark>
 
-Generator 函数（生成器）是一种特殊的函数，它能够**暂停执行**并在稍后**从暂停点恢复执行**。这是通过 Generator 函数内部维护的一个 **状态机 (State Machine)** 来实现的。
+Generator 函数（生成器）是一种特殊的函数，它能够**暂停执行**并在稍后**从暂停点恢复执行**。这是通过 Generator 函数内部维护的一个 **状态机 (State Machine)** 来实现的。本质是同步的
 
-`function*`定义 Generator 函数
+`function`定义 Generator 函数
 
 `yield`暂停函数执行，并返回 `yield` 后的值
 
@@ -561,69 +659,28 @@ console.log(gen.next());
 
 `async/await` 是 ES7 (ES2016) 引入的，它的底层是基于 **Promise** 和 **Generator** 实现的**语法糖 (Syntactic Sugar)**。它的核心原理是**自动化**了 Generator 的驱动过程，相当于异步完成后自动调用了.next
 
-开放题：
+对比：
+- **Promise** 是 `async/await` 的**外部接口**（输入和输出）。
+- **Generator** 是 `async/await` 实现**暂停和恢复**的**内部引擎**。
+- **async/await**` 是对 **Promise** 和 **Generator** 的一种**语法糖 (Syntactic Sugar)**。
 
-#### 你觉得js里this的设计怎么样?有没有什么缺点啥的
 
-`this` 的设计初衷是为了实现高度的**灵活性**和**代码复用**。通过显式绑定隐式绑定可以更加灵活
+#### 严格模式
 
-`this` 的所有缺点都源于一个核心问题：**它的值是动态绑定（Runtime Dynamic Binding）的，依赖于函数的调用点 (Call Site)，而不是定义点。**
+严格模式是 ES5 引入的一种特殊模式，旨在选择性地限制 JavaScript 的某些不安全、低效或有缺陷的行为
 
-有严重的上下文丢失陷阱：回调函数问题： 当一个对象的方法被作为参数传递给异步函数（如 `setTimeout`、`Promise.then()`）或事件处理器时，它通常会失去其隐式绑定，退化为**默认绑定（指向全局对象或 `undefined`）**。
+- **全局模式：** 在脚本文件顶部添加 `"use strict";`。
 
-违反词法作用域原则 ：JavaScript 的变量（使用 `let/const`）是词法作用域（静态确定）的，但 `this` 却是动态作用域的。这种不一致性打破了语言的统一性，使得在阅读嵌套代码时很难预测 `this` 的值。
+- **函数模式：** 在函数体内部顶部添加 `"use strict";`
 
-es6通过箭头函数和class弥补了这个问题，开发者应当尽可能利用箭头函数和 `class` 语法来避免直接依赖普通函数的动态 `this` 机制
+严格模式是保证代码质量和项目维护性的要求
 
-##### proxy写法
+重要规则：
 
-```javascript
-const handler = {
-    // 陷阱 (Trap)：拦截属性的读取操作
-    get(target, prop, receiver) {
-        if (prop === 'message3') {
-            return `[${target.message1} ${target.message2}]`;
-        }
-        // 默认行为：返回目标对象的属性值
-        return Reflect.get(target, prop, receiver); 
-    },
-    // ... 比如 set(target, prop, value, receiver) { ... }
-}
-const target = {
-    message1: "Hello",
-    message2: "World"
-};
-const proxy = new Proxy(target, handler);
-```
+禁止隐式全局变量：尝试给未声明的变量赋值时，将不再自动在全局对象 (`window` 或 `global`) 上创建该变量，而是**直接抛出 `ReferenceError`**。
 
-##### Reflect 是什么？怎么用
+规范 `this` 默认绑定（上下文可预测性）：独立函数调用 `this` 为 `undefined`
 
-`Reflect` 是一个内置对象，它提供了一系列静态方法，这些方法与 `Proxy` 陷阱的方法**同名且参数一致**。
+静默失败转为抛出错误 (代码健壮性)
 
-例如：
-
-- 以前获取对象属性：`obj.prop` 或 `Object.getOwnPropertyDescriptor(obj, prop)`
-
-- 现在通过 `Reflect`：`Reflect.get(obj, prop)`
-
-- `'prop' in obj` $\rightarrow$ `Reflect.has(obj, 'prop')`
-
-- `delete obj.prop` $\rightarrow$ `Reflect.deleteProperty(obj, 'prop')`
-
-在 `Proxy` 的 `handler` 中，我们经常需要执行目标对象上的默认操作。使用 `Reflect` 可以干净、安全地实现这一点。
-
-`Reflect` 将一些命令式的操作符（如 `delete`）或命令式的方法调用（如 `new`）转换成了函数式的调用，使得代码更易于维护和理解。
-
-Reflect 能提供操作失败的明确反馈，返回一个**布尔值**表示成功或失败，代码更简洁。一般的 `Object` 上的方法（例如 `Object.defineProperty`），在执行失败时会抛出异常，这需要用 `try...catch` 捕获。
-
-##### Object.defineProperties 的作用
-
-把参数2的属性赋值给参数1，特点是不仅复制属性，还复制属性的属性，比如是否可枚举、可修改这些属性
-
-- 不仅仅是赋值，而是**使用属性描述符定义属性**
-
-- 可以控制属性的可写性、可枚举性、可配置性
-
-- 可以定义访问器属性（getter/setter）
-
-- 默认属性特性与普通赋值不同
+禁用堆栈调用属性，禁止函数动态获取调用栈信息，（严重阻碍了js 引擎进行即时编译优化

