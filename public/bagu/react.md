@@ -30,7 +30,6 @@
 
 ###### 讲讲react项目的性能优化
 
-
 ###### 说说你对 React Hook的闭包陷阱的理解，有哪些解决方案
 ###### 说说 hooks 的思想和原理
 
@@ -75,7 +74,6 @@
 
 ######  react自定义hooks 和 Vue3 composable 本质区别？
 
-
 ###### React Fiber是什么?  说说fiber 架构的工作原理?
 ###### 为什么react需要 fiber架构，而Vue却不需要?
 ###### 讲讲React Fiber 是如何实现更新过程可控的
@@ -92,7 +90,6 @@
 
 ###### fiber为什么是性能飞跃
 
-
 ###### redux的使用原则
 
 ###### 说说 Redux的核心方法和工作流程
@@ -103,7 +100,6 @@
 ###### 除了 redux mbox dva 还用过其他的 状态管理没
 
 ###### 对比redux zustand
-
 
 ###### 说说react的事件代理机制原理和优缺点
 

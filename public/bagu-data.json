@@ -391,8 +391,8 @@
         {
           "id": "css-html-1",
           "title": "tailwind",
-          "content": "",
-          "hasAnswer": false
+          "content": "Tailwind 是一个原子化 CSS 框架，每个类名对应一个单独的 CSS 属性，通过组合类名来构建组件样式。  \n **优点**：1️⃣ 打包时只包含使用到的类，CSS 文件体积小；2️⃣ 响应式和状态样式有内置支持，熟悉后可快速阅读 HTML/JSX，无需跳转 CSS 文件。  \n **缺点**：1️⃣ HTML/JSX 中类名可能很长，阅读略困难；2️⃣ 对复杂动效和状态管理，需要组合更多类，前期学习成本高。\n\n 简单一句话概括：**Tailwind 用类名组装替代传统 CSS，更轻量、可维护，但初学者上手和复杂交互处理略有挑战。**",
+          "hasAnswer": true
         },
         {
           "id": "css-html-2",
@@ -403,13 +403,13 @@
         {
           "id": "css-html-3",
           "title": "em rem",
-          "content": "",
-          "hasAnswer": false
+          "content": "em 是以父元素font-size为基准，常用于局部比例计算\nrem 是以页面根元素font-size为基准，常用于页面的整体适配",
+          "hasAnswer": true
         },
         {
           "id": "css-html-4",
           "title": "小程序rpx和px在不同手机上有误差",
-          "content": "误差的可能原因：当 `rpx` 换算成的 `px` 不是一个整数时，浏览器或小程序框架会进行取舍 。误差在小尺寸元素上（尤其是 1rpx 边框）表现最明显，因为取整直接影响了元素的显示或隐藏。\n\n避免使用极小的 `rpx` 值。使用偶数的 rpx 值",
+          "content": "误差的可能原因：当 `rpx` 换算成的 `px` 不是一个整数时，浏览器或小程序框架会进行取舍 。误差在小尺寸元素上（尤其是 1rpx 边框）表现最明显，因为取整直接影响了元素的显示或隐藏。\n\n避免使用极小的 `rpx` 值。使用偶数的 rpx 值，必要时利用 CSS transform 缩放结合微元素 伪类解决。",
           "hasAnswer": true
         },
         {
@@ -433,14 +433,14 @@
         {
           "id": "css-html-8",
           "title": "Canvas vs SVG 的区别和选择",
-          "content": "canvas 位图：图像复杂、像素操作多、需要频繁重绘\n\nSVG 矢量图：图像简单、需要清晰缩放、需要与图形进行交互、需要良好的可访问性",
+          "content": "1️. Canvas vs SVG 的本质区别\n\n|特性|Canvas|SVG|\n|---|---|---|\n|绘制方式|**基于像素**，一次性绘制，渲染后不保留对象|**基于矢量**，DOM节点形式，每个图形元素可操作|\n|更新|需要重绘整个画布或部分区域|可以单独操作某个元素，自动重渲染|\n|性能|大量动态像素操作（游戏、动画）效率高|大量元素节点多时，性能可能下降|\n|调试|不像 DOM 元素可直接 inspect，调试相对困难|可直接 inspect DOM 节点，样式、位置可见|\n2️. 优缺点\n Canvas\n- **优点**：\n    - 适合大量动态渲染或复杂动画（游戏、可视化图表）\n    - 渲染速度快，像素级控制灵活\n- **缺点**：\n    - 不保留对象，不容易对单个元素操作\n    - 调试困难\n    - 对响应式、交互事件支持有限\n SVG\n- **优点**：\n    - 矢量图形，缩放不失真\n    - DOM 节点可操作，易调试，事件绑定方便\n    - 适合图标、静态或轻量级动画\n- **缺点**：\n    - 大量节点性能开销大，不适合复杂动画或实时渲染\n\n3️. 使用场景参考\n- **Canvas**：游戏渲染、粒子动画、复杂图表、图像处理\n- **SVG**：图标、流程图、矢量图、轻量动画、交互图表\n\n总结：Canvas 是基于像素的绘制方式，渲染后不保留对象，适合大量动态渲染和复杂动画，但调试相对困难；SVG 是基于矢量的，每个元素都是 DOM 节点，可单独操作，适合图标、静态图、轻量动画。选择时一般原则：**动态、像素级操作选 Canvas，静态或矢量图形选 SVG**",
           "hasAnswer": true
         },
         {
           "id": "css-html-9",
           "title": "HTML5 表单验证和自定义验证",
-          "content": "",
-          "hasAnswer": false
+          "content": "1. HTML5 表单验证，原生提供了**内置验证属性**，常见的有：\n\t- **required**：必填字段\n\t- **type**：比如 `email`、`number`、`url`，浏览器会自动检查格式\n\t- **pattern**：自定义正则，匹配特定格式\n\t- **min / max / step**：数值范围限制\n\t- **maxlength / minlength**：字符长度限制\n\t- 特点：\n\t\t- 浏览器自动触发验证\n\t\t- 不需要 JS 代码\n\t\t- 用户体验好，移动端也会弹出原生提示\n2. 自定义验证：有些场景 HTML5 自带的验证无法满足，比如：\n\t- 复杂密码规则\n\t- 异步验证（用户名是否已存在）\n\t- 联动验证（两个字段必须匹配）\n   这时就需要**JavaScript 自定义验证**，常用方法：\n\t1. **oninput / onchange**：输入实时验证\n\t2. **onSubmit 拦截**：`form.addEventListener('submit', function(e) {...}`\n总结：HTML5 表单验证主要分两类：一是浏览器原生验证，通过 `required`、`type`、`pattern`、`min/max` 等属性自动检查输入；二是自定义验证，通过 JavaScript 检查复杂逻辑或异步条件，并通过 Constraint Validation API 或表单 submit 事件阻止非法提交。原生验证简单易用，但灵活性有限，自定义验证可以覆盖更复杂的场景。",
+          "hasAnswer": true
         },
         {
           "id": "css-html-10",
@@ -450,42 +450,24 @@
         },
         {
           "id": "css-html-11",
-          "title": "移动端 1px 边框问题解决方案",
-          "content": "CSS `transform: scale()` 缩放 (主流推荐): 将元素的伪元素 (`::before` 或 `::after`) 设置为 `1px` 宽或高，然后通过 `transform: scale(0.5)` 将其在 Y 轴或 X 轴上缩放 50%",
+          "title": "CSS 模块化和作用域方案",
+          "content": "目的：\n- **解决全局污染：** 默认情况下，CSS 所有的选择器都是全局的。不同组件同名的 `.title` 会相互覆盖。\n- **提高复用性：** 像 JS 模块一样方便地导入、导出样式。\n- **提升维护性：** 明确样式与组件的绑定关系，删除组件时能放心地删除其样式。\n\n核心原理：\n1. **命名约定/空间隔离：** 通过人为约定的规范（如 BEM）来模拟作用域。\n2. **构建转换（哈希化）：** 通过构建工具（Webpack/Vite）自动重命名选择器。\n    - **原理：** 当你导入一个 CSS 模块时，编译器会将你的类名（如 `.button`）转换成一个唯一的哈希字符串（如 `._button_x1y2z`）。\n    - **映射：** 编译器会生成一个 JSON 映射表，让 JS 能够引用这个变色后的类名。\n\n常见方案：\n1. CSS Modules：基于 JS 映射的哈希化。开发者编写正常的 CSS 文件（通常命名为 `.module.css`），打包工具在构建时对类名进行转换增加hash，比如`._title_1a2b3_5`，并把引用处也做相同的修改。\n2. Scoped CSS：基于属性选择器的隔离： 打包工具在编译模板时，会给该组件内所有的 DOM 节点加上一个唯一的属性，例如 `data-v-7ba5bd90`，同时将对应的 CSS 选择器转换增加属性选择。\n3. Tailwind CSS：基于原子类的预扫描方案，不进行类名哈希化。优点是按需编译和极致复用。",
           "hasAnswer": true
         },
         {
           "id": "css-html-12",
-          "title": "CSS 模块化和作用域方案",
-          "content": "**CSS 模块化**的目的是解决 CSS 全局污染、命名冲突和样式依赖管理的问题。",
-          "hasAnswer": true
-        },
-        {
-          "id": "css-html-13",
           "title": "前端性能优化之 CSS 优化策略",
           "content": "1. **合并与压缩 CSS 文件：**\n\n2. **利用媒体查询 (Media Queries) 按需加载：**\n   \n   使用 `<link rel=\"stylesheet\" media=\"(max-width: 600px)\" href=\"mobile.css\">`，只有在符合条件时才加载相应样式。\n\n3. **减少 CSS 嵌套和选择器复杂度：**\n   \n   复杂的选择器（如 `div > ul > li:last-child`）会增加浏览器计算匹配的成本。\n\n4. 避免在 HTML 中使用内联样式 (`style=\"...\"`)：内联样式会增加 HTML 文件体积，且不利于样式复用和缓存。\n\n5. 将 `<link>` 标签放在 `<head>` 顶部：让浏览器尽快下载和解析 CSS，避免**白屏时间**过长。",
           "hasAnswer": true
         },
         {
-          "id": "css-html-14",
-          "title": "请描述一个你如何使用SVG来增强网站视觉体验的情况。",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "css-html-15",
+          "id": "css-html-13",
           "title": "解释CSS中的BEM命名方法，并展示如何使用它来组织你的样式表。",
           "content": "**BEM** 是 **Block (块)、Element (元素)、Modifier (修饰符)** 的缩写，是一种用于组织 CSS 类名的命名规范。它旨在解决 CSS 全局作用域带来的命名冲突和样式依赖问题，使样式代码更具可读性和可维护性。示例：.card__title--large   .card__image--dark\n\n```css\n.user-card {\n    display: flex;\n    padding: 20px;\n    border: 1px solid #ccc;\n\n    /* 2. Modifier: .user-card--vip (变体) */\n    &--vip {\n        border-color: gold;\n        box-shadow: 0 0 5px gold;\n    }\n...\n}\n```",
           "hasAnswer": true
         },
         {
-          "id": "css-html-16",
-          "title": "你将如何处理跨浏览器的兼容性问题，尤其是在不同设备和操作系统上?",
-          "content": "- **制定统一的兼容性基线：**\n  \n  - 首先确定项目需要支持的**最低浏览器版本和设备范围**（如 IE11+、最近 2 个版本的 Chrome/Firefox/Safari/Edge、iOS 14+、Android 10+）。\n  \n  - **渐进增强 (Progressive Enhancement):** 优先保证核心功能在所有浏览器中可用，然后为现代浏览器添加高级功能和更优的体验。\n  \n  - **优雅降级 (Graceful Degradation):** 先为现代浏览器构建，然后确保在老旧浏览器中也能以合理的方式工作。\n\n- **编码规范与工具：**\n  \n  - **CSS 前缀：** 使用 **Autoprefixer** 等工具，自动为 CSS3 属性（如 `transform`、`flex`、`grid`）添加必要的浏览器厂商前缀（如 `-webkit-`, `-moz-`）。\n  \n  - **CSS Reset/Normalize：** 使用 **Normalize.css** 或 **Reset.css** 来统一不同浏览器对标签默认样式的差异。\n  \n  - **Polyfills 和 Transpilers：**\n    \n    - 使用 **Babel** 将 ES6+ 的 JavaScript 语法编译为 ES5，以兼容老旧浏览器。\n    \n    - 使用 **Polyfills**（如 `core-js`）为老旧浏览器提供缺失的现代 API（如 `Promise`、`fetch`）。\n\n- **兼容性处理技巧：**\n  \n  - **Flexbox/Grid 兼容性：** 明确知道哪些属性在旧版本浏览器上不支持，并提供备用方案（例如对不支持 Flexbox 的浏览器使用 `float` 布局）。\n  \n  - **特性检测：** 相比于用户代理 (UA) 检测，优先使用 **特性检测 (Feature Detection)**，如 Modernizr，来判断浏览器是否支持某一 CSS 或 JS 特性，并据此执行不同的代码分支。\n\n- **测试与验证：**\n  \n  - 在真实的设备、操作系统和浏览器组合上进行测试。\n  \n  - 使用 **BrowserStack**、**Sauce Labs** 等云测试平台进行自动化和手动兼容性测试。\n  \n  - 利用 Chrome DevTools 的**设备模拟器**和**网络限速**功能进行快速调试",
-          "hasAnswer": true
-        },
-        {
-          "id": "css-html-17",
+          "id": "css-html-14",
           "title": "在一个复杂的页面上，用户操作导致多次不必要的DOM操作，你将如何优化它?",
           "content": "不必要的 DOM 操作是前端性能的常见瓶颈，因为它会频繁触发浏览器的 **重排 (Reflow/Layout)** 和 **重绘 (Repaint)**。优化策略核心是**减少操作次数**和**批量处理操作**。\n\n1. **使用文档片段 (DocumentFragment) 批量操作：**\n   \n   - **原理：** `DocumentFragment` 是一个轻量级的容器，它**不是真实的 DOM 树的一部分**。将所有需要添加或修改的元素先插入到 `DocumentFragment` 中，然后只需进行**一次**操作，将 `DocumentFragment` 整体插入到 DOM 中。\n   \n   - **优化效果：** 只触发**一次**重排和重绘。\n\n2. **避免频繁读写 DOM 属性：**\n   \n   - **问题：** 连续读取（如 `element.offsetWidth`）和写入（如 `element.style.width = '100px'`）操作会导致“强制同步布局”——浏览器为了保证读取到的值是最新的，会立即执行挂起的重排。\n   \n   - **优化：** 应该**先读取**所有需要的 DOM 属性，然后**集中进行写入**操作。\n\n3. **使用防抖 (Debounce) 和节流 (Throttle)：**\n   \n   - **场景：** 针对用户输入、`resize`、`scroll`、`mousemove` 等高频触发的事件。\n   \n   - **防抖：** 将多次触发合并成一次，只在事件停止触发后执行一次（如搜索框输入）。\n   \n   - **节流：** 在一个时间周期内，事件只执行一次（如页面滚动）。\n\n4. **使用 Virtual DOM (适用于组件化框架)：**\n   \n   - React、Vue 等框架通过 **Virtual DOM** 将所有的 DOM 操作放入内存中进行对比，计算出最小的更新路径，然后一次性批量应用到真实 DOM 上，从框架层面解决了不必要的 DOM 操作问题。\n\n5. **用 CSS 类代替内联样式：**\n   \n   - 避免直接操作 `element.style`，因为它会导致样式计算和布局的开销。\n   \n   - **优化：** 预先定义好 CSS 类，通过增删改元素的 `className` 或 `classList` 来改变样式。\n\n6. **将元素脱离文档流：**\n   \n   - 如果必须对一个元素进行多次复杂的 DOM 操作，可以先通过设置 `display: none` 或将其从 DOM 中移除，进行操作，然后重新插入/显示。脱离文档流的操作不会触发整个页面的重排。",
           "hasAnswer": true
@@ -1062,25 +1044,13 @@
         },
         {
           "id": "browser-11",
-          "title": "怎么衡量一个页面的渲染速度，性能",
+          "title": "了解浏览器渲染引擎有哪些，渲染机制是怎样的吗，举例说明一下",
           "content": "",
           "hasAnswer": false
         },
         {
           "id": "browser-12",
-          "title": "你对首屏时间，可交互时间等概念的理解和看法",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "browser-13",
-          "title": "xss、csrf攻击原理和防范",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "browser-14",
-          "title": "了解浏览器渲染引擎有哪些，渲染机制是怎样的吗，举例说明一下",
+          "title": "浏览器地址栏url后发生了什么",
           "content": "",
           "hasAnswer": false
         }
@@ -1237,7 +1207,7 @@
         {
           "id": "engineering-1",
           "title": "Webpack 构建流程和原理",
-          "content": "阶段一：初始化 (Initialization)：Webpack 从启动到开始处理文件前的准备阶段。\n\n1. **参数合并:** 读取并合并 `webpack.config.js` 中的配置参数、Shell 命令行参数以及默认配置。\n\n2. **创建 Compiler:** 创建一个 `Compiler` 实例。`Compiler` 是 Webpack 的核心对象，它贯穿整个生命周期，负责协调整个构建流程。\n\n3. **加载插件:** 遍历配置中的 `plugins` 数组，依次执行插件的 `apply` 方法，注册各种 Hook（钩子）函数，监听 Compiler 或 Compilation 的事件。\n\n阶段二：构建模块 (Building Modules)：此阶段的核心是根据入口文件递归地构建**模块依赖图 (Module Dependency Graph)**。\n\n1. **确定入口:** 从配置中定义的 `entry` 入口文件开始。\n\n2. **创建 Compilation:** 创建一个 `Compilation` 实例。`Compilation` 对象负责本次构建过程的资源管理，包括模块、依赖图、Chunk、生成的资源文件等信息。\n\n3. **Module 构建循环:** Webpack 进入模块处理的循环：\n   \n   - **加载 (Loading):** 根据模块路径读取文件内容。\n   \n   - **解析 (Resolving):** 使用配置好的 `resolve` 规则，确定模块的绝对路径。\n   \n   - **处理 (Processing):**\n     \n     - 将文件内容传递给匹配的 **`Loader`**。Loader 负责将非 JS 类型的资源（如 TS, Sass, Vue 文件）转换为有效的 JavaScript 模块内容，或进行转换（如 Babel 转译）。\n     \n     - Loader 链式执行，前一个 Loader 的输出是后一个 Loader 的输入。\n   \n   - **依赖分析:** 使用 **`Parser`** (解析器) 遍历经过 Loader 处理后的代码内容。解析器会识别出代码中的 `import`、`require()`、`import()` 等模块导入语句。\n   \n   - **递归:** 每识别到一个依赖，就将其加入到依赖图，并对该依赖文件重复整个构建循环，直到所有依赖都被处理。\n\n阶段三：生成资源 (Sealing & Emitting)\n\n在依赖图构建完成后，Webpack 开始将模块组合成可部署的资源文件。\n\n1. **Chunk 分组:** 将构建好的模块根据它们的关系进行分组，形成 **Chunks** (代码块)。\n   \n   - **Entry Chunk:** 对应入口文件及其同步依赖。\n   \n   - **Lazy Chunk:** 对应通过 `import()` 动态导入形成的异步加载模块。\n   \n   - **Vendor/Common Chunk:** 对应通过 `SplitChunksPlugin` 提取的公共/第三方模块。\n\n2. **Chunk 优化 (Tree Shaking/Code Splitting):** 运行优化步骤，如 Tree Shaking 移除未使用的代码，以及 `splitChunks` 配置提取公共代码。\n\n3. **生成 Bundle:** 将 Chunk 映射到最终的输出文件（Bundle）。Webpack 为每个 Chunk 添加 runtime 代码（用于加载和执行模块）和模块包装器。\n\n4. **写入文件:** 最终，执行 `emitAssets` 钩子，将内存中生成的 Bundle 文件内容写入到输出目录（`output` 配置）。",
+          "content": "阶段一：初始化 (Initialization)：Webpack 从启动到开始处理文件前的准备阶段。\n\n1. **参数合并:** 读取并合并 `webpack.config.js` 中的配置参数、Shell 命令行参数以及默认配置。\n\n2. **创建 Compiler:** 创建一个 `Compiler` 实例。`Compiler` 是 Webpack 的核心对象，它贯穿整个生命周期，负责协调整个构建流程。\n\n3. **加载插件:** 遍历配置中的 `plugins` 数组，依次执行插件的 `apply` 方法，注册各种 Hook（钩子）函数，监听 Compiler 或 Compilation 的事件。\n\n阶段二：构建模块 (Building Modules)：此阶段的核心是根据入口文件递归地构建**模块依赖图 (Module Dependency Graph)**。\n\n1. **确定入口:** 从配置中定义的 `entry` 入口文件开始。\n\n2. **创建 Compilation:** 创建一个 `Compilation` 实例。`Compilation` 对象负责本次构建过程的资源管理，包括模块、依赖图、Chunk、生成的资源文件等信息。\n\n3. **Module 构建循环:** Webpack 进入模块处理的循环：\n   \n   - **加载 (Loading):** 根据模块路径读取文件内容。\n   \n   - **解析 (Resolving):** 使用配置好的 `resolve` 规则，确定模块的绝对路径。\n   \n   - **处理 (Processing):**\n     \n     - 将文件内容传递给匹配的 **`Loader`**。Loader 负责将非 JS 类型的资源（如 TS, Sass, Vue 文件）转换为有效的 JavaScript 模块内容，或进行转换（如 Babel 转译）。\n     \n     - Loader 链式执行，前一个 Loader 的输出是后一个 Loader 的输入。\n   \n   - **依赖分析:** 使用 **`Parser`** (解析器) 遍历经过 Loader 处理后的代码内容。解析器会识别出代码中的 `import`、`require()`、`import()` 等模块导入语句。\n   \n   - **递归:** 每识别到一个依赖，就将其加入到依赖图，并对该依赖文件重复整个构建循环，直到所有依赖都被处理。\n\n阶段三：生成资源 (Sealing & Emitting)\n\n在依赖图构建完成后，Webpack 开始将模块组合成可部署的资源文件。\n\n1. **Chunk 分组:** 将构建好的模块根据它们的关系进行分组，形成 **Chunks** (代码块)。\n   - **Entry Chunk:** 对应入口文件及其同步依赖。\n   - **Lazy Chunk:** 对应通过 `import()` 动态导入形成的异步加载模块。\n   - **Vendor/Common Chunk:** 对应通过 `SplitChunksPlugin` 提取的公共/第三方模块。\n\n2. **Chunk 优化 (Tree Shaking/Code Splitting):** 运行优化步骤，如 Tree Shaking 移除未使用的代码，以及 `splitChunks` 配置提取公共代码。\n\n3. **生成 Bundle:** 将 Chunk 映射到最终的输出文件（Bundle）。Webpack 为每个 Chunk 添加 runtime 代码（用于加载和执行模块）和模块包装器。\n\n4. **写入文件:** 最终，执行 `emitAssets` 钩子，将内存中生成的 Bundle 文件内容写入到输出目录（`output` 配置）。",
           "hasAnswer": true
         },
         {
@@ -1358,7 +1328,7 @@
     },
     {
       "id": "cicd",
-      "name": "CI/CD",
+      "name": "CI&CD",
       "questions": [
         {
           "id": "cicd-1",
@@ -1368,66 +1338,72 @@
         },
         {
           "id": "cicd-2",
+          "title": "前端工程化的理解，如何自动化，成熟的体系应该具备哪些要素",
+          "content": "前端工程化的本质是——让前端开发从“手工活”变成“可规模化、可度量、可迭代的生产体系”，核心目标是：提效、稳定、可控。\n\n自动化质量控制 lint prettier git规范等\n\n自动化构建，自动化发布，保证性能、产物可控、灰度发布、流量分配、自动回滚\n\n监控报警\n\n前端工程化的核心是标准化 + 自动化 + 流程化 + 度量化。  \n成熟体系应该覆盖整个研发生命周期：从代码规范、项目结构、组件库沉淀、构建优化，到测试、CI/CD、灰度发布、监控报警。  \n最终目标是：让开发提效、质量可控、上线可回滚、运行可监控。",
+          "hasAnswer": true
+        },
+        {
+          "id": "cicd-3",
           "title": "nginx配置",
           "content": "Nginx 主要用于作为**反向代理**、**静态资源服务器**和**负载均衡器**。\n\n前端常用：配置SPA 、静态资源路径、反向代理解决跨域、缓存配置、Gzip 压缩等\n\n核心配置项：\n\n```\nserver {\n    listen 80;\n    server_name example.com;\n\n    # 1. 静态资源托管\n    location / {\n        root /usr/share/nginx/html;\n        index index.html;\n        try_files $uri $uri/ /index.html; # 关键：解决 Vue/React Router 刷新 404 问题\n    }\n\n    # 2. 反向代理（解决跨域）\n    location /api/ {\n        proxy_pass http://api.backend.com/; # 转发到真实后端\n    }\n\n    # 3. 开启 Gzip 压缩\n    gzip on;\n    gzip_types text/plain application/javascript text/css;\n}\n```",
           "hasAnswer": true
         },
         {
-          "id": "cicd-3",
+          "id": "cicd-4",
           "title": "cdn配置",
           "content": "将静态资源分发到全球边缘节点，使用户可以从最近的节点获取资源，加速访问\n\n- **前端配合:** 构建工具（Webpack/Vite）需要配置 **`publicPath`** 为 CDN 域名地址。\n\n- **CDN 关键配置:**\n  \n  - **回源策略:** 配置 CDN 节点在缓存未命中时，回源到 Nginx 或 OSS。\n  \n  - **缓存规则:** 区分可缓存（如带 Content Hash 的 JS/CSS）和不可缓存（如 `index.html`）。通常对带 Hash 的资源设置长缓存（如 1 年），对 `index.html` 设置短缓存（如 5 分钟）或不缓存。\n  \n  - **预热/刷新:** 部署后对新的资源文件进行预热，对旧的资源路径进行缓存刷新。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-4",
+          "id": "cicd-5",
           "title": "oss 是什么？有什么作用和优势",
           "content": "- 高可靠、高并发、低成本的静态文件存储服务（如 AWS S3, 阿里云 OSS）。\n\n- **前端应用:** 通常将前端构建产物直接上传到 OSS 存储桶中，然后通过 CDN 绑定该存储桶的域名进行加速访问。\n\n- **优势:** 免维护服务器、高可用性。\n\n和cdn对比：\nOSS (Object Storage Service - 对象存储)\n- **作用**：像一个海量的硬盘，专门存静态文件（图片、JS、CSS、视频）。\n- **优势**：高可靠（文件不丢）、按量付费（省钱）、不占用服务器磁盘。\n\nCDN (Content Delivery Network - 内容分发网络)\n- **作用**：像连锁店。在全国各地放服务器，缓存 OSS 里的内容。\n- **优势**：**就近访问**。你在北京访问，CDN 就从北京节点给你发货，速度极快。\n\n| **维度** | **OSS**            | **CDN**                 |\n| ------ | ------------------ | ----------------------- |\n| **本质** | **仓库**（存东西的地方）     | **快递**（送东西的地方）          |\n| **位置** | 固定的中心机房            | 分布在全国各地的边缘节点            |\n| **配合** | 前端产物 `dist` 传给 OSS | 域名指向 CDN，CDN 回源 OSS 拿数据 |",
           "hasAnswer": true
         },
         {
-          "id": "cicd-5",
+          "id": "cicd-6",
           "title": "OSS 怎么配合 CDN 做缓存刷新的主流方案",
           "content": "文件哈希 + 强缓存：这是目前不需要手动频繁刷新 CDN 的最稳妥方案：\n\n- **静态资源 (JS/CSS/Image)**：文件名带上 Hash（如 `main.a1b2c3.js`）。设置 CDN 为**强缓存**（Cache-Control: max-age=31536000）。\n    - _原理_：文件名变了，CDN 没见过这个文件，会自动回源 OSS 拿新的。\n\n- **入口文件 (index.html)**：文件名不变。设置 CDN 为**协商缓存**（Cache-Control: no-cache）。\n    - _原理_：每次访问 index.html，CDN 都会回源头对比一下。如果 index.html 更新了，它就下发新的，从而引导浏览器去加载新的 Hash 资源。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-6",
+          "id": "cicd-7",
           "title": "npm pnpm",
           "content": "pnpm：下载包全局存储，然后硬链接到项目目录。所以避免一台机器上重复下载和拷贝，节约磁盘空间，且安装快速\n\n严格的非扁平化依赖树，**避免幽灵依赖**。只允许访问声明的依赖，提高稳定性。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-7",
+          "id": "cicd-8",
           "title": "npm install后发生了什么",
           "content": "- **检查本地缓存:** 检查 `node_modules` 是否存在，以及 `lock` 文件是否与 `package.json` 匹配。\n\n- **下载依赖:**\n  \n  - **npm/Yarn:** 访问 npm Registry，根据 `lock` 文件中记录的 URL/Hash/Version 下载依赖包，并存入全局缓存。\n  \n  - **pnpm:** 检查本地内容寻址存储中是否已存在该版本的包。如果存在，跳过下载。\n\n- **构建依赖树:**\n  \n  - **npm/Yarn:** 根据下载的包创建**扁平化**的依赖树结构，解决依赖冲突（如果能解决）。\n  \n  - **pnpm:** 根据 `lock` 文件创建**严格的非扁平化**依赖树，使用**硬链接和符号链接**连接到全局存储的包。\n\n- **执行生命周期脚本:** 运行依赖包中定义的 `install`、`postinstall` 等脚本（例如 `node-sass` 或 `Puppeteer` 的编译步骤）。\n\n- **生成/更新 Lock 文件:** 如果 `package.json` 有变化，更新 `package-lock.json` 或 `pnpm-lock.yaml`，确保团队构建环境的一致性。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-8",
+          "id": "cicd-9",
           "title": "模块化发展历程(AMD/CMD/UMD/ES6)",
           "content": "**CommonJS (CJS)** 同步加载，`require()` 和 `module.exports`。用在node环境\n\n**AMD 异步**加载，适合浏览器，如 RequireJS。**依赖前置**，模块定义时所有依赖就绪并加载（预先加载）。\n\n**CMD**异步加载，推崇就近依赖。模块代码执行到 `require` 时才加载（按需加载）。\n\n**UMD**通用模式，兼容 CJS、AMD 和全局变量，用于库的发布。是**打包规范**，用于让一个模块或库同时兼容多种加载环境。\n\n**ES Module (ESM)** 静态加载、`import` / `export`，支持 Tree Shaking 和 `import()` 动态加载。\n\nAMD CMD UMD 它们都需要引入各自的模块加载器库，因为浏览器不原生支持这些规范。\n\nWebpack（以及其他现代构建工具，如 Rollup, Parcel, Vite）在编译时处理了 CJS 的引用和依赖关系，并消除了对原生 CJS 运行时环境的需求\n\n补充：JavaScript 模块化机制中最核心、最稳定的特性：**模块单例（Module Singleton）**。对于所有现代 JavaScript 模块规范（CJS, AMD, **ESM**），无论是同步导入还是动态导入，一旦一个模块被加载并执行，它的结果就会被**缓存**起来。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-9",
+          "id": "cicd-10",
           "title": "动态 import()",
           "content": "这是前端性能优化重要方式，也就是所谓的**路由懒加载**。\n用法：返回一个 Promise 对象。可以用.then或者async await\n\n- **作用：** 只有当代码真正运行到这一行时，才去服务器下载对应的 JS 模块。\n\n- **原理（Webpack 实现）：**\n    1. **代码分割 (Code Splitting)**：构建工具识别到 `import()`，会将该模块打包成一个独立的子包（Chunk）。\n    2. **JSONP 加载**：运行到该行时，浏览器动态插入一个 `<script>` 标签指向子包地址。\n    3. **异步执行**：脚本加载完成后，Promise 状态变为 `resolved`，执行后续逻辑。\n\n- **优势：**\n    1. **减小首屏体积**：不用一次性下载几 MB 的代码。 \n    2. **按需加载**：用户不点击的功能永远不下载，省流量。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-10",
+          "id": "cicd-11",
           "title": "前端微服务架构实践",
           "content": "**核心目标:** 将一个庞大的前端应用拆分为多个独立开发、独立部署、独立运行的小应用。\n\n- **Module Federation (推荐):** Webpack 5 联邦模块功能，实现运行时模块共享和依赖去重。\n\n- **Single-SPA/Qiankun (基于框架):** 通过路由劫持和沙箱机制，实现应用级的集成。\n\n- **Web Components/Iframe (隔离):** 通过浏览器原生技术实现 UI 隔离。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-11",
+          "id": "cicd-12",
           "title": "Monorepo 项目管理",
           "content": "- **定义:** 将多个项目（Package）的代码存储在一个 Git 仓库中。最终的构建（Build）和部署（Deploy）仍然是**按需、独立**进行的。\n\n- **常用工具:** Lerna, Nx, Turborepo, Yarn/pnpm Workspace。\n\n- **优势:**\n  \n  - **代码共享:** 易于在不同项目间共享代码和配置。\n  \n  - **原子提交:** 一个 Commit 可以涉及多个项目，提交历史清晰。\n  \n  - **统一依赖:** 容易实现依赖版本统一。\n\n- **挑战:** 仓库体积大，工具配置复杂，权限控制难度增加。\n\n- CI：**Monorepo 工具的集成 (Nx/Turborepo):** 这些工具可以智能地判断**哪些项目**受到了代码变动的影响。例如，在 CI 中运行 `npx nx affected:build`，只构建那些代码或其依赖发生变化的子项目。\n\n- 通常会有一个位于 Monorepo 根目录下的**主 CI 配置文件**，它负责调用 Monorepo 工具，并确定哪个子项目的部署流程需要被触发。\n\n- **部署脚本：** 具体的部署逻辑（例如如何将文件上传到 S3 或如何调用 K8s 部署 API）通常会封装成每个项目内部的独立脚本，或由主 CI 配置文件通过参数动态调用。\n\n**总结：** 在 Monorepo 中，CI 流程是**集中的且智能的**；而 CD 流程是**分散的且独立的**。",
           "hasAnswer": true
         },
         {
-          "id": "cicd-12",
+          "id": "cicd-13",
           "title": "包管理和版本控制策略",
           "content": "- **版本锁定:** 强制使用 `package-lock.json` 或 `pnpm-lock.yaml` 锁定依赖版本，确保不同环境下的依赖一致性。\n\n- **包管理:** 使用 **pnpm Workspace**（基于 Monorepo 的包管理）来实现依赖共享和节省空间。\n\n模块的单例行为与 React Hooks 或 Vue Composition API 中的 `composable`（组合式函数）的行为，构成了前端状态管理和逻辑复用的两种截然不同的模式。\n\n模块：共享的应用级状态\n\nHooks / Composable：隔离的组件级状态",
           "hasAnswer": true
@@ -1447,38 +1423,68 @@
         },
         {
           "id": "open-questions-2",
-          "title": "前端鉴权的几种方式和优缺点",
-          "content": "##### Session-Cookie 鉴权（传统主流）\n\n这是最经典的“有状态”鉴权方式。\n\n- **流程**：用户登录成功，服务器创建一个 **Session** 记录并存储在内存/Redis中，同时向浏览器返回一个包含 `SessionID` 的 **Cookie**。后续请求浏览器会自动带上该 Cookie。\n    \n- **优点**：\n    \n    - **安全性高**：敏感数据存在服务端，Cookie 设置 `HttpOnly` 可防 XSS。\n        \n    - **可控性强**：服务端可以随时销毁 Session 强制用户下线。\n        \n- **缺点**：\n    \n    - **扩展性差**：多台服务器时需要做 Session 共享（如同步到 Redis），否则负载均衡会导致登录失效。\n        \n    - **跨端不友好**：原生 App 或小程序对 Cookie 的支持不如浏览器。\n        \n    - **CSRF 风险**：因为依赖 Cookie 自动携带，容易受到 CSRF 攻击。\n\n##### OAuth 2.0 (第三方授权)\n\n这通常用于“第三方登录”（如微信、GitHub 登录）或分布式系统间的权限委派。\n\n- **流程**：\n    1. 用户向授权服务器申请授权。\n    2. 授权服务器返回 **Code (授权码)**。\n    3. 后端用 Code 换取 **Access Token**。\n- **优点**：\n    - **安全性**：用户不需要将密码交给第三方应用。\n    - **细粒度**：可以控制只授权读取头像、不授权发动态等权限。\n- **缺点**：\n    - **逻辑复杂**：需要多次跳转和 Code 换 Token 的过程。\n\n##### SSO (Single Sign-On, 单点登录)\n\n解决“一个公司有多个子系统，登录一次即可访问所有”的需求。\n\n- **实现方式**：\n    \n    - **同父域**：通过设置 Cookie 的 `Domain` 为父域名（如 `.baidu.com`），让子域共享 Cookie。\n        \n    - **跨域**：使用 CAS (Central Authentication Service) 模式。用户重定向到独立的 **认证中心**，登录后携带 Ticket 回跳。\n        \n- **优点**：提升用户体验，统一管理账号。\n    \n- **缺点**：认证中心一旦宕机，所有关联系统全部瘫痪（单点故障）。\n\n#####  JWT (JSON Web Token)？\n\n**J这是“无状态”鉴权的代表，非常适合前后端分离及分布式架构。\n\n- **结构：** 它由三部分组成：`Header`（算法信息）、`Payload`（用户信息，如 user_id）、`Signature`（签名，防止篡改）。\n- **存储：** 前端拿到后，通常不存在 Cookie 里，而是存在 `localStorage` 或 `sessionStorage` 中。\n- **传递：** 发请求时，前端手动把它塞进 HTTP Header 的 `Authorization` 字段里（例如：`Authorization: Bearer <token>`）\n\n##### 为什么 JWT 天然免疫 CSRF？\n\n**原因很简单：CSRF 攻击靠的是浏览器的“自动带 Cookie”机制。**\n\n- **Cookie 机制：** 它是浏览器的**原生行为**。不管你愿意不愿意，只要地址匹配，浏览器就自动帮你贴上 Cookie。黑客就是利用这种“自动”来完成攻击。\n    \n- **JWT 机制：** 它是**手动行为**。存在 `localStorage` 里的 JWT，浏览器绝对不会自动帮你带在 Header 里。必须由你（开发者）写代码 `headers: { 'Authorization': token }` 才能带上去。\n\n当用户点击黑客的 `a.com` 诱导链接时，黑客的脚本无法读取你 `b.com` 域名下的 `localStorage`（受同源策略保护），且浏览器不会自动给跨站请求加上 `Authorization` 头。**既然请求里没有 Token，服务器就会直接拒绝，CSRF 攻击就此失效。**\n\n#### JWT vs Cookie (Session) 深度对比\n\n| **维度**      | **Cookie + Session (传统)**      | **JWT (现代)**                 |\n| ----------- | ------------------------------ | ---------------------------- |\n| **存储位置**    | 服务器存 Session，客户端存 Cookie       | 服务器不存（无状态），客户端存 Token        |\n| **CSRF 防护** | **风险高**，需额外配合 Token 或 SameSite | **天然免疫**，因为不依赖浏览器自动行为        |\n| **水平扩展**    | 较难（多台服务器需要共享 Session）          | **非常容易**（服务器只要有密钥就能解密 Token） |\n| **时效性**     | 可以在服务端随时注销                     | 一旦签发，很难在有效期内提前作废             |\n#### JWT 就绝对安全了吗？（新的挑战）\n\n虽然 JWT 解决了 CSRF，但它引入了新的风险：**XSS 风险。**\n\n- **风险点：** 如果你的页面有 XSS 漏洞，黑客可以运行 JS 代码 `localStorage.getItem('token')`。一旦 Token 被偷走，黑客可以在任何地方冒充你。\n    \n- **对比：** Cookie 如果设置了 `HttpOnly`，JS 是读不到的，所以 Cookie 在防范 XSS 偷取凭证方面比 JWT 强。\n\n#### JWT进阶：双令牌机制 (Access Token + Refresh Token)\n\n**双令牌机制**（Dual Token Mechanism）是为了解决 JWT（JSON Web Token）的一个核心矛盾：**“安全性”与“用户体验”的博弈。**\n\n**双令牌机制的本质**：把“验证频率”和“登录频率”拆分开。\n\n| **令牌名称**                 | **作用**                                   | **有效期**           | **存储位置建议**                       |\n| ------------------------ | ---------------------------------------- | ----------------- | -------------------------------- |\n| **Access Token** (访问令牌)  | 真正的“通行证”，每次请求都携带。安全性高，即使被盗也很快失效。         | **短**（如 15-30 分钟） | 内存 (Vuex/Pinia) 或 SessionStorage |\n| **Refresh Token** (刷新令牌) | 专门用来换取新的 Access Token。只在刷新时才发送一次，暴露频率极低。 | **长**（如 7-14 天）   | LocalStorage 或 HttpOnly Cookie   |\n\n工作流程（无感续期）\n1. **用户登录**：服务端返回两个 Token：`accessToken` 和 `refreshToken`。\n2. **正常访问**：前端将 `accessToken` 放在 Header 里请求数据，后端验证通过。\n3. **令牌过期**：\n    - `accessToken` 过期，后端返回 **401 Unauthorized**（或特定错误码）。\n4. **无感刷新**：\n    - 前端拦截到 401 错误，**不跳转登录页**。\n    - 前端自动发起一个隐藏请求，携带 `refreshToken` 访问“刷新接口”。\n    - 服务端验证 `refreshToken` 有效，颁发一个新的 `accessToken` 给前端。\n5. **重新请求**：前端用新的 `accessToken` 重新发起刚才失败的那个业务请求。用户完全感觉不到中途发生了令牌置换。\n\n#### 工程上怎么选登录方案？\n\n- **Session-Cookie**：最成熟，安全性高，但对分布式系统不友好，且存在 CSRF 风险。需要配合 `HttpOnly`、`Secure`、`SameSite=Lax` 以及 `CSRF Token`，全方位防护。\n\n- **JWT**：目前最流行，它是无状态的，易于横向扩展，适合跨端，但要注意 XSS 防护以及 Token 吊销的问题。尤其 **移动端 (App / 小程序)** 首选 **JWT**。因为 App 没有浏览器的 Cookie 限制，JWT 跨域和扩展性极强。\n\n- **OAuth 2.0**：主要用于授权，是实现第三方登录的标准。\n\n- **SSO**：解决多系统间的统一登录问题。",
+          "title": "web worker & service worker",
+          "content": "##### Web Workers 的工作原理和使用场景\n\nWeb Workers 是浏览器提供的**多线程解决方案**，允许在后台线程中运行 JavaScript 代码，避免阻塞主线程（UI 线程）。\n\n特点：\n\n- **没有 DOM 访问权限**：Worker 线程无法操作 `window`、`document`、`parent` 对象。\n    \n- **同源限制**：Worker 脚本文件必须与主页面同源。\n    \n- **通信机制**：主线程与 Worker 线程之间通过 `postMessage` 传递数据，通过 `onmessage` 监听。\n    \n- **独立上下文**：它有自己的全局对象 `self`，支持 `navigator`、`location`（只读）、`XMLHttpRequest` 和 `fetch`。\n\n分类：\n\n- 普通Web Worker (Dedicated Worker)： **不能**直接拦截网络请求，需要通过主线程代为请求。   \n    \n- **Shared Worker**：可以被多个窗口、iframe 或标签页共享（前提是同源）。\n    \n- **Service Worker**：拦截和处理网络请求，可以用来实现离线缓存、消息推送、后台同步，充当代理服务器。\n\n主要优势：\n\n- 提高用户体验：耗时计算放在后台，保证主界面流畅。\n    \n- 利用多核 CPU：现代浏览器可以将 Worker 调度到不同的 CPU 核心上并行执行。\n\n##### 解释什么是服务工作线程(Service Worker)，以及它可以如何帮助提高一个游戏网站的性能?\"\n\nservice worker是web worker的一种，Service Worker 脚本在后台运行，与网页的生命周期分离。它最强大的能力是拦截和处理流经它的网络请求，以及持久化存储的能力，这使得缓存控制和离线体验成为可能。\n\n关键能力：\n\n- **离线缓存 (Caching)：** 通过 `Cache Storage API` 控制缓存，实现“网络优先”或“缓存优先”等策略，使用户在离线时也能访问内容。\n    \n- **请求拦截：** 在 Service Worker 的 `fetch` 事件中，可以自定义如何响应网络请求（例如返回缓存、发送请求到网络、或返回自定义响应）。\n    \n- **消息推送 (Push Notification)：** 配合 Push API，在用户未打开页面时，也能接收服务器推送的消息。\n    \n- **后台同步 (Background Sync)：** 允许应用在离线时操作数据，待设备联网后自动进行同步。\n\n使用限制：\n\n- **必须在 HTTPS 环境下使用：** 为了安全考虑，Service Worker 只能在通过 HTTPS 提供的页面上注册和运行（本地开发环境的 `localhost` 除外）。\n    \n- **同源限制：** 只能控制相同源（协议、域名、端口）下的页面。\n    \n- **不能访问 DOM：** 与 Web Worker 一样，不能直接操作 DOM。",
           "hasAnswer": true
         },
         {
           "id": "open-questions-3",
-          "title": "开放题&场景题",
-          "content": "大文件上传\n\n前端截图，海报绘制\n\n自动化发布，发布版本号，停留页面提示更新\n\n##### SSR-SSG-SPA-MPA\n\n调试console\n\n##### 前端存储 Local storage，session，indexDB，cookie，根据写的倒计时代码，穿插着问的，问的很深\n\nIndexDB存储上限\n\nfile blob\n\n##### npm install后发生了什么\n\n浏览器地址栏url后发生了什么\n\njs写倒计时组件代码，并优化，长时间怎么解决误差，数据量大怎么办\n\n用过的 AI大模型，使用方式，用了他们那些功能，觉得AI大模型他们存在有什么样的缺点\n\n##### 前端性能指标有哪些?(LCP, FID,CLS等)如何优化这些指标\n\n##### 某个复杂模块的设计思路、遇到的性能瓶颈及解决方案\n\n如何设计一个高可用的前端系统\n\n##### 前端监控系统如何设计?如何上报和分析数据?\n\nPWA (Progressive Web Apps)了解吗?它的核心技术有哪些\n\n谈谈你对SSR(Server-Side Rendering)和 CSR (Client-Side Rendering) 的理解。\n\n如何处理前端的兼容性问题?\n\n对于新技术，你是如何学习和评估的\n\n你认为前端未来3-5年的发展方向是什么?\n\n##### 设计一个在线文档协同编辑的方案，需要考虑哪些技术点\n\n你遇到的最大的技术挑战是什么?从中学习到了什么?\n\n除了 redux mbox dva 还用过其他的 状态管理没\n\n职业发展，今年的打算\n\n组件升级怎么让使用这个组件的人都知道\n\n如果让你设计项目自动设计组件升级，并且安全，你会怎么去设计\n\n用setTimeout实现setInterva，用requestAnimationFrame实现setTimeout\n\n##### Web Workers 的工作原理和使用场景\n\nWeb Workers 是浏览器提供的**多线程解决方案**，允许在后台线程中运行 JavaScript 代码，避免阻塞主线程（UI 线程）。主要优势：\n\n- 提高用户体验：耗时计算放在后台，保证主界面流畅。\n\n- 利用多核 CPU：现代浏览器可以将 Worker 调度到不同的 CPU 核心上并行执行。\n\n#### 跨浏览器 跨终端开发的兼容性处理方案\n\n挑战：\n\n 不同设备：屏幕尺寸与分辨率，输入方式差异，性能与网络条件\n\n- **性能考量**：考虑不同设备的性能差异\n\n- **工具自动化**：使用构建工具处理大部分兼容性问题\n\n- **组件库**：使用成熟的 UI 库（如 Ant Design、Material-UI）\n\n\"描述一种方法，用以实现一个动态加载内容的无限滚动列表。\"\n\n\"如果你有一个含有数百个项目的数组，你将如何有效地搜索特定项目?\"\n\n\"我们的游戏界面需要实时更新玩家的得分，你会如何设计前端架构来实现这一功能?\"\n\n##### \"解释什么是服务工作线程(Service Worker)，以及它可以如何帮助提高一个游戏网站的性能?\"\n\nservice worker是web worker的一种，Service Worker 脚本在后台运行，与网页的生命周期分离。它最强大的能力是拦截和处理流经它的网络请求，以及持久化存储的能力，这使得缓存控制和离线体验成为可能。\n\n- **请求拦截能力（`fetch` 事件）。**\n\n- **持久化存储能力（`Cache Storage API`）。**\n\n\"如何在前端项目中实现国际化和本地化?\n\n模块化的演进历程\n\nJavaScript 内存管理和垃圾回收\n\n防抖和节流的实现与应用\n\n深拷贝的多种实现方案\n\n函数式编程在项目中的应用?\n\n##### 错误监控和异常处理\n\n前端安全(XSS/CSRF)防护\n\nWebpack 构建流程和原理\n\n##### 前端性能指标有哪些?(LCP,FID,CLS等)如何优化这些指标?\n\n你觉得js里this的设计怎么样?有没有什么缺点啥的\n\n##### 如果让你从零开始搭建一个大型电商网站的前端架构，你会如何设计?考虑哪些问题如何解决\n\n架化 与设计共同维护的UI库\n\nCICD 打包工具 nginx 部署流程CDN OSS 通常都是接公司平台 灰度发布\n\n团队与工程化 menorepo 规范 lint prettier 微前端\n\n监控报警 sentry\n\n其他 国际化 与设计共同维护的UI库\n\n##### 项目报错如何定位，sourcemap\n\n**Sourcemap 是源码和编译后代码的映射文件**，让浏览器能将压缩混淆后的代码映射回原始源代码。在复杂的现代前端项目中，代码经过构建工具（如 Webpack、Vite）的打包、压缩、混淆，生产环境在监控工具或浏览器控制台中，错误堆栈显示的是 **压缩后的文件名、行号和列号**（例如 `main.js:123:45`）。当浏览器或监控工具遇到一个指向 `main.js:123:45` 的错误时，根据sourcemap 查找对应的 `main.js.map` 文件。这个 `.map` 文件存储了原始代码和压缩代码之间的**映射关系**（即 `main.js` 的第 123 行第 45 列对应于 `src/components/UserForm.vue` 的第 50 行第 10 列）。map文件建议不部署到生产服务器。而是将 `.map` 文件上传到错z误监控平台（如 Sentry）。\n\nreact 对比 vue，为什么react需要fiber\n\n##### 如果让你从零开始搭建一个大型前端项目\n\n技术栈选型 框架 语言ts/js css 状态管理 组件库\n\n架构总体思路：ssr/csr SPA/MPA\n\nCICD 打包工具 nginx 部署流程CDN OSS 通常都是接公司平台 灰度发布\n\n团队与工程化 menorepo 规范 lint prettier 微前端\n\n监控报警 sentry\n\n其他 国际化 与设计共同维护的UI库\n\n##### 大型电商网站的架构，你会如何设计?考虑哪些问题如何解决\n\n高并发：忙绿兜底 下单锁 防刷\n\nSEO：ssr\n\nSKU复杂：SKU矩阵选择控件 库存变化要实时同步\n\n支付下单：流程复杂、强一致性要求高：必须 表单自动保存  交易失败兜底提示 幂等提交\n\n性能优化；OSS CDN \n\nA/B 测试、埋点\n\n安全\n\n##### 从0搭建一个内部脚手架项目\n\n##### 前端工程化的理解，如何自动化，成熟的体系应该具备哪些要素\n\n前端工程化的本质是——让前端开发从“手工活”变成“可规模化、可度量、可迭代的生产体系”，核心目标是：提效、稳定、可控。\n\n自动化质量控制 lint prettier git规范等\n\n自动化构建，自动化发布，保证性能、产物可控、灰度发布、流量分配、自动回滚\n\n监控报警\n\n前端工程化的核心是标准化 + 自动化 + 流程化 + 度量化。  \n成熟体系应该覆盖整个研发生命周期：从代码规范、项目结构、组件库沉淀、构建优化，到测试、CI/CD、灰度发布、监控报警。  \n最终目标是：让开发提效、质量可控、上线可回滚、运行可监控。\n\n##### 微前端\n\n两个角色，主应用和子应用\n\n技术难点：样式隔离，JavaScript 隔离，路由管理和应用切换，公共依赖的打包和互相引用、应用之间事件和数据传输\n\n解决：\n\n样式隔离：CSS Modules+CSS-in-JS\n\njs隔离：所有微应用共享全局环境（`window` 对象），如果微应用 A 在全局对象上挂载了变量，微应用 B 可能会意外使用或覆盖它。主流方案是：利用 ES6 的 `Proxy` 对象劫持对 `window` 对象的访问。微应用对 `window` 的读写操作都被 `Proxy` 拦截，读操作从全局 `window` 读取，写操作写入到**当前微应用自己的代理对象**中，从而隔离了对真实全局 `window` 的污染\n\n路由管理和应用切换：路由切换时，主应用能正确加载/卸载对应的微应用，并保持 URL 同步。监听 `hashchange` 或 `popstate` 事件，匹配路由，加载/卸载模块\n\n公共依赖：避免每个微应用都打包相同的库。方案两个方向，1是子应用不处理外部模块的打包，主应用负责加载公共包，2是webpack5的联邦模块，允许应用 A **暴露**其内部的模块（如 React 库）给应用 B **消费**，实现真正的运行时共享\n\n事件和数据传输：发布订阅模式/基于全局状态管理\n\n实现方案：\n\nQiankun：上手难度低，做了css  js隔离，有完整的生命周期钩子，支持多种技术栈。核心是沙箱机制和生命周期管理\n\nsingle-spa：核心作用是作为一个应用路由器（Application Router）和生命周期管理器\n\n联邦模块 (Webpack 5)，只用来处理公共依赖包的情况\n\n**最佳实践**通常是：**使用 Qiankun 或 Single-SPA 来管理应用的隔离和生命周期，同时使用 Webpack 联邦模块来优化公共依赖和公共组件的加载性能。\n\n##### 未来前端技术哪些需要特别关注的技术点\n\n\n\n##### 设计一套全站点请求耗时统计工具\n\n##### 双 token 无感刷新怎么做？如果 refresh token 也失效了，但你这时挂起了一堆请求，刷新失败了，怎么处理\n\n双 token 机制通常包括一个 **Access Token** (访问令牌) 和一个 **Refresh Token** (刷新令牌)。\n\n1. **Access Token (短有效期):** 用于访问受保护的资源，过期时间短（例如 10 分钟）。\n\n2. **Refresh Token (长有效期):** 用于在 Access Token 过期后，获取新的 Access Token，过期时间长（例如 7 天）\n\n当 Refresh Token 也失效时，意味着用户必须重新登录。此时核心问题是挂起的一堆请求如何在刷新登录后重试，方案是用一个全局的 **刷新锁** 和一个 **请求队列**。\n\n##### 如果要集成一个船上的摄像监控系统（第三方页面，但它不能改代码，只能iframe嵌进去，而且还要求根据用户权限控制展示内容，你会怎么处理\n\n方案1：通过代理服务器实现内容过滤，iframe嵌套后端路径，有权限时跳转，无权限时返回一个兜底\n\n方案2：利用 **第三方系统自身的 URL 参数** 进行控制，前提是第三方已有支持\n\n方案3：用前端遮罩进行视觉控制，只控制是否展示，内容有泄漏风险\n\n##### 有这样一个场景：如果你从多个系统的 API 拉数据，但这些系统的数据结构不一致，比如 A 系统返回 camelCase、B 系统是 snake_case，还有一些是中文 key，你怎么统一数据结构，来复用\n\n核心思想：在逻辑和外部 API 之间，建立一个专门负责转换的中间层——**适配器 (Adapter)**。每个外部系统都有一个专属的适配器，该适配器只负责：从外部系统获取数据 $\\rightarrow$ 将其转换成规范模型 $\\rightarrow$ 传递给你的应用核心逻辑。\n\n对于 **`camelCase` 和 `snake_case`** 之间的转换，可以使用成熟的库进行自动化处理\n\n对于中文 Key 或需要复杂的**业务值转换**，需要硬编码映射规则，维护一个 JSON 或 YAML **映射文件**\n\n##### 如果让你来你现在负责一个项目，有20+个页面，需求方经常改字段、加字段，你每次都要改组件，这个时候你怎么来设计\n\n思路：数据驱动渲染+配置化\n\n配置层：把字段抽象出一套配置文件\n\n业务组件和渲染逻辑层都不需要关心如何配置，而是根据配置自动化地应用\n\n##### 如果你要做一个拖拽式仪表盘Dashboard用户呢能自己拖拽、组合图表组件展示不同数据源的信息，你会怎么来设计这个系统\n\n##### 如果现在一个页面要同时展示 300 辆车的实时位置+轨迹，你怎么来优化\n\n数据层面+渲染层面\n\n数据：后续更新只传输增量变化的字段\n\n渲染：分区绘制/懒加载；WebGL/Canvas 渲染；前端聚合（在地图缩放级别较低时，将前端可见的密集点聚合成一个集群图标）；动画优化GPU加速和requestAnimationFrame\n\n**最佳实践组合：** 在后端实现 **视窗过滤** 和 **轨迹简化**，并使用 **WebSocket** 推送增量位置数据。在前端，使用 **WebGL 地图库** (如 Mapbox GL JS) 进行高性能渲染。\n\n##### 地图中你是怎么处理车辆轨迹“绕圈走”的情况的？比如一个车在原地掉头、拐弯，但 GPS 连续记录了好几个点，那肯定你的轨迹图就会一堆锯齿，怎么来做呢\n\n##### GeoJSON 有哪些字段？你在做行政区边界展示的时候，做过数据裁剪吗？如果只展示“浦东新区”这一个区的数据，你怎么只加载它？\n\n##### 怎么处理 WebSocket 的多连接问题？比如你一个页面要同时订阅车辆位置、报警事件、设备状态，怎么复用，保证不丢数据\n\n##### 有没有处理过图表/地图上的数据级联问题？比如点击图表某个项目，地图跟着联动展示，这块怎么处理的\n\n##### 你认为一个优秀的前端架构师/高级工程师需要具备哪些特质?在你的团队中，你是如何推动技术规范落地和技术选型的?\n\n##### 低代码平台如何实现远程组件的动态加载?\n\n####",
+          "title": "前端存储",
+          "content": "前端存储 Local storage，session，indexDB，cookie，根据写的倒计时代码，穿插着问的，问的很深",
           "hasAnswer": true
         },
         {
           "id": "open-questions-4",
+          "title": "前端鉴权的几种方式和优缺点",
+          "content": "##### Session-Cookie 鉴权（传统主流）\n\n这是最经典的“有状态”鉴权方式。\n\n- **流程**：用户登录成功，服务器创建一个 **Session** 记录并存储在内存/Redis中，同时向浏览器返回一个包含 `SessionID` 的 **Cookie**。后续请求浏览器会自动带上该 Cookie。\n    \n- **优点**：\n    \n    - **安全性高**：敏感数据存在服务端，Cookie 设置 `HttpOnly` 可防 XSS。\n        \n    - **可控性强**：服务端可以随时销毁 Session 强制用户下线。\n        \n- **缺点**：\n    \n    - **扩展性差**：多台服务器时需要做 Session 共享（如同步到 Redis），否则负载均衡会导致登录失效。\n        \n    - **跨端不友好**：原生 App 或小程序对 Cookie 的支持不如浏览器。\n        \n    - **CSRF 风险**：因为依赖 Cookie 自动携带，容易受到 CSRF 攻击。\n\n##### OAuth 2.0 (第三方授权)\n\n这通常用于“第三方登录”（如微信、GitHub 登录）或分布式系统间的权限委派。\n\n- **流程**：\n    1. 用户向授权服务器申请授权。\n    2. 授权服务器返回 **Code (授权码)**。\n    3. 后端用 Code 换取 **Access Token**。\n- **优点**：\n    - **安全性**：用户不需要将密码交给第三方应用。\n    - **细粒度**：可以控制只授权读取头像、不授权发动态等权限。\n- **缺点**：\n    - **逻辑复杂**：需要多次跳转和 Code 换 Token 的过程。\n\n##### SSO (Single Sign-On, 单点登录)\n\n解决“一个公司有多个子系统，登录一次即可访问所有”的需求。\n\n- **实现方式**：\n    \n    - **同父域**：通过设置 Cookie 的 `Domain` 为父域名（如 `.baidu.com`），让子域共享 Cookie。\n        \n    - **跨域**：使用 CAS (Central Authentication Service) 模式。用户重定向到独立的 **认证中心**，登录后携带 Ticket 回跳。\n        \n- **优点**：提升用户体验，统一管理账号。\n    \n- **缺点**：认证中心一旦宕机，所有关联系统全部瘫痪（单点故障）。\n\n#####  JWT (JSON Web Token)？\n\n**J这是“无状态”鉴权的代表，非常适合前后端分离及分布式架构。\n\n- **结构：** 它由三部分组成：`Header`（算法信息）、`Payload`（用户信息，如 user_id）、`Signature`（签名，防止篡改）。\n- **存储：** 前端拿到后，通常不存在 Cookie 里，而是存在 `localStorage` 或 `sessionStorage` 中。\n- **传递：** 发请求时，前端手动把它塞进 HTTP Header 的 `Authorization` 字段里（例如：`Authorization: Bearer <token>`）\n\n##### 为什么 JWT 天然免疫 CSRF？\n\n**原因很简单：CSRF 攻击靠的是浏览器的“自动带 Cookie”机制。**\n\n- **Cookie 机制：** 它是浏览器的**原生行为**。不管你愿意不愿意，只要地址匹配，浏览器就自动帮你贴上 Cookie。黑客就是利用这种“自动”来完成攻击。\n    \n- **JWT 机制：** 它是**手动行为**。存在 `localStorage` 里的 JWT，浏览器绝对不会自动帮你带在 Header 里。必须由你（开发者）写代码 `headers: { 'Authorization': token }` 才能带上去。\n\n当用户点击黑客的 `a.com` 诱导链接时，黑客的脚本无法读取你 `b.com` 域名下的 `localStorage`（受同源策略保护），且浏览器不会自动给跨站请求加上 `Authorization` 头。**既然请求里没有 Token，服务器就会直接拒绝，CSRF 攻击就此失效。**\n\n#### JWT vs Cookie (Session) 深度对比\n\n| **维度**      | **Cookie + Session (传统)**      | **JWT (现代)**                 |\n| ----------- | ------------------------------ | ---------------------------- |\n| **存储位置**    | 服务器存 Session，客户端存 Cookie       | 服务器不存（无状态），客户端存 Token        |\n| **CSRF 防护** | **风险高**，需额外配合 Token 或 SameSite | **天然免疫**，因为不依赖浏览器自动行为        |\n| **水平扩展**    | 较难（多台服务器需要共享 Session）          | **非常容易**（服务器只要有密钥就能解密 Token） |\n| **时效性**     | 可以在服务端随时注销                     | 一旦签发，很难在有效期内提前作废             |\n#### JWT 就绝对安全了吗？（新的挑战）\n\n虽然 JWT 解决了 CSRF，但它引入了新的风险：**XSS 风险。**\n\n- **风险点：** 如果你的页面有 XSS 漏洞，黑客可以运行 JS 代码 `localStorage.getItem('token')`。一旦 Token 被偷走，黑客可以在任何地方冒充你。\n    \n- **对比：** Cookie 如果设置了 `HttpOnly`，JS 是读不到的，所以 Cookie 在防范 XSS 偷取凭证方面比 JWT 强。\n\n#### JWT进阶：双令牌机制 (Access Token + Refresh Token)\n\n**双令牌机制**（Dual Token Mechanism）是为了解决 JWT（JSON Web Token）的一个核心矛盾：**“安全性”与“用户体验”的博弈。**\n\n**双令牌机制的本质**：把“验证频率”和“登录频率”拆分开。\n\n| **令牌名称**                 | **作用**                                   | **有效期**           | **存储位置建议**                       |\n| ------------------------ | ---------------------------------------- | ----------------- | -------------------------------- |\n| **Access Token** (访问令牌)  | 真正的“通行证”，每次请求都携带。安全性高，即使被盗也很快失效。         | **短**（如 15-30 分钟） | 内存 (Vuex/Pinia) 或 SessionStorage |\n| **Refresh Token** (刷新令牌) | 专门用来换取新的 Access Token。只在刷新时才发送一次，暴露频率极低。 | **长**（如 7-14 天）   | LocalStorage 或 HttpOnly Cookie   |\n\n工作流程（无感续期）\n1. **用户登录**：服务端返回两个 Token：`accessToken` 和 `refreshToken`。\n2. **正常访问**：前端将 `accessToken` 放在 Header 里请求数据，后端验证通过。\n3. **令牌过期**：\n    - `accessToken` 过期，后端返回 **401 Unauthorized**（或特定错误码）。\n4. **无感刷新**：\n    - 前端拦截到 401 错误，**不跳转登录页**。\n    - 前端自动发起一个隐藏请求，携带 `refreshToken` 访问“刷新接口”。\n    - 服务端验证 `refreshToken` 有效，颁发一个新的 `accessToken` 给前端。\n5. **重新请求**：前端用新的 `accessToken` 重新发起刚才失败的那个业务请求。用户完全感觉不到中途发生了令牌置换。\n#### 如果 refresh token 也失效了，但你这时挂起了一堆请求，刷新失败了，怎么处理\n\n当 Refresh Token 也失效时，意味着用户必须重新登录。此时核心问题是挂起的一堆请求如何在刷新登录后重试，方案是用一个全局的 **刷新锁** 和一个 **请求队列**。\n\n#### 工程上怎么选登录方案？\n\n- **Session-Cookie**：最成熟，安全性高，但对分布式系统不友好，且存在 CSRF 风险。需要配合 `HttpOnly`、`Secure`、`SameSite=Lax` 以及 `CSRF Token`，全方位防护。\n\n- **JWT**：目前最流行，它是无状态的，易于横向扩展，适合跨端，但要注意 XSS 防护以及 Token 吊销的问题。尤其 **移动端 (App / 小程序)** 首选 **JWT**。因为 App 没有浏览器的 Cookie 限制，JWT 跨域和扩展性极强。\n\n- **OAuth 2.0**：主要用于授权，是实现第三方登录的标准。\n\n- **SSO**：解决多系统间的统一登录问题。",
+          "hasAnswer": true
+        },
+        {
+          "id": "open-questions-5",
+          "title": "大文件&长列表&大数据等优化场景",
+          "content": "大文件上传\n\n长列表渲染",
+          "hasAnswer": false
+        },
+        {
+          "id": "open-questions-6",
+          "title": "开放题&场景题",
+          "content": "大文件上传 （file blob）\n\n自动化发布，发布版本号，停留页面提示更新\n\n调试console\n\njs写倒计时组件代码，并优化，长时间怎么解决误差，数据量大怎么办\n##### 某个复杂模块的设计思路、遇到的性能瓶颈及解决方案\n\n如何设计一个高可用的前端系统\n\nPWA (Progressive Web Apps)了解吗?它的核心技术有哪些。\n\n对于新技术，你是如何学习和评估的\n\n你认为前端未来3-5年的发展方向是什么?\n##### 设计一个在线文档协同编辑的方案，需要考虑哪些技术点\n\n你遇到的最大的技术挑战是什么?从中学习到了什么?\n\n职业发展，今年的打算\n\n组件升级怎么让使用这个组件的人都知道\n\n如果让你设计项目自动设计组件升级，并且安全，你会怎么去设计\n\n用setTimeout实现setInterva，用requestAnimationFrame实现setTimeout\n\n\"如何在前端项目中实现国际化和本地化?\n\n函数式编程在项目中的应用?\n##### 如果让你从零开始搭建一个大型电商网站的前端架构，你会如何设计?考虑哪些问题如何解决\n\n##### 如果让你从零开始搭建一个大型前端项目\n\n技术栈选型 框架 语言ts/js css 状态管理 组件库\n\n团队与工程化 menorepo 规范 lint prettier 微前端\n\n与设计共同维护的UI库\n##### 大型电商网站的架构，你会如何设计?考虑哪些问题如何解决\n\n高并发：忙绿兜底 下单锁 防刷\n\nSEO：ssr\n\nSKU复杂：SKU矩阵选择控件 库存变化要实时同步\n\n支付下单：流程复杂、强一致性要求高：必须 表单自动保存  交易失败兜底提示 幂等提交\n\n性能优化；OSS CDN \n\nA/B 测试、埋点\n\n安全\n\n##### 从0搭建一个内部脚手架项目\n\n##### 设计一套全站点请求耗时统计工具\n\n##### 如果要集成一个船上的摄像监控系统（第三方页面，但它不能改代码，只能iframe嵌进去，而且还要求根据用户权限控制展示内容，你会怎么处理\n\n方案1：通过代理服务器实现内容过滤，iframe嵌套后端路径，有权限时跳转，无权限时返回一个兜底\n\n方案2：利用 **第三方系统自身的 URL 参数** 进行控制，前提是第三方已有支持\n\n方案3：用前端遮罩进行视觉控制，只控制是否展示，内容有泄漏风险\n\n##### 有这样一个场景：如果你从多个系统的 API 拉数据，但这些系统的数据结构不一致，比如 A 系统返回 camelCase、B 系统是 snake_case，还有一些是中文 key，你怎么统一数据结构，来复用\n\n核心思想：在逻辑和外部 API 之间，建立一个专门负责转换的中间层——**适配器 (Adapter)**。每个外部系统都有一个专属的适配器，该适配器只负责：从外部系统获取数据 $\\rightarrow$ 将其转换成规范模型 $\\rightarrow$ 传递给你的应用核心逻辑。\n\n对于 **`camelCase` 和 `snake_case`** 之间的转换，可以使用成熟的库进行自动化处理\n\n对于中文 Key 或需要复杂的**业务值转换**，需要硬编码映射规则，维护一个 JSON 或 YAML **映射文件**\n\n##### 如果让你来你现在负责一个项目，有20+个页面，需求方经常改字段、加字段，你每次都要改组件，这个时候你怎么来设计\n\n思路：数据驱动渲染+配置化\n\n配置层：把字段抽象出一套配置文件\n\n业务组件和渲染逻辑层都不需要关心如何配置，而是根据配置自动化地应用\n\n##### 如果你要做一个拖拽式仪表盘Dashboard用户呢能自己拖拽、组合图表组件展示不同数据源的信息，你会怎么来设计这个系统\n\n##### 如果现在一个页面要同时展示 300 辆车的实时位置+轨迹，你怎么来优化\n\n数据层面+渲染层面\n\n数据：后续更新只传输增量变化的字段\n\n渲染：分区绘制/懒加载；WebGL/Canvas 渲染；前端聚合（在地图缩放级别较低时，将前端可见的密集点聚合成一个集群图标）；动画优化GPU加速和requestAnimationFrame\n\n**最佳实践组合：** 在后端实现 **视窗过滤** 和 **轨迹简化**，并使用 **WebSocket** 推送增量位置数据。在前端，使用 **WebGL 地图库** (如 Mapbox GL JS) 进行高性能渲染。\n\n##### 地图中你是怎么处理车辆轨迹“绕圈走”的情况的？比如一个车在原地掉头、拐弯，但 GPS 连续记录了好几个点，那肯定你的轨迹图就会一堆锯齿，怎么来做呢\n\n##### GeoJSON 有哪些字段？你在做行政区边界展示的时候，做过数据裁剪吗？如果只展示“浦东新区”这一个区的数据，你怎么只加载它？\n\n##### 怎么处理 WebSocket 的多连接问题？比如你一个页面要同时订阅车辆位置、报警事件、设备状态，怎么复用，保证不丢数据\n\n##### 有没有处理过图表/地图上的数据级联问题？比如点击图表某个项目，地图跟着联动展示，这块怎么处理的\n\n##### 你认为一个优秀的前端架构师/高级工程师需要具备哪些特质?在你的团队中，你是如何推动技术规范落地和技术选型的?\n\n##### 低代码平台如何实现远程组件的动态加载?\n\n\n\"如果你有一个含有数百个项目的数组，你将如何有效地搜索特定项目?\"\n\n\"我们的游戏界面需要实时更新玩家的得分，你会如何设计前端架构来实现这一功能?\"",
+          "hasAnswer": true
+        },
+        {
+          "id": "open-questions-7",
           "title": "微信登录支付",
           "content": "2025-11-21-22-12-43-image.png\n\n2025-11-21-22-13-18-image.png",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-5",
-          "title": "海报绘制",
-          "content": "海报绘制",
-          "hasAnswer": false
+          "id": "open-questions-8",
+          "title": "微前端",
+          "content": "解决：多团队共同维护一个大前端项目时，不同团队之前各自维护不同的模块，互相之间又有少量依赖的场景，如何保证项目的长期维护和迭代\n\n技术难点：样式隔离，JavaScript 隔离，路由管理和应用切换，公共依赖的打包和互相引用、应用之间事件和数据传输。包括两个角色，主应用和子应用\n\n样式隔离：CSS Modules+CSS-in-JS\n\njs隔离：所有微应用共享全局环境（`window` 对象），如果微应用 A 在全局对象上挂载了变量，微应用 B 可能会意外使用或覆盖它。主流方案是：利用 ES6 的 `Proxy` 对象劫持对 `window` 对象的访问。微应用对 `window` 的读写操作都被 `Proxy` 拦截，读操作从全局 `window` 读取，写操作写入到**当前微应用自己的代理对象**中，从而隔离了对真实全局 `window` 的污染\n\n路由管理和应用切换：路由切换时，主应用能正确加载/卸载对应的微应用，并保持 URL 同步。监听 `hashchange` 或 `popstate` 事件，匹配路由，加载/卸载模块\n\n公共依赖：避免每个微应用都打包相同的库。方案两个方向，1是子应用不处理外部模块的打包，主应用负责加载公共包，2是webpack5的联邦模块，允许应用 A **暴露**其内部的模块（如 React 库）给应用 B **消费**，实现真正的运行时共享\n\n事件和数据传输：发布订阅模式/基于全局状态管理\n\n业界常见实现方案：\n\nQiankun：上手难度低，做了css  js隔离，有完整的生命周期钩子，支持多种技术栈。核心是沙箱机制和生命周期管理\n\nsingle-spa：核心作用是作为一个应用路由器（Application Router）和生命周期管理器\n\n联邦模块 (Webpack 5)，只用来处理公共依赖包的情况\n\n**最佳实践**通常是：**使用 Qiankun 或 Single-SPA 来管理应用的隔离和生命周期，同时使用 Webpack 联邦模块来优化公共依赖和公共组件的加载性能。",
+          "hasAnswer": true
         },
         {
-          "id": "open-questions-6",
+          "id": "open-questions-9",
+          "title": "性能监控&错误监控和上报",
+          "content": "#### 前端监控系统如何设计?如何上报和分析数据?\n\n一个完整的前端监控系统通常分为三个维度：\n\n- **错误监控：** JS 运行时错误、Promise 未捕获异常、资源加载失败、HTTP 请求错误。\n    \n- **性能监控：** 核心 Web 指标（LCP, FID, CLS）以及传统指标（FP, FCP, TTI）。\n    \n- **行为监控：** 用户路径跟踪\n\n**上报方式：**\n\n- **`navigator.sendBeacon(url, data)`：** **业界首选**。它能在浏览器卸载页面（如关闭标签页）时异步发送数据，不阻塞主线程，不影响下一页面的加载。\n- 普通HTTP请求\n- **Image 对象 (GIF 上报)：** 传统的 `(new Image()).src = 'url?data=...'`。优点是跨域兼容性极好，且请求体积小。\n\n#### 项目报错如何定位\n\n**定位：** 在生产环境，代码是压缩混淆过的（如 `app.js:1:15234`），无法直接阅读。我们需要将报错的堆栈信息（Line, Column）配合 **SourceMap** 文件还原回原始源码。\n\n**Sourcemap 是源码和编译后代码的映射文件**，让浏览器能将压缩混淆后的代码映射回原始源代码。在复杂的现代前端项目中，代码经过构建工具（如 Webpack、Vite）的打包、压缩、混淆，生产环境在监控工具或浏览器控制台中，错误堆栈显示的是 **压缩后的文件名、行号和列号**（例如 `main.js:123:45`）。当浏览器或监控工具遇到一个指向 `main.js:123:45` 的错误时，根据sourcemap 查找对应的 `main.js.map` 文件。这个 `.map` 文件存储了原始代码和压缩代码之间的**映射关系**（即 `main.js` 的第 123 行第 45 列对应于 `src/components/UserForm.vue` 的第 50 行第 10 列）。map文件建议不部署到生产服务器。而是将 `.map` 文件上传到错z误监控平台（如 Sentry）。\n\n#### 除了sourcemap还有什么方法？\n\n**用户行为回溯 (Replay/Breadcrumbs)：** Sentry 等工具会记录用户报错前的点击路径、路由跳转、Console 日志。即使不知道报错的具体代码行，通过看用户的操作轨迹，也能大概猜出是在哪个业务逻辑出错的。\n#### sourcemap带来的安全性怎么办？\n\n**SourceMap 安全问题：** 如果把 `.map` 文件直接发到线上，任何人都可以在控制台看到你的源码。 **解决方案：**\n\n1. **私有化部署：** 将 `.map` 文件上传到内部的监控平台（如 Sentry），不放在 CDN 静态资源服务器上。\n    \n2. **黑白名单限制：** 只有公司内网 IP 才能访问 `.map` 文件。\n    \n3. **构建后删除：** Webpack 编译完成后，脚本自动将 `.map` 移动到安全的地方，并从 dist 目录中删除。\n\n##### 怎么衡量一个页面的渲染速度和性能？你对首屏时间，可交互时间等概念的理解和看法？\n\n- **首次内容渲染 (First Contentful Paint, FCP)：** 浏览器第一次渲染出任何文本、图像或画布的时间。这是用户感知“页面动了”的关键点。\n- **FP (First Paint):** 像素级首次渲染。\n- **LCP (Largest Contentful Paint):** 最大内容绘制。衡量**加载速度**。常用标准：<$2.5s$。\n- **CLS (Cumulative Layout Shift):** 累积布局偏移。衡量**视觉稳定性**（页面跳来跳去吗）。常用标准：<$0.1$。\n- **可交互时间 (Time to Interactive, TTI)：** 页面内容已渲染，且主线程空闲，能响应用户输入的时间。\n- **INP (Interaction to Next Paint):** 交互到下次绘制。衡量**交互延迟**（取代了旧的 FID）。标准：<$200ms$。\n\n**看法：** 我认为 **LCP (Largest Contentful Paint)** 现在比 FCP 更重要，因为它衡量的是页面“主体内容”什么时候出来。\n\n#### 错误监控和报警业界方案\n\n- **sentry**：Sentry 是目前前端监控领域事实上的“行业标准”。有开箱可用的SDK，会记录用户报错前的点击路径、路由跳转、Console 日志；会自动收集浏览器版本、操作系统等上下文信息；支持**数据清洗与聚合**，将成相同的报错聚合起来避免告警风暴；\n- **阿里云 ARMS / 腾讯云 RUM：** 云服务商提供的成熟商业方案，开箱即用。\n- **app 消息报警：** 通常对接 **企微/钉钉/飞书 Webhook**，设置阈值告警（如：某接口报错率 > 5% 立即触发报警）。",
+          "hasAnswer": true
+        },
+        {
+          "id": "open-questions-10",
+          "title": "海报绘制",
+          "content": "##### 1. 客户端方案（最常用）\n\n这类方案直接在用户的浏览器中运行，优点是响应快、不消耗服务器资源。\n\n- **HTML5 Canvas 绘图 (原生)**\n    \n    - **原理：** 使用 `canvas.drawImage()` 将图片、文字手动绘制到画布上，再通过 `canvas.toDataURL()` 生成 Base64 图片。\n    - **缺点：** 手动计算位置非常痛苦，不适合复杂的 DOM 结构。\n\n```\nconst generatePoster = async () => {\n  // 1. 创建canvas\n  const canvas = document.createElement('canvas');\n  const ctx = canvas.getContext('2d');\n\n  // 2. 设置画布尺寸\n  canvas.width = 600;\n  canvas.height = 800;\n\n  try {\n    // 3. 输出图片\n    const dataURL = canvas.toDataURL('image/png');\n    console.log('生成的海报Base64:', dataURL);\n  } catch (err) {\n    console.error('绘制失败', err);\n  }\n};\n```\n\n- **html2canvas (业界主流标准)**\n    \n    - **原理：** 它并不是真正的“截图”，而是通过 **JS 重新渲染**。它会读取 DOM 结构、解析 CSS 样式，然后在 `<canvas>` 上按像素重新画一遍。\n    - **优点：** 使用简单，支持度高。\n    - **缺点：** * **样式兼容性：** 对某些高级 CSS（如 `box-shadow`、某些 `flex` 布局、复杂的 `filter`）支持不完美。\n        - **跨域：** 图片必须支持跨域，否则会报“画布被污染”错误。\n        - **清晰度：** 在高分屏下容易模糊（需要设置 `scale` 参数，配合 `devicePixelRatio` 优化）。\n\n```\nimport html2canvas from 'html2canvas';\n\nconst captureElement = async () => {\n  const element = document.getElementById('poster-area'); // 要截图的 DOM 节点\n  \n  try {\n    const canvas = await html2canvas(element, {\n      useCORS: true,          // 允许跨域图片\n    });\n\n    // 将 canvas 转为图片下载或预览\n    const imageData = canvas.toDataURL('image/png');\n    const link = document.createElement('a');\n    link.href = imageData;\n    link.download = 'screenshot.png';\n    link.click();\n  } catch (error) {\n    console.error('截图失败:', error);\n  }\n};\n```\n\n- **dom-to-image (SVG 方案)**\n    \n    - **原理：** 利用 SVG 的 `<foreignObject>` 特性。它将 DOM 序列化为 XML，放入 SVG 中，再利用浏览器原生的 SVG 渲染引擎。\n    - **优点：** 性能通常优于 html2canvas，生成的图片更接近真实 DOM 效果。\n\n```\nimport domtoimage from 'dom-to-image';\n\nconst captureBySvg = () => {\n  const node = document.getElementById('my-node');\n\n  // 1. 调用插件的方法，把要截图的元素里的内容转成 PNG 格式的字符串 (dataUrl)\n  domtoimage.toPng(node)\n    .then((dataUrl) => {\n      const img = new Image();\n      img.src = dataUrl;\n      document.body.appendChild(img); // 直接展示生成的图片\n    })\n    .catch((error) => {\n      console.error('生成图片出错!', error);\n    });\n};\n```\n### 2. 服务端方案（高还原度）\n\n如果需要 100% 还原页面（包含复杂动画、阴影、外部字体），或者需要批量生成图片，通常采用服务端截图。\n\n- **Puppeteer / Playwright (Headless Browser)**\n    \n    - **原理：** 在 Node.js 服务端运行一个**无头浏览器**（无界面的 Chrome）。\n    - **流程：** 服务端接收请求 -> 浏览器打开指定 URL -> 等待页面加载完成 -> 调用浏览器底层的 `screenshot` API -> 返回图片。\n    - **优点：** **最完美还原**。页面长什么样，截出来就长什么样。\n    - **缺点：** 实现相对复杂，且消耗服务器 CPU/内存资源巨大，并发量大时会有明显的延迟。\n\n### 3. 常见痛点与解决方案\n\n| **痛点**      | **解决方案**                                              |\n| ----------- | ----------------------------------------------------- |\n| **图片模糊**    | 将 Canvas 放大 `window.devicePixelRatio` 倍，再通过 CSS 缩小显示。 |\n| **图片跨域**    | 后端设置 CORS，或者前端配置 `useCORS: true`。                     |\n| **字体丢失**    | 客户端截图通常无法读取系统外的字体，需将字体转为 Base64 嵌入 CSS。               |\n| **滚动内容截不全** | 截图前临时设置 `height: auto` 或克隆一份 DOM 放到屏幕外隐藏位置进行渲染。       |",
+          "hasAnswer": true
+        },
+        {
+          "id": "open-questions-11",
           "title": "自动化发布",
           "content": "自动化发布\n2025-11-21-22-06-49-image.png",
           "hasAnswer": false
         },
         {
-          "id": "open-questions-7",
+          "id": "open-questions-12",
           "title": "跨浏览器 跨终端开发的兼容性处理方案",
-          "content": "##### 跨浏览器 跨终端开发的兼容性处理方案\n\n确保同一个网页或Web应用在**不同的浏览器**上和在**不同类型的设备**上都能具有**一致的外观、布局和功能**，提供**良好的用户体验**。\n\n挑战：\n\n不同浏览器：CSS 渲染差异，JavaScript API 支持度不同\n\n不同设备：屏幕尺寸与分辨率，输入方式差异，性能与网络条件\n\n解决：\n\n开发工具链：\n\n```js\n\"@babel/core\": \"^7.20.0\",          // JavaScript 转译\n\"autoprefixer\": \"^10.4.13\",        // CSS 自动前缀\n\"postcss\": \"^8.4.21\",              // CSS 后处理\n\"eslint\": \"^8.30.0\",               // 代码检查\n\"stylelint\": \"^14.16.0\",           // CSS 检查\n```\n\n检测与兼容性查询能力：\n\n```js\nserviceWorker：'serviceWorker' in navigator\nIntersectionObserver：'IntersectionObserver' in window\n响应式图片：<picture> + <source > 等\nwebp：document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0\nCan I Use：caniuse.isSupported(feature, navigator.userAgent)\n```\n\n原则和思路：\n\n- **渐进增强**：从基础功能开始，逐步为现代浏览器增强体验\n\n- **优雅降级**：现代功能不可用时，提供可用的降级方案\n\n- **移动优先**：从小屏幕开始设计，逐步适配大屏幕\n\n- **使用标准 API**：优先选择广泛支持的 Web 标准\n\n- **特性检测**：运行时检测浏览器能力，而非浏览器嗅探\n\n- **响应式设计**：使用弹性布局和媒体查询\n\n- **性能考量**：考虑不同设备的性能差异\n\n- **工具自动化**：使用构建工具处理大部分兼容性问题\n\n- **组件库**：使用成熟的 UI 库（如 Ant Design、Material-UI）",
+          "content": "##### 跨浏览器 跨终端开发的兼容性处理方案\n\n确保同一个网页或Web应用在**不同的浏览器**上和在**不同类型的设备**上都能具有**一致的外观、布局和功能**，提供**良好的用户体验**。\n\n挑战：\n不同浏览器：CSS 渲染差异，JavaScript API 支持度不同\n不同设备：屏幕尺寸与分辨率，输入方式差异，性能与网络条件\n\n主要分两步：  \n 1️⃣ **识别环境**：通过 UA、屏幕尺寸、触控点数等判断设备类型、操作系统和浏览器环境，以便做差异化处理。  \n 2️⃣ **处理兼容性**： \n1) CSS 层面\n- **前缀处理**：使用 autoprefixer 自动加 `-webkit-` 等\n- **现代 CSS 特性降级**：`flex` → `float` fallback\n- **媒体查询**：针对不同屏幕尺寸适配\n 2) JS / API 层面\n- **特性检测**（Feature Detection）：`if ('IntersectionObserver' in window)`\n- **Polyfill**：为不支持的 API 提供替代实现\n- **事件差异处理**：如触屏事件 `touchstart` / `touchmove` vs 鼠标事件 `mousedown` / `mousemove`\n3) **组件库**：使用成熟的 UI 库（如 Ant Design、Material-UI）\n4) 开发工具链：一些常用的库结合现代化构建工具，自动化进行兼容处理\n```js\n\"@babel/core\": \"^7.20.0\",          // JavaScript 转译\n\"autoprefixer\": \"^10.4.13\",        // CSS 自动前缀\n\"postcss\": \"^8.4.21\",              // CSS 后处理\n\"eslint\": \"^8.30.0\",               // 代码检查\n\"stylelint\": \"^14.16.0\",           // CSS 检查\n```\n\n补充：检测与兼容性查询能力：\n\n```js\nserviceWorker：'serviceWorker' in navigator\nIntersectionObserver：'IntersectionObserver' in window\n响应式图片：<picture> + <source > 等\nwebp：document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0\nCan I Use：caniuse.isSupported(feature, navigator.userAgent)\n```\n\n总体原则和思路：\n\n- **渐进增强**：从基础功能开始，逐步为现代浏览器增强体验\n\n- **优雅降级**：现代功能不可用时，提供可用的降级方案\n\n- **移动优先**：从小屏幕开始设计，逐步适配大屏幕\n\n- **使用标准 API**：优先选择广泛支持的 Web 标准\n\n- **特性检测**：运行时检测浏览器能力，而非浏览器嗅探\n\n- **响应式设计**：使用弹性布局和媒体查询\n\n- **性能考量**：考虑不同设备的性能差异\n\n- **工具自动化**：使用构建工具处理大部分兼容性问题\n\n- **组件库**：使用成熟的 UI 库（如 Ant Design、Material-UI）",
           "hasAnswer": true
         }
       ]
@@ -1489,30 +1495,36 @@
       "questions": [
         {
           "id": "miniprogram-1",
-          "title": "选框架 uniapp taroapp",
-          "content": "团队主栈\n\n需要发布到 App 端 优选**uni-app**\n\n需要覆盖最多平台 uni-app\n\n更注重小程序性能 unia-app（taro由于底层基于 React Virtual DOM，相较于原生小程序的渲染可能会有轻微性能损耗，但在绝大多数场景下足够使用。）\n\n更注重H5性能的大型项目 优选taro  由于基于 React 体系，更适合大型项目中的组件化、状态管理和架构规范。",
+          "title": "小程序登录 支付",
+          "content": "![[2025-11-21-22-13-18-image.png]]",
           "hasAnswer": true
         },
         {
           "id": "miniprogram-2",
+          "title": "选框架 uniapp taroapp",
+          "content": "参考团队主要技术栈是vue还是react\n\n需要发布到 App 端 优选**uni-app**\n\n需要覆盖最多平台 uni-app\n\n更注重小程序性能 unia-app（taro由于底层基于 React Virtual DOM，相较于原生小程序的渲染可能会有轻微性能损耗，但在绝大多数场景下足够使用。）\n\n更注重H5性能的大型项目 优选taro  由于基于 React 体系，更适合大型项目中的组件化、状态管理和架构规范。",
+          "hasAnswer": true
+        },
+        {
+          "id": "miniprogram-3",
           "title": "小程序和H5的性能差异，结合小程序分包和SPA",
           "content": "| 特性    | 小程序       | H5 SPA           | 建议场景                     |\n| ----- | --------- | ---------------- | ------------------------ |\n| 首屏性能  | 可控，分包优点明显 | 首屏大包阻塞可能慢        | 小程序更适合首次访问频繁的轻量应用        |\n| 页面切换  | 分包可能轻微延迟  | 路由切换快            | SPA 优势在页面多切换且包已加载        |\n| 渲染性能  | 跨桥更新瓶颈    | DOM 操作瓶颈         | 大列表：SPA diff+虚拟 DOM 优势更大 |\n| JS 执行 | 沙箱受限，低端机慢 | 浏览器内存大，可用 Worker | 计算密集型 SPA 更适合浏览器         |\n| 数据请求  | 并发有限      | 并发可控             | 高并发数据接口 SPA 更灵活**        |\n\n小程序：依托微信生态丰富，登录、支付等微信能力更流畅，容易接入官方API，用户触达 分享等方面更有微信的优势，结合分包机制能按需加载，减少首屏 JS。但性能略差，大量组件或频繁 UI 更新时可能卡顿，无法自由访问浏览器原生 API。\n\nH5：交互灵活，渲染性能可优化，浏览器 API功能无限制，技术栈成熟、生态丰富，SPA首屏性能压力大，拉新/留存不如小程序便利",
           "hasAnswer": true
         },
         {
-          "id": "miniprogram-3",
+          "id": "miniprogram-4",
           "title": "小程序和h5的渲染性能对比",
           "content": "首次加载：小程序需下载框架和代码包，H5 可按需加载。\n\n热启动：小程序更快，H5取决于缓存策略\n\n渲染性能：小程序有双线程，能 避免 JS 阻塞渲染，交互更流畅。\n\n操作DOM：小程序框架底层对DOM 操作有更严格控制，但是频繁地setData也可能会导致性能瓶颈；H5类似的操作DOM可能会导致性能瓶颈，一般要依赖框架的响应式数据更新或者渲染优化",
           "hasAnswer": true
         },
         {
-          "id": "miniprogram-4",
+          "id": "miniprogram-5",
           "title": "小程序底层架构详解",
           "content": "小程序采用的是双线程（Dual-Thread）的运行模型，这是其架构的基石。这个模型将页面的逻辑处理和界面渲染分别放在两个独立的运行环境中，通过异步消息通道通信。开发者编写的**逻辑代码**运行在一个根本，是一个没有 DOM 逻辑层和 BOM 的独立环境中。\n\n逻辑层 (JS Thread) 由独立的 JavaScript 引擎 实现 。\n\n渲染层 (View Thread) 基于浏览器的 WebView，负责渲染页面的容器。\n\n（**WebView 是一种宿主环境提供的、内嵌式的浏览器内核功能。它允许应用程序（App）或小程序框架在原生界面中加载和渲染 Web 内容，它包含了浏览器的大部分核心功能，它运行在原生 App 内部，本质上就是一个浏览器内核组件**）\n\n这种分离架构的好处是解决传统 Web 应用的**性能瓶颈**（双线程）和**安全问题**（无法直接操作DOM），同时保证**跨平台能力**（渲染层可以对不同平台做不同的渲染）。\n\n缺点是：增加了一层数据传输，可能带来通信延迟，增加了调试复杂性，增加一定的内存占用；开发者无法使用完整的浏览器 API和一些成熟的web库；频繁调用setData可能会引起性能问题，因为涉及了两个线程之间的**跨线程通信**和**数据处理**：",
           "hasAnswer": true
         },
         {
-          "id": "miniprogram-5",
+          "id": "miniprogram-6",
           "title": "小程序没有dom是如何渲染的",
           "content": "编译阶段：将开发者定义的 WXML/WXSS 转换为渲染指令（类似虚拟DOM的结构对象）和和css\n\n运行阶段：根据渲染指令（类似VDOM）构建真实DOM，数据发生更新时，先diff然后把增量数据发给渲染层，渲染层精确更新 DOM",
           "hasAnswer": true
@@ -1567,42 +1579,48 @@
       "questions": [
         {
           "id": "tech-selection-1",
-          "title": "技术选型",
-          "content": "",
-          "hasAnswer": false
-        },
-        {
-          "id": "tech-selection-2",
           "title": "框架 vue/react/nextjs",
           "content": "",
           "hasAnswer": false
         },
         {
+          "id": "tech-selection-2",
+          "title": "模块化选型",
+          "content": "",
+          "hasAnswer": false
+        },
+        {
           "id": "tech-selection-3",
-          "title": "模块化方案",
+          "title": "SSR/CSR",
           "content": "",
           "hasAnswer": false
         },
         {
           "id": "tech-selection-4",
-          "title": "SSR/CSR等",
+          "title": "SPA/MPA",
           "content": "",
           "hasAnswer": false
         },
         {
           "id": "tech-selection-5",
-          "title": "redux zustand  vuex pinia",
+          "title": "redux zustand",
           "content": "",
           "hasAnswer": false
         },
         {
           "id": "tech-selection-6",
-          "title": "移动端适配方案(rem/vw/响应式)",
+          "title": "vuex pinia",
           "content": "",
           "hasAnswer": false
         },
         {
           "id": "tech-selection-7",
+          "title": "移动端适配方案(rem/vw/响应式)",
+          "content": "",
+          "hasAnswer": false
+        },
+        {
+          "id": "tech-selection-8",
           "title": "小程序选框架 uniapp taroapp",
           "content": "",
           "hasAnswer": false
@@ -1616,35 +1634,35 @@
         {
           "id": "teamwork-1",
           "title": "如何平衡重构和需求时间冲突",
-          "content": "",
-          "hasAnswer": false
+          "content": "(1) 风险控制\n- **评估重构风险**：提前评估改动对现有业务的影响\n- **保留回滚方案**：必要时做 feature flag 或分支策略\n (2) 渐进式策略\n- **模块化重构**：只重构最影响维护性的模块，减少一次性改动\n- **分阶段迭代**：把重构拆分到多个版本逐步上线\n (3) 团队协作\n- **跨角色沟通**：和产品、测试协商重构计划，保证上线不影响业务\n- **代码 review + 测试覆盖**：确保重构质量\n (4) 工具与实践\n- **使用自动化工具**：静态检查、单元测试、CI/CD 提高重构安全性\n- **记录和文档**：对重构部分做文档说明，方便团队理解和接手\n\n 面试加分点：可以结合自己实际经验举例，比如某个上线紧急需求中，如何渐进式重构，体现“业务优先 + 质量保障 + 团队协作”。",
+          "hasAnswer": true
         },
         {
           "id": "teamwork-2",
           "title": "谈谈你对“大前端”的理解",
-          "content": "",
-          "hasAnswer": false
+          "content": "(1) 技术上\n- **多平台统一**：大前端不仅是 Web，还包括小程序、移动端、桌面端（Electron）、后台管理系统等。\n- **前端全栈意识**：涉及前端框架、Node.js、服务端渲染、前端工程化、构建工具等。\n- **微前端 / 组件化 / 工程化**：在大团队、多模块、多项目的环境下，强调可复用、可组合、可扩展。通过微前端架构、共享 NPM 包、组件库统一管理等方式，保证项目整体稳定性和开发效率。\n(2) 工程化和流程\n- **代码规范 & CI/CD**：统一 eslint、prettier、git hook，自动化部署流程，保证团队质量。\n- **版本管理 / 依赖管理**：NPM 包、私有组件库、依赖升级策略。\n- **测试和监控**：单元测试、集成测试、前端性能监控、日志收集等。\n(3) 团队协作和知识管理\n- **文档标准化**：设计规范、接口文档、组件库文档\n- **团队共享和复盘机制**：技术分享会、代码 review 流程、经验沉淀",
+          "hasAnswer": true
         },
         {
           "id": "teamwork-3",
           "title": "如何带领一个前端团队?如何提升团队的技术能力",
-          "content": "",
-          "hasAnswer": false
+          "content": "(1) 团队管理\n- **任务分解 & 目标设定**：按能力分配任务，设置短期/长期目标\n- **沟通机制**：定期会议、即时沟通渠道、跨组协作流程\n- **绩效与成长**：明确晋升路径、技术成长规划、code review 作为学习手段\n (2) 技术能力提升\n- **技术分享**：定期分享最新技术、最佳实践或项目经验\n- **代码规范 & 工程化**：推动统一规范、组件化、可复用库\n- **培训与实践**：安排小项目练习、Pair Programming、内部 Hackathon\n- **学习新技术趋势**：关注前端社区、开源项目、前沿框架（React/Next/Vue/微前端等）\n (3) 风险控制与质量保障\n- **重构与迭代策略**：控制大规模重构风险，采用渐进式重构\n- **测试覆盖率**：单元、集成、E2E 测试\n- **性能与监控**：前端性能指标 (FCP/LCP/TTI/FID/INP) 和异常监控\n> 面试加分点：你可以顺便结合“如何带新人上手”和“大前端视角”，说明你不仅懂管理，也懂技术驱动团队。",
+          "hasAnswer": true
         },
         {
           "id": "teamwork-4",
           "title": "平时如何学习前端技术？",
-          "content": "",
-          "hasAnswer": false
+          "content": "(1) 系统化学习\n- **专题学习**：对某一块技术（如 React、TypeScript、前端性能优化）系统学习，而不是零散碎片化\n- **做学习计划**：安排周期性学习、练习和总结\n (2) 实践与落地\n- **小项目练习**：练习新框架、新工具或设计模式\n- **复盘总结**：在项目中尝试新技术后，做复盘文档或者分享，巩固理解\n (3) 社交学习\n- **技术分享 / 内部培训**：参加团队分享会、线上/线下 meetup\n- **交流讨论**：通过评论、issue 或社群讨论问题，加深理解\n (4) 利用工具和 AI\n- **查阅资料**：官方文档、源码、GitHub issue\n- **借助 AI 提高效率**：快速定位问题或理解概念，但核心还是自己实践和总结",
+          "hasAnswer": true
         },
         {
           "id": "teamwork-5",
-          "title": "讲两个你觉得会越来越重要的前端技术？",
-          "content": "",
-          "hasAnswer": false
+          "title": "讲几个你觉得会越来越重要的前端技术？",
+          "content": "1.**服务端渲染（SSR）与全栈前端技术**\n- 例如 Next.js、Nuxt.js 等框架，结合 React Server Components 或 Vue 3 的 SSR，可以提升首屏加载速度和 SEO 体验。    \n- 越来越多的项目希望前端不仅负责交互，也能优化性能和 SEO，因此前端对服务端渲染的理解会越来越重要。\n\n2️. **微前端和模块化架构** \n - 随着大型前端项目和多团队协作增多，微前端可以让多个团队独立开发、独立部署，减少耦合。\n - 技术上涉及模块联邦（Module Federation）、Web Components、iframe 沙箱隔离等，这些能力会越来越吃香。     \n\n3️.**前端性能优化与体验监控**\n  - 包括前端性能指标（FCP、LCP、TTI、INP/FID）、懒加载、代码分割、缓存策略、离线体验（PWA）。     \n  - 用户体验要求越来越高，性能优化和监控能力直接影响产品质量和业务指标。\n\n4.**AI 与前端结合**：自动化测试、智能推荐、代码生成工具\n\n5.**TypeScript / 强类型化前端**：在大项目中保证可维护性\n\n6.**WebAssembly**：性能敏感场景（图形、游戏、音视频处理）",
+          "hasAnswer": true
         }
       ]
     }
   ],
-  "generatedAt": "2026-01-03T11:08:21.327Z"
+  "generatedAt": "2026-01-04T17:27:34.018Z"
 }

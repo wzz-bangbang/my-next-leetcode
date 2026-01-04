@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "TypeScript.md",
+                "file": "工程化.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "TypeScript"
+              "title": "工程化"
             }
           }
         ]
@@ -185,28 +185,38 @@
   },
   "active": "1ae796748a4b9609",
   "lastOpenFiles": [
-    "JavaScript基础.md",
-    "CSS&HTML.md",
-    "Ai及应用.md",
-    "网络与安全.md",
-    "Node.md",
-    "Nextjs.md",
-    "React.md",
-    "TypeScript.md",
-    "Vue.md",
-    "CI&CD.md",
-    "工程化.md",
-    "浏览器.md",
-    "技术选型.md",
     "工作协作.md",
-    "开放题&场景题/微信登录支付.md",
-    "开放题&场景题/自动化发布.md",
+    "技术选型.md",
+    "浏览器.md",
     "小程序.md",
-    "开放题&场景题/开放题&场景题.md",
+    "Ai及应用.md",
+    "CSS&HTML.md",
+    "Nextjs.md",
+    "Node.md",
+    "React.md",
+    "工程化.md",
+    "网络与安全.md",
+    "CI&CD.md",
+    "JavaScript基础.md",
     "开放题&场景题/前端鉴权的几种方式和优缺点.md",
+    "开放题&场景题/开放题&场景题.md",
     "开放题&场景题/跨浏览器 跨终端开发的兼容性处理方案.md",
+    "开放题&场景题/前端存储.md",
+    "开放题&场景题/微信登录支付.md",
+    "开放题&场景题/微前端.md",
+    "开放题&场景题/web worker & service worker.md",
+    "开放题&场景题/SSR-SSG-SPA-MPA.md",
+    "开放题&场景题/自动化发布.md",
+    "开放题&场景题/性能监控&错误监控和上报.md",
     "开放题&场景题/海报绘制.md",
+    "开放题&场景题/大文件&长列表&大数据等优化场景.md",
+    "开放题&场景题/2025-11-21-22-06-49-image.png",
+    "开放题&场景题/2025-11-21-22-10-13-image.png",
+    "开放题&场景题/2025-11-21-22-10-50-image.png",
+    "开放题&场景题/2025-11-21-22-11-34-image.png",
+    "开放题&场景题/2025-11-21-22-12-43-image.png",
+    "开放题&场景题/2025-11-21-22-13-18-image.png",
     "2025-12-12-01-17-22-image.png",
-    "开放题&场景题/SSR-SSG-SPA-MPA.md"
+    "TypeScript.md"
   ]
 }
