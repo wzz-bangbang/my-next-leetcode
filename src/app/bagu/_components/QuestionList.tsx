@@ -113,9 +113,9 @@ export default function QuestionList({
       {categories.map((category) => {
         const isExpanded = expandedCategories.has(category.id);
         const hasQuestions = category.questions.length > 0;
-        const completedCount = category.questions.filter((q) =>
-          completedQuestions.has(q.id)
-        ).length;
+        // const completedCount = category.questions.filter((q) =>
+        //   completedQuestions.has(q.id)
+        // ).length;
 
         return (
           <div key={category.id} className="mb-0.5">
@@ -165,6 +165,7 @@ export default function QuestionList({
                     //   disabled={question.title.length < 20}
                     // >
                       <button
+                        key={question.id}
                         data-question-id={question.id}
                         onClick={() => onSelectQuestion(question, category.id)}
                         className={`w-full text-left pl-10 pr-3 py-2 !text-[0.875rem] transition-all duration-200 flex items-center gap-2 outline-none focus:outline-none ${

@@ -80,8 +80,19 @@ async和defer使用场景
 
 #### script link img标签的crossorigin属性作用是什么？
 
-参数：默认 anonymous 表示不携带 cookie，use-credentials 表示携带 cookie
+**面试回答**：
+`script`、`img`、`link` 等标签即使跨域也可以正常加载资源，但默认情况下浏览器会限制这些资源的可用性。
 
+`crossorigin` 属性用于控制跨域资源请求时是否携带凭证，以及这些资源是否可以被 JavaScript 或 Canvas 等进一步使用。
+
+常见的取值有两个：
+- `anonymous`：表示跨域请求不携带 cookie，需要服务端允许当前源或使用 `Access-Control-Allow-Origin`
+- `use-credentials`：表示跨域请求会携带 cookie，服务端必须显式指定允许的源，并返回 `Access-Control-Allow-Credentials: true`
+
+如果不设置 `crossorigin`，资源本身可以加载成功，但在 `img` 场景下 Canvas 会被污染，JavaScript 无法读取像素数据；在 `script` 场景下，跨域脚本报错时只能看到 `Script error.`，无法获取完整的错误堆栈。
+
+讲解：
+参数：默认 anonymous 表示不携带 cookie，use-credentials 表示携带 cookie
 规则：
 1. 默认情况下`<script src="https://cdn.xxx.com/app.js"></script>` ，浏览器**允许跨域加载并执行**，不需要 CORS 头
 2. `type="module"` 下，跨域规则完全不同。ES Module 脚本默认开启 CORS 检查，没有 `Access-Control-Allow-Origin` → 直接加载失败
@@ -109,8 +120,6 @@ async和defer使用场景
 
 所以浏览器规定： **跨域脚本，默认只允许“执行”，不允许“读取细节”**，会的，只要是跨域且未通过 CORS 授权的脚本，语法错误、运行时错误、Promise 未捕获异常都会被折叠成 `Script error.`
 
-总结：模块默认严格模式并强制 CORS，是为了安全和可分析性；而跨域脚本错误被隐藏，是浏览器防止跨站信息泄露的安全设计，需要 crossorigin + 服务端 CORS 才能拿到完整堆栈。
-实际工程中：静态资源一般会部署到 CDN。可以在CDN层面配置跨域，或者NGINX层面配置
 #### script标签的`type="module"` 有什么作用
 
 浏览器规范 **直接规定**：`type="module"` 脚本具有 **类 defer 行为**：不阻塞 HTML 解析；DOM 解析完成后执行；多个 module 按依赖顺序执行
@@ -266,19 +275,20 @@ header nav main article section footer h1-h6  form等
 3. Tailwind CSS：基于原子类的预扫描方案，不进行类名哈希化。优点是按需编译和极致复用。
 #### 前端性能优化之 CSS 优化策略
 
-1. **合并与压缩 CSS 文件：**
+CSS 性能优化我通常从浏览器渲染链路来做：尽量减少 Layout、Paint，并让动画尽可能走 Composite。
 
-2. **利用媒体查询 (Media Queries) 按需加载：**
-   
-   使用 `<link rel="stylesheet" media="(max-width: 600px)" href="mobile.css">`，只有在符合条件时才加载相应样式。
+1. **减少 重排重绘**：避免频繁读写会触发布局的属性，比如在循环里交替读 `offsetHeight` 和写样式；需要批量修改样式时尽量合并，或者通过切换 class 一次性生效。对于会改变几何信息的属性（width/height/top/left/margin）要谨慎，尤其在动画里尽量不要用。
 
-3. **减少 CSS 嵌套和选择器复杂度：**
-   
-   复杂的选择器（如 `div > ul > li:last-child`）会增加浏览器计算匹配的成本。
+2. **动画优化**：优先用 `transform` 和 `opacity` 做动画，避免触发布局；必要时对动画元素使用 `will-change: transform` 预创建合成层，但要控制数量避免占用显存。
 
-4. 避免在 HTML 中使用内联样式 (`style="..."`)：内联样式会增加 HTML 文件体积，且不利于样式复用和缓存。
+3. **降低选择器匹配成本**：选择器尽量简单，避免过深的嵌套、`*` 通配、复杂的后代选择器；类选择器比标签/后代链更稳定高效。复杂的选择器（如 `div > ul > li:last-child`）会增加浏览器计算匹配的成本。
 
-5. 将 `<link>` 标签放在 `<head>` 顶部：让浏览器尽快下载和解析 CSS，避免**白屏时间**过长。
+4. **减少阻塞和体积**：首屏关键 CSS 可以内联或拆分，非关键 CSS 延后加载；CSS 体积上做压缩、按路由/组件拆分，减少不必要的全量样式。
+
+5. **利用媒体查询 (Media Queries) 按需加载：**
+	使用 `<link rel="stylesheet" media="(max-width: 600px)" href="mobile.css">`，只有在符合条件时才加载相应样式。
+
+6. 避免在 HTML 中使用内联样式 (`style="..."`)：内联样式会增加 HTML 文件体积，且不利于样式复用和缓存。
 
 #### 解释CSS中的BEM命名方法，并展示如何使用它来组织你的样式表。
 

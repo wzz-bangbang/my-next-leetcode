@@ -915,6 +915,12 @@
           "title": "子组件portal能冒泡到父组件吗",
           "content": "",
           "hasAnswer": false
+        },
+        {
+          "id": "react-70",
+          "title": "RSC react server component",
+          "content": "React Server Components 是 React 提出的 **一种让部分组件只在服务器端执行的渲染模式** \n它不是传统意义上的 SSR（Server-Side Rendering）那样生成完整 HTML，而是：\n\n**在服务器执行组件逻辑，把渲染结果以特殊协议序列化成数据流发送给客户端，客户端再把这些数据解释成 UI。**\n\n核心特点：\n- 组件代码 **永远不发送到客户端**（不会打包到 bundle 里）。\n- 只能运行在服务器上，不能使用浏览器 API 和交互 Hooks（如 `useState`, `useEffect`）。主要用于数据密集型、展示型的 UI。\n- 主要用于数据密集型、展示型的 UI。\n\n这就能让 React 应用更“轻巧、高效、按需加载”。\n\n| 渲染方式        | JS 发送到客户端       | 数据获取模式         | 互动能力                 |\n| ----------- | --------------- | -------------- | -------------------- |\n| CSR (客户端渲染) | 全组件 JS          | 客户端请求 API      | 强                    |\n| SSR (服务端渲染) | 全组件 JS + HTML   | 服务端预取数据 → HTML | 交互需要 hydrate         |\n| **RSC**     | **只发送必要的交互 JS** | 服务器直接数据访问      | 交互需 Client Component |\n\nReact Server Components 是一种服务器执行的组件模式，它让 UI 的渲染和数据获取在服务端完成，只把 UI 结构通过序列化协议发送给客户端，从而减少 JS bundle、提高性能并简化数据获取，同时和交互组件协同工作，适配复杂应用。\n\n**RSC 适合：数据驱动、多页面/大列表/复杂查询、多数据源聚合，但客户端交互较轻**的页面。\n\n**不适合：交互复杂、状态频繁变化、强实时响应**的组件。",
+          "hasAnswer": true
         }
       ]
     },
@@ -1182,26 +1188,134 @@
       "questions": [
         {
           "id": "nextjs-1",
-          "title": "nextjs 适用场景",
-          "content": "",
-          "hasAnswer": false
+          "title": "nextjs 是什么？适用场景？",
+          "content": "Next.js 本质是一个 React 的全栈框架，它通过内置 SSR、SSG、ISR 和 Server Components，解决了传统 React SPA 在首屏性能、SEO 和工程复杂度上的问题。  \n在新版本中，Next.js 以 App Router 和 RSC 为核心，通过默认服务端渲染和精细化缓存，大幅减少客户端 JS 体积，是目前 React 生态中性能和工程化最成熟的方案之一。\n\n1. **SEO 要求高的网站**：官网、博客、电商等需要搜索引擎收录的场景\n2. **内容型网站**：新闻、文档站点，适合 SSG/ISR 预渲染\n3. **全栈应用**：前后端一体化开发，API Routes 可直接写后端逻辑\n4. **性能敏感场景**：首屏加载要求高，需要 SSR + 流式渲染\n5. **团队协作项目**：约定式路由 + 文件结构清晰，降低沟通成本",
+          "hasAnswer": true
         },
         {
           "id": "nextjs-2",
-          "title": "SSR",
-          "content": "在传统的 SSR 架构（如早期的 React SSR）中，您确实需要维护两套入口（client-entry.js 和 server-entry.js），配置两套 Webpack，处理注水 (Hydration) 的各种样板代码。\nNext.js 把这一切都封装了。您只需要写一个 page.tsx，Next.js 会自动在服务器上把它渲染成 HTML，然后在客户端把它“激活”。对于开发者来说，只有一套代码，一套逻辑\nNext.js 的伟大之处在于，它让您在同一个项目、同一个文件结构、同一种语言中，流畅地穿梭于“服务端”和“客户端”之间。您不需要配置复杂的环境，但您需要清晰地知道“我现在是在服务器上（获取数据）”还是“我现在是在浏览器里（处理交互）”。这种无缝融合，正是它作为全栈框架的体验确实是目前业界领先于业界的关键。\n\n客户端组件在服务端执行时，只会生成静态 HTML。它的 useEffect、onClick 等逻辑不会运行。这些逻辑只有代码被下载到浏览器并“注水 (Hydrate)”后，才会真正在客户端执行。\n服务端组件 (RSC) 的代码，只在服务器上运行。零 JS 发送：这些组件的 JavaScript 代码永远不会被打包发送给浏览器。浏览器收到了什么？：浏览器接收到的是 RSC 执行后的结果（一种特殊的 JSON 数据格式，描述了 UI 的结构）。![](/Users/wzz/Library/Application%20Support/marktext/images/2025-12-01-00-06-38-image.png)\n\n服务端内容变成了纯数据：`<h1>Hello Server</h1>`没有变成 HTML 标签，而是变成了一个描述：“这有一个 h1，内容是 Hello Server”。\n客户端组件变成了“占位符”：注意那个 \"$L2\"。它告诉浏览器：“这里应该放一个 ClientButton 组件。它的代码在 ClientButton.js 里，请去下载它，并把 initialCount: 10 传给它。”\n浏览器拿到这个 JSON 后做了什么？\nReact 读取 JSON。\n把 div 和 h1 渲染出来（或者更新现有的）。\n看到 $L2，去加载客户端组件的代码。\n最关键的一步：如果页面上本来就有一个 ClientButton，React 会保留它现在的状态（比如用户已经把 count 点到了 15），然后只更新必要的 props，实现了无缝衔接。\n\n在首次加载页面时，RSC Payload 是内嵌在 HTML 源码中的。浏览器拿到这个 JSON 后做了什么？\nReact 读取 JSON。\n把 div 和 h1 渲染出来（或者更新现有的）。\n看到 $L2，去加载客户端组件的代码。\n最关键的一步：如果页面上本来就有一个 ClientButton，React 会保留它现在的状态（比如用户已经把 count 点到了 15），然后只更新必要的 props，实现了无缝衔接。\n\n服务端组件只在服务端执行，所以不能调客户端的方法包括window等（Node.js 里根本就没有浏览器窗口的概念），也不能useeffect usestate，这些 Hooks 的作用是“在浏览器里管理状态和副作用”。既然 RSC 的代码都不发送给浏览器，这些 Hooks 自然也就毫无用武之地。\n\n客户端组件则是提前再服务端执行得到初始样式和HTML，浏览器加载完HTML后再下载并执行js文件进行水合（React 在浏览器里再次运行这个组件，这次它会执行 useEffect，并且把 onClick 事件监听器挂载到那个已经存在的按钮上。）\n\n当 Next.js 在服务器（Node.js）上渲染一个客户端组件时，它其实是在执行一个“阉割版”的 React 渲染流程：\n执行组件函数：Node.js 会像浏览器一样，去调用组件函数\n处理 Hooks (有特殊规则)：useState只取初始值；useEffect / useLayoutEffect: 直接跳过；useContext: 正常执行读取组件树上层的 Provider 里的值；\n生成 Virtual DOM：函数执行完，React 得到了一棵组件树。\n序列化为 HTML：React 的服务端渲染器 (ReactDOMServer) 遍历这棵树，把它转换成纯文本的 HTML 字符串（例如.  \\<div>\\<button>Click</button></div> ）。 \n\nApp Router 是 Next.js 13.4 之后推出的全新路由和渲染架构\n基于 app/ 目录：以前的页面写在 pages/ 里，现在的页面写在 app/ 里。\n默认 RSC：这是最大的区别。在 app/ 里写的组件，默认全是服务端组件。这彻底改变了开发模式。\n嵌套布局 (Nested Layouts)：支持 layout.tsx 嵌套，这是 Pages Router 做不到的。\n流式传输 (Streaming)：利用 React Suspense，可以把页面拆成碎片，一部分一部分地发给浏览器（比如先发个 loading 骨架屏，再发数据），极大地优化了 TTFB。",
+          "title": "Next.js 解决了 React 的哪些核心问题",
+          "content": "1. **SEO 问题**：React默认CSR，首屏 JS 大、白屏时间长、SEO 差，Next.js 提供 **SSR / RSC** \n2. **服务端能力**：React 只负责 UI，Next.js = **前端 + BFF + API 层**，服务端组件 / Server Actions / Middleware\n3. **工程复杂度**：SSR开箱即用，Next.js 提供文件系统路由，自动按页面代码分割，零配置起步，约定大于配置\n4. **开发体验**：Fast Refresh、内置 TypeScript 支持、API Routes 等",
           "hasAnswer": true
         },
         {
           "id": "nextjs-3",
-          "title": "RSC react server component",
-          "content": "React Server Components 是 React 提出的 **一种让部分组件只在服务器端执行的渲染模式** \n它不是传统意义上的 SSR（Server-Side Rendering）那样生成完整 HTML，而是：\n\n> **在服务器执行组件逻辑，把渲染结果以特殊协议序列化成数据流发送给客户端，客户端再把这些数据解释成 UI。**\n\n核心特点：\n\n- 组件代码 **永远不发送到客户端**（不会打包到 bundle 里）。\n\n- 只能运行在服务器上，不能使用浏览器 API 和交互 Hooks（如 `useState`, `useEffect`）。主要用于数据密集型、展示型的 UI。\n\n- 主要用于数据密集型、展示型的 UI。\n\n这就能让 React 应用更“轻巧、高效、按需加载”。\n\n| 渲染方式        | JS 发送到客户端       | 数据获取模式         | 互动能力                 |\n| ----------- | --------------- | -------------- | -------------------- |\n| CSR (客户端渲染) | 全组件 JS          | 客户端请求 API      | 强                    |\n| SSR (服务端渲染) | 全组件 JS + HTML   | 服务端预取数据 → HTML | 交互需要 hydrate         |\n| **RSC**     | **只发送必要的交互 JS** | 服务器直接数据访问      | 交互需 Client Component |\n\nReact Server Components 是一种服务器执行的组件模式，它让 UI 的渲染和数据获取在服务端完成，只把 UI 结构通过序列化协议发送给客户端，从而减少 JS bundle、提高性能并简化数据获取，同时和交互组件协同工作，适配复杂应用。\n\n**RSC 适合：数据驱动、多页面/大列表/复杂查询、多数据源聚合，但客户端交互较轻**的页面。\n\n**不适合：交互复杂、状态频繁变化、强实时响应**的组件。",
+          "title": "Next.js 和 React 的区别？",
+          "content": "| 维度   | React            | Next.js                     |\n| ---- | ---------------- | --------------------------- |\n| 定位   |                  | 全栈框架                        |\n| 路由   | 需要 react-router  | 内置文件系统路由                    |\n| 渲染   | 默认仅 CSR          | RSC/SSR/SSG/ISR/CSR 都支持     |\n| 后端能力 | 19 开始官方支持 RSC 协议 | API Routes + Server Actions |\n| 构建工具 | 需自行配置            | 内置 Turbopack/Webpack        |\n| SEO  | 需额外处理            | 原生支持                        |\n\n**一句话**：React 是造轮子的原料，Next.js 是装好轮子的车。\n\n追问：\nNext.js 的 RSC 和 React 19 是不是“一样”？\nReact 的**RSC 是“框架能力”，不是库能力。** React 19 开始正式支持 RSC 的协议和运行时，但它并不提供完整的服务端渲染和构建体系。RSC 在 React 中更多是作为一种规范存在，主要是给 **框架作者** 用的，不是给普通业务开发者直接用的。而 Next.js 在 App Router 中实现了完整的 RSC 工程化方案，包括 bundle 拆分、缓存、Streaming 和 Server Actions，因此两者在能力完整度上差异很大。",
           "hasAnswer": true
         },
         {
           "id": "nextjs-4",
+          "title": "Next.js 支持哪些渲染模式？",
+          "content": "1. **CSR（Client-Side Rendering）**：纯客户端渲染，用 `use client` 组件实现\n2. **RSC（React Server Components）**：默认在服务端执行，不进入 JS bundle，减少客户端 JS 体积\n3. **SSR（Server-Side Rendering）**：每次请求时服务端渲染，首屏渲染快，SEO更优秀，页面实时性高，适合动态数据，但成本高\n4. **SSG（Static Site Generation）**：构建时生成 HTML，适合静态内容，不适合频繁变化内容\n5. **ISR（Incremental Static Regeneration）**：SSG + 定时重新生成，兼顾性能和数据新鲜度\n\n**一句话总结**：  \nCSR 是兜底，SSR 是实时，SSG 是极致性能，ISR 是折中方案，RSC 是未来方向",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-5",
+          "title": "Next.js 的 SSR",
+          "content": "在传统的 SSR 架构（如早期的 React SSR）中，您确实需要维护两套入口（client-entry.js 和 server-entry.js），配置两套 Webpack，处理注水 (Hydration) 的各种样板代码。\nNext.js 把这一切都封装了。您只需要写一个 page.tsx，Next.js 会自动在服务器上把它渲染成 HTML，然后在客户端把它\"激活\"。对于开发者来说，只有一套代码，一套逻辑\nNext.js 的伟大之处在于，它让您在同一个项目、同一个文件结构、同一种语言中，流畅地穿梭于\"服务端\"和\"客户端\"之间。您不需要配置复杂的环境，但您需要清晰地知道\"我现在是在服务器上（获取数据）\"还是\"我现在是在浏览器里（处理交互）\"。这种无缝融合，正是它作为全栈框架的体验确实是目前业界领先于业界的关键。\n\n客户端组件在服务端执行时，只会生成静态 HTML。它的 useEffect、onClick 等逻辑不会运行。这些逻辑只有代码被下载到浏览器并\"注水 (Hydrate)\"后，才会真正在客户端执行。\n服务端组件 (RSC) 的代码，只在服务器上运行。零 JS 发送：这些组件的 JavaScript 代码永远不会被打包发送给浏览器。浏览器收到了什么？：浏览器接收到的是 RSC 执行后的结果（一种特殊的 JSON 数据格式，描述了 UI 的结构）。![](/Users/wzz/Library/Application%20Support/marktext/images/2025-12-01-00-06-38-image.png)\n\n服务端内容变成了纯数据：`<h1>Hello Server</h1>`没有变成 HTML 标签，而是变成了一个描述：\"这有一个 h1，内容是 Hello Server\"。\n客户端组件变成了\"占位符\"：注意那个 \"$L2\"。它告诉浏览器：\"这里应该放一个 ClientButton 组件。它的代码在 ClientButton.js 里，请去下载它，并把 initialCount: 10 传给它。\"\n浏览器拿到这个 JSON 后做了什么？\nReact 读取 JSON。\n把 div 和 h1 渲染出来（或者更新现有的）。\n看到 $L2，去加载客户端组件的代码。\n最关键的一步：如果页面上本来就有一个 ClientButton，React 会保留它现在的状态（比如用户已经把 count 点到了 15），然后只更新必要的 props，实现了无缝衔接。\n\n在首次加载页面时，RSC Payload 是内嵌在 HTML 源码中的。浏览器拿到这个 JSON 后做了什么？\nReact 读取 JSON。\n把 div 和 h1 渲染出来（或者更新现有的）。\n看到 $L2，去加载客户端组件的代码。\n最关键的一步：如果页面上本来就有一个 ClientButton，React 会保留它现在的状态（比如用户已经把 count 点到了 15），然后只更新必要的 props，实现了无缝衔接。\n\n服务端组件只在服务端执行，所以不能调客户端的方法包括 window 等（Node.js 里根本就没有浏览器窗口的概念），也不能 useeffect usestate，这些 Hooks 的作用是\"在浏览器里管理状态和副作用\"。既然 RSC 的代码都不发送给浏览器，这些 Hooks 自然也就毫无用武之地。\n\n客户端组件则是提前再服务端执行得到初始样式和 HTML，浏览器加载完 HTML 后再下载并执行 js 文件进行水合（React 在浏览器里再次运行这个组件，这次它会执行 useEffect，并且把 onClick 事件监听器挂载到那个已经存在的按钮上。）\n\n当 Next.js 在服务器（Node.js）上渲染一个客户端组件时，它其实是在执行一个\"阉割版\"的 React 渲染流程：\n执行组件函数：Node.js 会像浏览器一样，去调用组件函数\n处理 Hooks (有特殊规则)：useState 只取初始值；useEffect / useLayoutEffect: 直接跳过；useContext: 正常执行读取组件树上层的 Provider 里的值；\n生成 Virtual DOM：函数执行完，React 得到了一棵组件树。\n序列化为 HTML：React 的服务端渲染器 (ReactDOMServer) 遍历这棵树，把它转换成纯文本的 HTML 字符串（例如. \\<div>\\<button>Click</button></div> ）。\n\nApp Router 是 Next.js 13.4 之后推出的全新路由和渲染架构\n基于 app/ 目录：以前的页面写在 pages/ 里，现在的页面写在 app/ 里。\n默认 RSC：这是最大的区别。在 app/ 里写的组件，默认全是服务端组件。这彻底改变了开发模式。\n嵌套布局 (Nested Layouts)：支持 layout.tsx 嵌套，这是 Pages Router 做不到的。\n流式传输 (Streaming)：利用 React Suspense，可以把页面拆成碎片，一部分一部分地发给浏览器（比如先发个 loading 骨架屏，再发数据），极大地优化了 TTFB。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-6",
+          "title": "什么是 React Server Components？",
+          "content": "**核心概念**：只在服务端执行的 React 组件，JS 代码不会发送到客户端。\n\n**特点**：\n1. **零客户端 JS**：组件代码不打包到 bundle，减小体积\n2. **直接访问后端资源**：可以直接读数据库、文件系统、调用内部 API\n3. **输出是 RSC Payload**：一种特殊 JSON 格式，描述 UI 结构\n\n**限制**：\n- 不能用 useState、useEffect 等 Hooks\n- 不能绑定事件（onClick 等）\n- 不能访问浏览器 API（window、document）\n\n**使用场景**：数据获取、静态展示、包裹客户端组件\n\n总结：React Server Components 是一种服务器执行的组件模式，本质是**把 React 的一部分计算前移到服务端**，它让 UI 的渲染和数据获取在服务端完成，只把 UI 结构通过序列化协议发送给客户端，从而减少 JS bundle、提高性能并简化数据获取，同时和交互组件协同工作，适配复杂应用。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-7",
           "title": "Next.js RSC 漏洞",
-          "content": "这个漏洞（2024–2025 问题）本质是 **反序列化不可信数据 → 服务端执行恶意构造的代码（RCE）**\n\n漏洞点：服务端反序列化 RSC payload 时，默认信任客户端的数据，服务端代码，没有校验actionId 和 payload 结构是否可信，而是直接可以执行\n\n导致只要攻击者伪造结构正确的 payload，就能执行任意的 Server Action 函数\n\n正确的校验应该：\n\n**校验 1：payload 引用的 actionId 必须属于当前构建生成的 action map**\n\n**校验 2：反序列化过程中禁止还原任意类型对象，只允许白名单类型**",
+          "content": "这个漏洞（2024–2025 问题）本质是 **反序列化不可信数据 → 服务端执行恶意构造的代码（RCE）**\n\n漏洞点：服务端反序列化 RSC payload 时，默认信任客户端的数据，服务端代码，没有校验 actionId 和 payload 结构是否可信，而是直接可以执行\n\n导致只要攻击者伪造结构正确的 payload，就能执行任意的 Server Action 函数\n\n正确的校验应该：\n\n**校验 1：payload 引用的 actionId 必须属于当前构建生成的 action map**\n\n**校验 2：反序列化过程中禁止还原任意类型对象，只允许白名单类型**",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-8",
+          "title": "use client 是做什么的？",
+          "content": "**作用**：声明一个组件为客户端组件，标记「服务端 → 客户端」的边界。\n\n**使用时机**：\n1. 需要用 useState、useEffect 等 Hooks\n2. 需要绑定事件（onClick、onChange）\n3. 需要访问浏览器 API（window、localStorage）\n4. 使用仅客户端的第三方库\n\n**注意事项**：\n- 放在文件顶部第一行\n- 该文件及其导入的所有模块都会打包到客户端\n- 客户端组件可以渲染服务端组件（通过 children）",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-9",
+          "title": "Next.js 如何做 SEO？",
+          "content": "1. **渲染策略**\n\t- 需要 SEO 的页面用 **SSG/ISR/SSR** 输出完整 HTML。\n\t- 内容稳定：SSG / ISR；强实时：SSR。\n\t- App Router 里默认 Server Component，本身就更利于首屏和可索引内容。\n2. **Meta / OpenGraph / 结构化数据**\n\t- **App Router 用 `generateMetadata()` 或 `metadata` 导出（更结构化）。\n\t- Pages Router 用 `next/head` 写 title、description、canonical、OG、twitter card。\n\t- App Router 用 `generateMetadata()` 或 `metadata` 导出（更结构化）。\n\t- 对文章页加 JSON-LD（结构化数据），提高 rich result 概率。\n3. **站点工程化**\n\t- `sitemap.xml`、`robots.txt`、规范化 URL（canonical）、国际化 hreflang（如果有）。\n\t- 避免重复内容，控制分页/筛选页索引策略。\n\t- \n**加分点：**\n- SEO 不只看“能不能爬”，还看 **Core Web Vitals（LCP/INP/CLS）**，Next.js 通过图片优化、代码分割、RSC 降 JS 等改善性能指标。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-10",
+          "title": "Pages Router vs App Router 有什么区别？",
+          "content": "两者的本质差异在于：**App Router 是围绕 RSC（Server Components）重新设计的路由与渲染体系**，而 Pages Router 是传统的 SSR/SSG 模型。\n\n| 维度   | Pages Router                         | App Router                         |\n| ---- | ------------------------------------ | ---------------------------------- |\n| 目录   | `pages/`                             | `app/`                             |\n| 组件模型 | 默认客户端组件                              | 服务端组件，标 `use client` 才会进客户端 bundle |\n| 布局   | `_app.tsx` 全局                        | `layout.tsx` 嵌套                    |\n| 数据获取 | getServerSideProps /getStaticProps 等 | 直接 async/await                     |\n| 流式渲染 | 不支持                                  | 支持 Suspense                        |\n| 错误处理 | `_error.tsx`                         | `error.tsx` 嵌套                     |\n\n**迁移建议**：新项目直接用 App Router，老项目可渐进式迁移。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-11",
+          "title": "layout.tsx 和 page.tsx 的区别？",
+          "content": "**layout.tsx**：定义该路由段及其所有子路由共享的布局（导航栏、侧边栏等）\n- **路由切换时保持状态**不会重新渲染\n- 可以嵌套，子路由继承父布局\n- 必须接收 `children` 并渲染\n- 在 App Router 下 layout 默认是 Server Component（除非 `use client`）\n**page.tsx**：\n- 定义路由的实际内容，对应一个 URL 的最终页面\n- 每次访问都会重新渲染\n- 是路由可访问的必要条件\n- 接收 `params` 和 `searchParams`\n\n**执行顺序**：layout 包裹 page，从外到内渲染。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-12",
+          "title": "图片优化 Image 组件的原理？",
+          "content": "Next.js 的 `next/image` 做的是“**端到端的图片性能优化**”，核心目标是降低 LCP、节省带宽。\n1. **按需生成与压缩**：Image 不是简单 `<img>`，它会请求 Next 的图片优化服务（loader），在服务端做 resize 压缩 格式转换（优先 WebP/AVIF）\n2. **响应式尺寸**：根据 `sizes` 属性生成多尺寸 srcset，让浏览器按 DPR 与视口选择合适的资源\n3. **懒加载**：默认 `loading=\"lazy\"`，进入视口才加载；首屏关键图用 `priority` 提升加载优先级\n4. **占位符**：`placeholder=\"blur\"` 显示模糊预览图（**必须**有 `blurDataURL` 才生效）\n5. **防止布局偏移**：通过 width/height 或 fill + container 约束，提前占位，减少布局抖动\n\n**核心**：不是构建时处理，而是请求时按需优化 + 缓存。\n\n**常见坑：**\n- 外链域名没配 `images.domains/remotePatterns` 会失败。\n- `fill` 必须给父容器明确尺寸/position，否则布局异常。\n- 首屏大图不加 `priority` 容易拉高 LCP。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-13",
+          "title": "loading.tsx 的渲染时机？",
+          "content": "**原理**：Next.js 自动将 loading.tsx 包装成 Suspense 的 fallback。\n\n**触发时机**：页面首次加载时/路由切换时，Server Components 在等待数据或组件异步加载导致挂起，Next 会先返回并显示该段的 `loading.tsx`，等数据 ready 后再把真实内容“流式替换”进来。\n\n**特点**：\n- 每个路由段可以有自己的 loading.tsx\n- 支持流式传输，先返回 loading 状态\n- 布局（layout.tsx）不会触发 loading",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-14",
+          "title": "路由跳转是如何避免整页刷新的？",
+          "content": "Next.js 的客户端路由（`next/link` / `router.push`）本质是 **SPA 导航**：\n1. **拦截点击事件**：`<Link>` 阻止浏览器默认跳转（不触发整页 reload）。\n2. **History API**：使用 `pushState/replaceState` 改 URL，不刷新页面。\n3. **预取与增量请求**：Next 会预取目标路由所需的 JS chunk / 数据（空闲时或可见时），导航时只做最小增量加载。\n4. **差异化更新**：只重新渲染变化的路由段，保留共享布局状态\n5. **按需 hydration**：只对需要交互的 Client Components 做 hydration（RSC 场景下客户端 JS 更少）。\n\n**补一句加分：**  \n如果你用 `<a href>` 且没用 Link，或跳到外域，就会整页刷新，这是预期行为。`",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-15",
+          "title": "Next.js 中如何做代码分割？",
+          "content": "Next.js 默认就做了非常多代码分割，核心是 **按路由、按组件、按依赖** 三层：\n\n1. **路由级分割（自动）**：每个页面/路由会生成独立 chunk，只有访问该路由才加载对应 JS。\n2. **动态导入（手动控制）**\n\t- 用 `next/dynamic` 对重组件（富文本、图表、地图）做按需加载：\n\t    - 只在需要时加载\n\t    - 可以 SSR: false（例如只在浏览器可用的库）\n\t\n3. **组件边界与 RSC**\n\t- App Router 默认 Server Components 不进客户端 bundle，本质上把很多 UI 逻辑“分割”到服务端，减少客户端 JS。\n\t- `use client` 会把该组件及其依赖打进客户端 chunk，所以要控制 client 边界尽量小。\n\n4. **第三方依赖优化**\n\t- 把大依赖放到动态 import 或只在 Server Component 使用，避免进主包。\n\n**常见坑：**\n- 一个顶层组件加了 `use client`，会把它依赖的很多东西都拖进客户端包（client 边界扩散）。\n- 动态 import 过多会产生大量小 chunk，可能增加请求开销，需要平衡。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-16",
+          "title": "Next.js 中如何做鉴权？",
+          "content": "**正确的 Next.js 鉴权思路是“分层”**：登录（Authentication）+ 会话（Session）+ 授权（Authorization）。官方指南就是这么拆的。\n常见落地方案（面试说这套就稳）\n1. **登录/注册**： 用 **Server Actions** 接表单，执行在服务端，适合放敏感逻辑。\n2. **会话管理**：Session 放 **HTTP-only Cookie**（或配合 session store / JWT）\n3. 授权：不能只在 middleware 做粗过滤，真正的数据读取处也要校验\n\n**常用对比**：\n1. **Middleware**：\n   - 在请求到达页面前拦截\n   - 适合路由级别的权限控制\n2. **Server Component**：\n   - 直接读取 cookies/headers 验证\n   - 适合页面级数据权限\n3. **Server Actions**：\n   - 每个 action 内部校验用户身份\n   - 适合操作级别的权限\n4. **第三方库**：NextAuth.js / Clerk / Auth0\n\n**最佳实践**：\n用 middleware 做快速跳转和粗过滤，但真正的数据读取必须在 Server Components / Route Handlers / Server Actions 的数据访问层再做一次授权校验。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-17",
+          "title": "middleware 能做什么？不能做什么？",
+          "content": "**能做**：核心就是“改请求/改响应/改去向”\n1. 重定向 / 重写 URL\n2. 设置/读取 cookies 和 headers\n3. 直接返回一个响应，比如鉴权拦截\n4. 请求日志\n\n**不能做**：\n1. 访问 Node.js API（fs、path 等）—— 运行在 Edge Runtime\n2. 直接连接数据库（需通过 API 调用）\n3. 执行耗时操作（会把每次请求的“最前置链路”拖慢）\n4. 使用大型 npm 包（bundle 大小限制）\n\n**执行时机**：在缓存之前、路由匹配之后。\n实战建议：middleware/proxy 只做**快速、轻量、可失败**的事：重定向、locale、A/B、粗鉴权、灰度、加 header",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-18",
+          "title": "Next.js 的数据请求是怎么缓存的？",
+          "content": "**四层缓存机制**：\n\n1. **Request Memoization**：同一渲染过程中，相同请求自动去重\n2. **Data Cache**：fetch 结果持久化缓存（跨请求/部署）\n3. **Full Route Cache**：SSG 页面的 HTML + RSC Payload 缓存\n4. **Router Cache**：客户端缓存已访问的路由段（30s/5min）\n\n并且（重要）：Next 默认倾向于“**尽可能缓存**”，除非你显式 opt-out 或触发动态渲染条件。\n\n**控制缓存**示例：\n```tsx\nfetch(url, { cache: 'no-store' }); // 不缓存\nfetch(url, { next: { revalidate: 60 } }); // 60秒后重新验证\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-19",
+          "title": "fetch 在 Server Component 中和浏览器 fetch 有什么不同？",
+          "content": "**相同点：**API 形状一样，都是 Web fetch。  \n**不同点（关键）：`cache` 的含义完全不同**：\n- 在**浏览器**：`cache` 表示怎么和浏览器 HTTP cache 交互。\n- 在 **Next 服务端**：`cache` 表示怎么和 Next 的 **Data Cache** 交互；并且 Next 给 fetch 增加了 `next.revalidate`、`next.tags` 等语义来做持久缓存与失效。\n- 默认是 auto：能静态 → 静态（等价于 force-cache）；发现动态 API → 退化成 no-store\n- Server Component 的 fetch：是 **服务端到服务端请求**，不受浏览器 CORS 限制\n- cookie 不是“隐式自动注入到所有 fetch”，而是由开发者显式控制。\n\n| 维度      | Server Component，注意执行在服务端       | 浏览器                |\n| ------- | ------------------------------- | ------------------ |\n| 执行环境    | Node.js / Edge                  | 浏览器                |\n| 默认缓存    | 默认是 auto，`cache: 'force-cache'` | `cache: 'default'` |\n| 请求去重    | 自动 memoization                  | 无                  |\n| 跨域限制    | 无 CORS 限制                       | 受 CORS 约束          |\n| Cookies | 需手动加参数控制                        | 自动携带               |\n| 扩展选项    | `next: { revalidate, tags }`    | 无                  |\n\n**注意**：Server Component 中的 fetch 运行在真正的服务端环境中，被 Next.js 增强过，不是原生 fetch。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-20",
+          "title": "Fast Refresh 是什么？",
+          "content": "**Fast Refresh 是 Next.js 的开发态热更新机制**。\n**Fast Refresh 是在不丢失组件 state 的前提下，实时刷新修改过的模块，用来提升开发体验。**\n\n它解决什么问题？\n- 普通 HMR：一改代码 → 整页刷新 → state 全丢\n- Fast Refresh：\n    - 只刷新受影响组件\n    - **尽量保留 React state**\n    - 错误修复后自动恢复页面\n\n面试官想听到的关键词\n- 开发态（development only）\n- 基于 React Refresh\n- 保留 state（如果是函数组件 & hooks 结构没破坏）\n- 修改 hooks 顺序 / export 结构会触发 full reload",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-21",
+          "title": "API Routes 是什么？",
+          "content": "**API Routes 是 Next.js 内置的后端接口能力（BFF）**\n**API Routes 允许在 Next.js 项目中直接编写服务端接口，用来承接前端请求或作为 BFF 层。**\n\n本质是什么？\n- 运行在 **Node.js / Edge Runtime**\n- 不进浏览器 bundle\n- 本质是一个 HTTP handler\n\n面试官想听的点\n- BFF（Backend For Frontend）\n- 鉴权、聚合接口、隐藏后端结构\n- 不适合复杂业务（不是完整后端）",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-22",
+          "title": "Edge Runtime",
+          "content": "Edge Runtime 本质是一个运行在 CDN 边缘的“请求拦截与改写层”，不是完整服务器，也不是浏览器。\n本质\n- 运行在 **CDN 边缘节点**\n- 执行的是 **Web 标准 API**\n- **不是 Node.js**\n- **比浏览器多权限，比 Node.js 少能力**\n\n可以把它理解成： **一个“增强版 Service Worker + 网络代理层”**",
           "hasAnswer": true
         }
       ]
@@ -1477,96 +1591,108 @@
         },
         {
           "id": "open-questions-4",
+          "title": "不同来源的 API 的数据格式不同怎么统一",
+          "content": "##### 有这样一个场景：如果你从多个系统的 API 拉数据，但这些系统的数据结构不一致，比如 A 系统返回 camelCase、B 系统是 snake_case，还有一些是中文 key，你怎么统一数据结构，来复用\n\n核心思想：在逻辑和外部 API 之间，建立一个专门负责转换的中间层——**适配器 (Adapter)**。每个外部系统都有一个专属的适配器，该适配器只负责：从外部系统获取数据 $\\rightarrow$ 将其转换成规范模型 $\\rightarrow$ 传递给你的应用核心逻辑。\n\n对于 **`camelCase` 和 `snake_case`** 之间的转换，可以使用成熟的库进行自动化处理\n\n对于中文 Key 或需要复杂的**业务值转换**，需要硬编码映射规则，维护一个 JSON 或 YAML **映射文件**",
+          "hasAnswer": true
+        },
+        {
+          "id": "open-questions-5",
           "title": "与外部协作场景",
           "content": "##### 如果要集成一个船上的摄像监控系统（第三方页面，但它不能改代码，只能iframe嵌进去，而且还要求根据用户权限控制展示内容，你会怎么处理\n\n方案1：通过代理服务器实现内容过滤，iframe嵌套后端路径，有权限时跳转，无权限时返回一个兜底\n\n方案2：利用 **第三方系统自身的 URL 参数** 进行控制，前提是第三方已有支持\n\n方案3：用前端遮罩进行视觉控制，只控制是否展示，内容有泄漏风险\n\n##### 提供给其他协作方的H5要注意什么？\n\n##### 如果要写一个公共库需要考量哪些？比如模块化，打包，版本，暴露的参数方法，文档等等",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-5",
+          "id": "open-questions-6",
           "title": "从零搭建和系统设计",
           "content": "##### 大型电商网站的架构，你会如何设计?考虑哪些问题如何解决\n\n高并发：忙绿兜底 下单锁 防刷\n\nSEO：ssr\n\nSKU复杂：SKU矩阵选择控件 库存变化要实时同步\n\n支付下单：流程复杂、强一致性要求高：必须 表单自动保存  交易失败兜底提示 幂等提交\n\n性能优化；OSS CDN \n\nA/B 测试、埋点\n\n安全\n\n##### 从0搭建一个内部脚手架项目\n\n##### 如果让你从零开始搭建一个大型电商网站的前端架构，你会如何设计?考虑哪些问题如何解决\n\n##### 如果让你从零开始搭建一个大型前端项目\n\n##### 设计一套全站点请求耗时统计工具\n\n##### 如果让你来你现在负责一个项目，有20+个页面，需求方经常改字段、加字段，你每次都要改组件，这个时候你怎么来设计\n\n思路：数据驱动渲染+配置化\n\n配置层：把字段抽象出一套配置文件\n\n业务组件和渲染逻辑层都不需要关心如何配置，而是根据配置自动化地应用\n\n##### 设计一个在线文档协同编辑的方案，需要考虑哪些技术点\n\n##### 设计一套全站点请求耗时统计工具\n\n##### 如何设计一个高可用的B端系统\n\n##### 如果要做一个拖拽式仪表盘Dashboard用户能自己拖拽、组合图表组件展示不同数据源的信息，你会怎么来设计这个系统\n\n我会把这个系统拆成四层：**布局层、组件层、数据层、权限与发布层**，保证既能拖拽搭建，又能稳定扩展。\n 1) 布局层（Layout）\n- Dashboard 的核心产物是一个 **Layout Schema**：  \n    记录每个卡片（Widget）的 `id、位置(x,y)、尺寸(w,h)、层级、响应式断点`。\n- 前端用成熟的栅格拖拽方案（类似 react-grid-layout 这种思想）：拖拽只改 layout，不直接影响数据逻辑。\n- 支持：对齐/吸附、最小尺寸、断点布局（desktop/tablet/mobile）。\n 1) 组件层（Widget/图表物料）\n- 每个图表是一个可注册的 Widget：  \n    `meta(配置面板schema) + render(运行时组件) + dataAdapter(数据适配器)`。\n- 配置面板是 schema-driven：用户选指标、维度、过滤器、样式；平台把它存成 `widgetConfig`。\n1) 数据层（Data Gateway + Query Model）\n- 性能策略：\n- 请求合并：同一数据源相同 query 做 dedupe\n- 缓存：按 query key 缓存 + TTL\n- 并发控制与取消：切过滤器时 cancel 旧请求\n- 大表/高频：优先用聚合接口，必要时异步查询（返回 jobId 轮询）\n 1) 权限与发布\n- 权限到 dashboard / widget / 数据源 / 字段（必要时行级）。\n- 支持“私有/团队共享/公开”，公开也走 token + 限流 + 脱敏策略。\n- 可观测：每个 widget 的 query 耗时、失败率、命中缓存率，方便定位哪个卡片拖慢整页。\n\n这个系统的关键是把复杂度隔离：**布局只是布局、组件只是展示、数据统一走网关、权限和审计在服务端兜底**，这样才能扩展物料和数据源且不失控。",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-6",
+          "id": "open-questions-7",
           "title": "低代码平台",
           "content": "#### 业界主流的实现思路和架构\n\n核心：Schema（DSL） → 编辑器（搭建器） → 运行时引擎（渲染 / 执行） → 扩展机制\n1. Schema / DSL 是什么？不是 JSX，不是模板，而是**纯配置化的 UI / 逻辑描述**。业界 Schema 通常覆盖 5 类：\n\tUI 结构：组件树、布局\n\t组件属性：props、样式、校验\n\t数据源：API、Mock、静态数据\n\t事件：点击、变更、提交\n\t逻辑：条件显隐、联动、流程\n2. 编辑器本质是什么？**一个“操作 Schema 的 UI”**\n\t- 增删改 Schema 节点\n\t- 改节点属性\n\t- 维护组件树结构\n\t常见的实现方式：左中右三栏布局，物料区+画布区+属性区\n\t注意：画布区，编辑时!=运行时\n\t- 组件有「选中态 / hover / 边框」\n\t- 支持拖拽排序（dnd-kit / react-dnd）\n\t- 支持插槽高亮、占位符\n\t业界成熟平台画布区一定是 **双渲染器**。\n\t- 编辑态要**辅助交互**\n\t- 运行态要**极致稳定和性能**\n\n3. 运行时引擎：低码平台的核心，目的：Schema 渲染成组件\n\t- 把 Schema 转成真实 UI（一棵真实的组件树）\n\t- 处理数据流、事件、联动逻辑，要把“页面数据”做成统一的模型\n\t\t- 数据初始化与合并（默认值、URL 参数、预加载数据）\n\t\t- 订阅与派发（哪些组件依赖哪些数据）\n\t- 标准化数据读取路径（`$page.xxx` / `$form.xxx` / `$ds.list.data`）\n\t- 动作系统：动作系统用来描述**用户交互触发的一整套行为流程**，把 schema action 编译/解释成可执行动作：提供动作执行的上下文 ctx（数据、组件引用、路由、权限、埋点）\n\n4. 扩展机制\n\t自定义组件\n\t自定义动作\n\t自定义表单校验\n\n架构：\n1. 编辑器(B端)一个项目，预览/运行时一个项目（最常见、最稳）\n\t- **B 端**：搭建器/编辑器（画布、属性面板、物料管理、权限、发布）\n\t- **运行时**：预览页 + 线上最终页面（同一套 runtime 包）\n\t- 集成方式（iframe / 微前端 / 直挂）\n\t- 优点：编辑器复杂度不会污染运行时；运行时可以做极致性能/体积优化；最利于保证一致性（预览和线上共用 runtime）；**C 端可以换壳**（Next.js / 小程序 / 原生 WebView），但**runtime/渲染引擎/物料协议最好一致**，否则样式/行为一致性很难保证。**\n\t- 缺点：工程上需要共享物料协议、版本管理更严格\n2. 全部一个项目（早期、团队小、迭代快）\n\t- 编辑器和预览都在一个前端项目里\n\t- 运行时作为一个模块被引用\n\t- 优点：开发简单、联调快  \n\t- 缺点：包会越来越大、边界容易糊、后期难维护\n\n#### 怎么保证“预览样式”和“最终生成页面”一致？\n\n核心原则：预览不要走“模拟渲染”，预览必须走“同一套运行时 + 同一份物料 + 同一份主题样式”。\n① 预览和线上共用同一个 Runtime 渲染器（最重要）\n② 物料（组件库）版本锁定：预览用哪个版本，线上就用哪个版本\n③ 主题与样式体系统一：Design Token / CSS 变量化\n\n预览和线上一致性的关键不是“截图对齐”，而是工程上保证它们**同源**：  \n**同一套 runtime、同一套物料版本、同一套主题 token、同一套基础样式和数据请求链路**。  \n只要把版本和环境锁住，一致性就可控。\n\n#### 有哪些性能瓶颈和核心难点\n\n瓶颈 1：Schema 解析 + 组件树构建过于频繁。\n- 节点很多（几百到上千）； props 多、表达式多；布局复杂（表格/表单/动态容器）\n- 如果每次 state 变动都从 root 重新 `render(schema)`，会导致页面频繁的重新渲染\n\n瓶颈2：表达式求值太多：表达式系统主要解决的是**配置里的“动态值”问题**，运行时需要在数据变化时**不断对这些表达式求值**，成熟平台一般会有 **依赖追踪和表达式缓存**\n- 每次 React render 都重新跑 N 个表达式\n- 表达式里还读深层对象、做过滤/排序\n- **解决方向**\n\t- 把表达式变成“计算属性”：依赖没变就不重算（memo）\n\t- 依赖追踪：只在依赖字段变化时更新\n\t- 表达式编译：字符串 → AST → 纯函数（避免重复 parse）\n\n瓶颈 3：数据更新粒度太粗（导致大面积重渲染）\n- 如果数据层是一个大 store，任何字段改动都触发全局订阅，那么：一个输入框 change → 整页组件都 rerender\n- **常用方案**\n\t- 分片 store：按作用域拆（page/form/ds）\n\t- 细粒度订阅：组件只订阅自己依赖的路径\n\t- 类似 mobx 的 derivation，或 proxy track（读取即收集）\n\n瓶颈 4：异步请求与联动风暴\n- 例如：A 字段 change → 触发 3 个请求 → 更新 5 个组件 → 又触发表达式 → 又触发请求…\n- **治理手段**\n\t- request 去重 / 取消（AbortController）\n\t- 防抖节流（输入联动必须）\n\t- “联动图”静态分析：避免循环依赖\n\t- 统一调度队列（batch updates）\n\n#### 为什么同一套 runtime 在 C 端会成为性能瓶颈\n\n线上 C 端确实不会频繁更新 Schema，但低码运行时真正高频变化的是数据层。  \n如果数据更新是粗粒度的，就会导致大量与本次变化无关的组件和表达式被重新计算，这个问题在联动多、表达式多的低码页面里会被成倍放大。\n前面讨论的那些“数据更新粒度粗导致的性能问题”，主要预设的是：  C 端是「复杂、强数据驱动」的页面。\n如果只是典型的活动页（展示为主、交互简单），**大多数情况下确实不会成为核心问题**。\n\n低码 C 端，其实分成两大类\n ① 强数据驱动型（最容易出问题）\n典型特征：\n- 表单多、字段联动多\n- Dashboard / 报表 / BI\n- 多数据源、实时/准实时刷新\n- 复杂条件显示 / 计算\n👉 **前面所有性能讨论，100% 针对这一类。**\n② 展示/活动页型（你说的场景）\n典型特征：\n- 内容以静态展示为主\n- 数据来源少（1–2 个接口）\n- 几乎无复杂联动\n- 交互偏简单（点击跳转、弹窗）\n👉 **这一类页面通常不会被“数据更新粒度”卡死。**\n\n#### 预览页面请求实际数据怎么做鉴权？\n\n配置端：\n**第一步：预览页本身先鉴权**\n- 平台内预览：B端复用公司的 SSO / 登录态（Cookie / OAuth token），预览路由需要登录。\n- 对外分享预览：用**一次性或短期有效的 Preview Token**，链接里带 token 或者扫码授权，且可随时撤销。\n第二步：**权限模型要到“资源级 / 字段级”**\n- 不是“能预览就能查所有数据”，而是按：应用/页面/组件/数据源/字段/行级规则（可选）授权。\n- 对外预览通常只给“只读 + 脱敏 + 限制范围（比如只看最近7天、只看聚合结果）”。\n**第三步：安全细节**\n- Token 短 TTL + 绑定场景（appId/pageId）+ 可撤销\n- 防重放：nonce / jti，必要时绑定 IP/UA（看业务）\n- CORS、CSRF、SameSite、HTTPS 必须到位\n- 全链路日志：谁在什么时候查了什么数据\n#### 业界开源平台或常用方案\n\n阿里 LowCode Engine：目前最“教科书级”的实现\n运行时具体怎么做？\n- Schema → React Element\n- 表达式：字符串表达式 + 运行时解析\n- 动作：事件 → Action Pipeline\n- 强插件化：几乎所有能力都可 Hook\n**优点**\n- 架构清晰\n- 引擎边界非常干净\n**缺点**\n- 表达式 / 动作偏“工程师友好”\n- 对纯业务方不够傻瓜\n\n业界主流低码平台本质都是 **Schema 驱动的运行时引擎**。  \n运行时负责三件核心事情：  \n**根据 Schema 渲染 UI、通过表达式系统做动态计算、通过动作系统执行用户行为。**\n\n成功的平台一般都选择“配置优先，但允许工程师兜底”。\n\n#### 低代码平台如何实现远程组件的动态加载?\n\n低代码平台实现远程加载组件，一般有三个方向：\n\n1. **按需异步加载**：将组件按功能或场景拆分成独立模块，打包成独立的 chunk，通过动态 import 或类似机制在真正使用组件时才加载。这种方式减少了初始包大小，提高加载性能。\n2. **组件独立打包为远程包**：将每个大型组件打包成单独的 npm 包或远程模块，组件之间耦合度低，更新和发布可以独立处理。在运行时，通过动态加载这些包实现按需渲染，保证低代码平台的灵活性和扩展性。\n3. **Webpack 模块联邦**：允许模块在运行时动态加载远程模块或微前端应用，实现模块之间的共享和独立打包。\n\n**总结**：核心思想是 **减少初始加载体积 + 动态按需获取组件**，既能保证性能，也便于扩展和维护。\n\n补充亮点\n- **缓存策略**：远程组件通常会结合浏览器缓存或 CDN，加快再次加载速度。\n- **版本管理**：低代码平台可能需要支持不同版本的组件远程加载，避免依赖冲突。典型做法：\n\t- 每个组件独立发布版本（npm 或私有 registry）\n\t- 通过版本号或 hash 动态加载，支持多版本共存\n- **安全性**：远程加载的组件需要做沙箱隔离，防止组件内部执行影响全局。",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-7",
+          "id": "open-questions-8",
           "title": "前端存储",
-          "content": "前端存储 Local storage，session，indexDB，cookie，根据写的倒计时代码，穿插着问的，问的很深",
+          "content": "#### 对比说说前端存储 localStorage，sessionStorage，IndexDB，Cookie\n\n| 方案             | 容量（大概）            | 生命周期              | 是否随请求发送                 | 访问方式   | 性能/特征             | 典型用途           |\n| -------------- | ----------------- | ----------------- | ----------------------- | ------ | ----------------- | -------------- |\n| Cookie         | ~4KB/条（总量也有限）     | 可会话/可持久           | ✅ 同域请求自动带（受SameSite等影响） | 同步     | 小、开销大（会走网络）       | 登录会话、偏好（少量）    |\n| localStorage   | ~5MB-10MB         | 持久（手动清/配额）        | ❌                       | 同步     | API简单但**同步阻塞主线程** | 用户偏好、简单缓存      |\n| sessionStorage | ~5MB-10MB         | **Tab级会话**（关tab清） | ❌                       | 同步     | 同上，且隔离更强          | 表单草稿、一次会话状态    |\n| IndexedDB      | 通常几十MB~更大（看浏览器配额） | 持久                | ❌                       | **异步** | 结构化、可索引、适合大数据     | 离线数据、大列表、缓存、队列 |\n\n1) Cookie：它不是“存储”，更多是“协议层会话载体”\n- **会随 HTTP 请求自动发送**（同域/同路径/符合 SameSite 等时）\n- 容量小（4KB量级），且每次请求都带 → **增加网络开销**\n- 可以设置：\n    - `HttpOnly`：JS 读不到（防 XSS 窃取 cookie）\n    - `Secure`：只走 HTTPS\n    - `SameSite`：控制跨站携带，影响 CSRF 风险\n    - `Domain/Path/Expires/Max-Age`\n- 典型场景：**登录态 / session**（强烈推荐：HttpOnly + Secure + SameSite）\n\n2) localStorage：简单、粗暴、但同步阻塞\n- `key -> string`（只能存字符串）\n- **同步 API**：读写大数据会卡 UI（尤其移动端）\n- 同源共享：同一个 origin 下的所有 tab 共享\n- 会触发 `storage` 事件（别的 tab 修改时）\n- 典型场景：\n\t- 用户偏好（主题、语言）；\n\t- 小体积缓存（如最近搜索词）\n\t- 跨 tab 简单同步（利用 storage event）\n- 不适合\n\t- 大对象、大数组（序列化/反序列化慢） \n\t- 高频写入（每次输入都写会卡）\n\t- 存敏感 token（XSS 一偷一个准）\n\n3) sessionStorage：更“短命”的 localStorage（Tab 级）\n- 和 localStorage API 一样，同步阻塞 \n- **每个 tab 独立**（同源但不同 tab 不共享）\n- 关闭 tab 即清空（更适合临时态）\n- 典型场景\n\t- 多步骤表单的中间状态\n\t- 一次会话的临时数据（比如从 A 页带到 B 页但不想持久化）\n\t- 防止同站不同 tab 相互污染（隔离）\n\n4) IndexedDB：浏览器内置“本地数据库”，离线与大数据首选\n- **异步**（不阻塞主线程）\n- 存结构化数据：对象、数组、Blob、File\n- 支持索引、范围查询、游标（cursor）\n- 事务（transaction）保证一致性\n- 适合大数据量、离线、复杂查询\n- 典型场景\n\t- 离线 PWA（文章列表、消息、草稿）\n\t- 大量缓存（接口数据、搜索索引）\n\t- 上传队列（断网重试）、日志队列\n\t- “数百/数千项列表”的本地检索、分页\n\n其他：\n**Service Worker 内存 / 全局变量**：短期缓存（会重启，不可靠）\nCache Storage：更像“浏览器里的 HTTP 缓存可编程版”\n\n总结：\n需要随请求携带、服务端会话相关用 Cookie（HttpOnly/Secure/SameSite）；  \n简单小量配置用 localStorage/sessionStorage（注意同步阻塞）；  \n大量结构化数据和离线查询用 IndexedDB；  \n资源和接口响应的离线缓存用 Cache Storage + Service Worker。\n\n#### Token 到底放哪？\n\n面试官经常想听你的“安全取舍”。\n- **最稳（常见 Web 应用）**：\n    - **HttpOnly Cookie**\n    - 配合 `SameSite` + CSRF 防护\n    - XSS 也读不到 cookie（但仍要防 XSS，因为可以发起请求）\n\n- 不能用 cookie的架构，建议用双token：**Refresh Token+Access Token**\n\t- refresh token 放在 HttpOnly Cookie 里，JS 读不到，配合Secure SameSite\n\t- access token 只存在内存中，页面刷新即失效（攻击窗口最小），避免 XSS 直接窃取长期凭证\n#### PWA (Progressive Web Apps)是什么?它的核心技术有哪些\n\nPWA 是一种通过 Web 技术提供“接近原生 App 体验”的应用形态，核心目标是：可安装、可离线、可快速加载。\n\nPWA想解决什么问题？\n- Web：依赖网络; 首屏慢; 不能离线        \n- Native：开发成本高; 发布审核慢\n**PWA 试图在中间找平衡**\n\n核心技术：通过 Service Worker 结合Manifest，把 Web 应用增强为可离线、可安装的形态，适合内容型和轻交互应用，但在系统能力上仍弱于原生。\n\n① Service Worker（核心中的核心）\n- 运行在浏览器后台线程\n- 拦截网络请求\n- 控制缓存策略\n- 支持离线\n- Service Worker **必须 HTTPS **，防中间人攻击，保证缓存可信\n②Web App Manifest\n- 一个 `manifest.json`\n- 定义：\n    - 应用名\n    - 图标\n    - 启动页\n    - 显示模式（standalone）",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-8",
+          "id": "open-questions-9",
           "title": "前端调试和单测",
           "content": "",
           "hasAnswer": false
         },
         {
-          "id": "open-questions-9",
+          "id": "open-questions-10",
           "title": "前端通信",
           "content": "postmessage\n\nmessagechannel\n\nlocalstorage\n\nurl参数+监听url变化",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-10",
+          "id": "open-questions-11",
           "title": "前端鉴权的几种方式和优缺点",
           "content": "##### Session-Cookie 鉴权（传统主流）\n\n这是最经典的“有状态”鉴权方式。\n\n- **流程**：用户登录成功，服务器创建一个 **Session** 记录并存储在内存/Redis中，同时向浏览器返回一个包含 `SessionID` 的 **Cookie**。后续请求浏览器会自动带上该 Cookie。\n    \n- **优点**：\n    \n    - **安全性高**：敏感数据存在服务端，Cookie 设置 `HttpOnly` 可防 XSS。\n        \n    - **可控性强**：服务端可以随时销毁 Session 强制用户下线。\n        \n- **缺点**：\n    \n    - **扩展性差**：多台服务器时需要做 Session 共享（如同步到 Redis），否则负载均衡会导致登录失效。\n        \n    - **跨端不友好**：原生 App 或小程序对 Cookie 的支持不如浏览器。\n        \n    - **CSRF 风险**：因为依赖 Cookie 自动携带，容易受到 CSRF 攻击。\n\n##### OAuth 2.0 (第三方授权)\n\n这通常用于“第三方登录”（如微信、GitHub 登录）或分布式系统间的权限委派。\n\n- **流程**：\n    1. 用户向授权服务器申请授权。\n    2. 授权服务器返回 **Code (授权码)**。\n    3. 后端用 Code 换取 **Access Token**。\n- **优点**：\n    - **安全性**：用户不需要将密码交给第三方应用。\n    - **细粒度**：可以控制只授权读取头像、不授权发动态等权限。\n- **缺点**：\n    - **逻辑复杂**：需要多次跳转和 Code 换 Token 的过程。\n\n##### SSO (Single Sign-On, 单点登录)\n\n解决“一个公司有多个子系统，登录一次即可访问所有”的需求。\n\n- **实现方式**：\n    \n    - **同父域**：通过设置 Cookie 的 `Domain` 为父域名（如 `.baidu.com`），让子域共享 Cookie。\n        \n    - **跨域**：使用 CAS (Central Authentication Service) 模式。用户重定向到独立的 **认证中心**，登录后携带 Ticket 回跳。\n        \n- **优点**：提升用户体验，统一管理账号。\n    \n- **缺点**：认证中心一旦宕机，所有关联系统全部瘫痪（单点故障）。\n\n#####  JWT (JSON Web Token)？\n\n**J这是“无状态”鉴权的代表，非常适合前后端分离及分布式架构。\n\n- **结构：** 它由三部分组成：`Header`（算法信息）、`Payload`（用户信息，如 user_id）、`Signature`（签名，防止篡改）。\n- **存储：** 前端拿到后，通常不存在 Cookie 里，而是存在 `localStorage` 或 `sessionStorage` 中。\n- **传递：** 发请求时，前端手动把它塞进 HTTP Header 的 `Authorization` 字段里（例如：`Authorization: Bearer <token>`）\n\n##### 为什么 JWT 天然免疫 CSRF？\n\n**原因很简单：CSRF 攻击靠的是浏览器的“自动带 Cookie”机制。**\n\n- **Cookie 机制：** 它是浏览器的**原生行为**。不管你愿意不愿意，只要地址匹配，浏览器就自动帮你贴上 Cookie。黑客就是利用这种“自动”来完成攻击。\n    \n- **JWT 机制：** 它是**手动行为**。存在 `localStorage` 里的 JWT，浏览器绝对不会自动帮你带在 Header 里。必须由你（开发者）写代码 `headers: { 'Authorization': token }` 才能带上去。\n\n当用户点击黑客的 `a.com` 诱导链接时，黑客的脚本无法读取你 `b.com` 域名下的 `localStorage`（受同源策略保护），且浏览器不会自动给跨站请求加上 `Authorization` 头。**既然请求里没有 Token，服务器就会直接拒绝，CSRF 攻击就此失效。**\n\n#### JWT vs Cookie (Session) 深度对比\n\n| **维度**      | **Cookie + Session (传统)**      | **JWT (现代)**                 |\n| ----------- | ------------------------------ | ---------------------------- |\n| **存储位置**    | 服务器存 Session，客户端存 Cookie       | 服务器不存（无状态），客户端存 Token        |\n| **CSRF 防护** | **风险高**，需额外配合 Token 或 SameSite | **天然免疫**，因为不依赖浏览器自动行为        |\n| **水平扩展**    | 较难（多台服务器需要共享 Session）          | **非常容易**（服务器只要有密钥就能解密 Token） |\n| **时效性**     | 可以在服务端随时注销                     | 一旦签发，很难在有效期内提前作废             |\n#### JWT 就绝对安全了吗？（新的挑战）\n\n虽然 JWT 解决了 CSRF，但它引入了新的风险：**XSS 风险。**\n\n- **风险点：** 如果你的页面有 XSS 漏洞，黑客可以运行 JS 代码 `localStorage.getItem('token')`。一旦 Token 被偷走，黑客可以在任何地方冒充你。\n    \n- **对比：** Cookie 如果设置了 `HttpOnly`，JS 是读不到的，所以 Cookie 在防范 XSS 偷取凭证方面比 JWT 强。\n\n#### JWT进阶：双令牌机制 (Access Token + Refresh Token)\n\n**双令牌机制**（Dual Token Mechanism）是为了解决 JWT（JSON Web Token）的一个核心矛盾：**“安全性”与“用户体验”的博弈。**\n\n**双令牌机制的本质**：把“验证频率”和“登录频率”拆分开。\n\n| **令牌名称**                 | **作用**                                   | **有效期**           | **存储位置建议**                       |\n| ------------------------ | ---------------------------------------- | ----------------- | -------------------------------- |\n| **Access Token** (访问令牌)  | 真正的“通行证”，每次请求都携带。安全性高，即使被盗也很快失效。         | **短**（如 15-30 分钟） | 内存 (Vuex/Pinia) 或 SessionStorage |\n| **Refresh Token** (刷新令牌) | 专门用来换取新的 Access Token。只在刷新时才发送一次，暴露频率极低。 | **长**（如 7-14 天）   | LocalStorage 或 HttpOnly Cookie   |\n\n工作流程（无感续期）\n1. **用户登录**：服务端返回两个 Token：`accessToken` 和 `refreshToken`。\n2. **正常访问**：前端将 `accessToken` 放在 Header 里请求数据，后端验证通过。\n3. **令牌过期**：\n    - `accessToken` 过期，后端返回 **401 Unauthorized**（或特定错误码）。\n4. **无感刷新**：\n    - 前端拦截到 401 错误，**不跳转登录页**。\n    - 前端自动发起一个隐藏请求，携带 `refreshToken` 访问“刷新接口”。\n    - 服务端验证 `refreshToken` 有效，颁发一个新的 `accessToken` 给前端。\n5. **重新请求**：前端用新的 `accessToken` 重新发起刚才失败的那个业务请求。用户完全感觉不到中途发生了令牌置换。\n#### 如果 refresh token 也失效了，但你这时挂起了一堆请求，刷新失败了，怎么处理\n\n当 Refresh Token 也失效时，意味着用户必须重新登录。此时核心问题是挂起的一堆请求如何在刷新登录后重试，方案是用一个全局的 **刷新锁** 和一个 **请求队列**。\n\n#### 工程上怎么选登录方案？\n\n- **Session-Cookie**：最成熟，安全性高，但对分布式系统不友好，且存在 CSRF 风险。需要配合 `HttpOnly`、`Secure`、`SameSite=Lax` 以及 `CSRF Token`，全方位防护。\n\n- **JWT**：目前最流行，它是无状态的，易于横向扩展，适合跨端，但要注意 XSS 防护以及 Token 吊销的问题。尤其 **移动端 (App / 小程序)** 首选 **JWT**。因为 App 没有浏览器的 Cookie 限制，JWT 跨域和扩展性极强。\n\n- **OAuth 2.0**：主要用于授权，是实现第三方登录的标准。\n\n- **SSO**：解决多系统间的统一登录问题。",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-11",
-          "title": "大文件&长列表&大数据&频繁计算等优化场景",
-          "content": "##### 大文件上传\n\n##### 长列表渲染\n\n##### 如果你有一个含有数百个项目的数组，你将如何有效地搜索特定项目?\n\n##### 如果现在一个页面要同时展示 300 辆车的实时位置+轨迹，你怎么来优化\n\n数据层面+渲染层面\n\n数据：后续更新只传输增量变化的字段\n\n渲染：分区绘制/懒加载；WebGL/Canvas 渲染；前端聚合（在地图缩放级别较低时，将前端可见的密集点聚合成一个集群图标）；动画优化GPU加速和requestAnimationFrame\n\n**最佳实践组合：** 在后端实现 **视窗过滤** 和 **轨迹简化**，并使用 **WebSocket** 推送增量位置数据。在前端，使用 **WebGL 地图库** (如 Mapbox GL JS) 进行高性能渲染。\n\n\n\n##### js写倒计时组件代码，并优化，长时间怎么解决误差，数据量大怎么办？\n用setTimeout实现setInterva，用requestAnimationFrame实现setTimeout",
-          "hasAnswer": true
-        },
-        {
           "id": "open-questions-12",
-          "title": "开放题&场景题",
-          "content": "PWA (Progressive Web Apps)了解吗?它的核心技术有哪些。\n\n如何在前端项目中实现国际化和本地化?\n##### 有这样一个场景：如果你从多个系统的 API 拉数据，但这些系统的数据结构不一致，比如 A 系统返回 camelCase、B 系统是 snake_case，还有一些是中文 key，你怎么统一数据结构，来复用\n\n核心思想：在逻辑和外部 API 之间，建立一个专门负责转换的中间层——**适配器 (Adapter)**。每个外部系统都有一个专属的适配器，该适配器只负责：从外部系统获取数据 $\\rightarrow$ 将其转换成规范模型 $\\rightarrow$ 传递给你的应用核心逻辑。\n\n对于 **`camelCase` 和 `snake_case`** 之间的转换，可以使用成熟的库进行自动化处理\n\n对于中文 Key 或需要复杂的**业务值转换**，需要硬编码映射规则，维护一个 JSON 或 YAML **映射文件**",
+          "title": "国际化和本地化",
+          "content": "##### 前端国际化 主要解决 5 件事：\n\n1. 文案翻译（自己维护的多语言文案资源文件），一般按语言分文件或者按模块分文件\n2. 日期/时间/数字/货币格式（本地化格式）一般用第三方库比如 Intl\n3. 路由与 SEO（多语言 URL、hreflang、索引）\n4. 资源加载与性能（按需加载语言包、缓存、回退）\n##### 工具：i18n vs l10n\n\n- **i18n（internationalization）**：把系统改造成“可支持多语言/多地区”的能力（抽取文案、格式化、路由、字体等）\n    \n- **l10n（localization）**：把具体语言/地区资源补齐（翻译、校对、区域格式、货币、时间、法律合规）\n\n##### 语言选择与回退策略（必须有）\n- 语言来源优先级（常用）：\n    1. URL（`/en/...`）或域名（`en.xxx.com`）\n    2. 用户设置（profile）\n    3. 浏览器 `Accept-Language`\n    4. 默认语言（比如 `en`）\n- 回退策略：\n    - `zh-HK` 找不到 → 回退 `zh` → 回退 `en`\n##### 路由与 SEO（Next.js/SSR 项目重点）\n URL 策略（常见 3 种）\n1. **路径前缀**：`/en/about`, `/zh-CN/about`（最常用，SEO 友好）\n2. **子域名**：`en.example.com`（更像国际站）\n3. **参数**：`?lang=en`（SEO 最差，通常不选）\nSEO 必做\n- `<link rel=\"alternate\" hreflang=\"...\">`    \n- canonical 规范化\n- sitemap 按语言输出\n\n##### 性能：语言包怎么加载（高频追问）\n小项目：全量加载也行\n- 语言包很小（几十 KB），一次加载搞定\n中大型：按需加载（推荐）\n- 按语言 + 按页面 namespace 分包\n- 路由切换时动态 import：\n    - 首屏只加载当前语言的必要 namespace\n    - 其他页面进入再加载\n缓存\n- 语言包可走静态资源缓存（hash 文件名）\n\n##### 总结\n前端做国际化会先确定语言来源优先级（URL/用户设置/浏览器/默认）和回退策略，然后把文案抽成多语言资源文件，提供统一的 `t()` 翻译函数，支持插值、复数、namespace。日期数字货币用 `Intl` 做本地化格式化。中大型项目会做语言包按需加载和缓存，并结合 lint/CI 检测缺失 key 与硬编码文案。SSR/Next.js 场景会用多语言路由并补齐 hreflang、sitemap，保证 SEO 和首屏一致性。",
           "hasAnswer": true
         },
         {
           "id": "open-questions-13",
+          "title": "大文件&长列表&大数据&频繁计算等优化场景",
+          "content": "#### 大文件上传\n\n大文件上传核心是 4 件事：**分片、断点续传、并发控制、秒传/校验**，再加上**服务端合并与校验**。\n1. 分片上传（Chunk Upload）\n\t- 前端把文件切片：`Blob.slice(start,end)`\n\t- 每片带上：`fileId/hash + chunkIndex + chunkSize + totalChunks`\n\t- 服务端每片落盘（或对象存储 multipart upload），记录已上传分片。\n\t- **好处：**\n\t\t- 网络抖动只重传少量片\n\t\t- 可并发提升吞吐\n2. 断点续传\n\t- 上传前先请求服务端：`GET /upload/status?fileId=xxx`\n\t- 服务端返回已存在的 chunkIndex 列表\n\t- 前端跳过已传分片，只补缺口\n 3. 秒传（去重）\n\t- 计算文件 hash（通常用 spark-md5 / wasm）：\n\t    - 大文件不要一次性读入内存，**分片增量算 hash**\n\t- 先问服务端：`POST /upload/exists {hash}`\n\t- 服务端如果已存在，直接返回文件 URL / fileKey，前端秒完成\n4. 并发与重试（非常容易被问）\n\t- 并发通常 3~6（看带宽与服务端限制）\n\t- 失败分片指数退避重试\n\t- 支持暂停/继续（中断 fetch / XHR，保存状态）\n5. 服务端合并与校验（很多人只讲前端）\n\t- 合并顺序：按 chunkIndex 串行写入\n\t- 合并完必须校验：\n\t    - 合并后的 hash 与客户端 hash 一致\n\t- 合并后清理临时分片\n6. 进度条怎么做（加分）\n\t- 分片上传进度 = 已完成分片数 / total\n\t- 更精细：每片用 XHR `upload.onprogress` 汇总（fetch 不好拿上传进度）\n#### 长列表渲染\n\n长列表性能瓶颈是：**DOM 数量、布局/重排、重绘、JS 计算与事件处理**。解决就是：**虚拟列表 + 稳定高度 + 渐进渲染**。\n1. 虚拟列表（Virtualization）只渲染可视区 + buffer：\n\t- React：react-window / react-virtualized\n\t- Vue：vue-virtual-scroller\n\t- 原理：容器撑起总高度；只渲染 start~end 的 items；用 translateY 定位\n2. 高度不固定怎么办？两种策略：\n\t- **估算高度 + 动态修正**（测量后更新偏移）\n\t- **分组/锚点**（按块维护前缀和，降低重算成本）\n3. 交互与更新优化\n\t- item 组件 `memo` / `PureComponent`\n\t- key 必须稳定（不要用 index）\n\t- 滚动事件节流，避免每帧 setState\n\t- 减少复杂样式（阴影、滤镜）和图片布局抖动\n4. 进一步优化（加分）\n\t- **窗口化 + 分页/增量加载**（infinite scroll）\n\t- 首屏优先：先渲染前 N 个，后面 idle time 再补\n\t- 大量图片：懒加载 + 低清占位（LQIP）\n#### 如果你有一个含有数百个项目的数组，你将如何有效地搜索特定项目?\n\n1. 一次性查找 / 查得不频繁\n- 直接 `Array.find` / `for` 即可：O(n)\n- “数百”其实很小，过度优化反而复杂\n**面试口径：** 如果只是偶尔查找，线性扫描就够了，代码简单且可维护。\n\n2. 频繁查询（比如输入框实时搜索）\n\n做索引：\n ① 按 id 精确查：Map\n ② 按字段检索：倒排索引（关键词→id 列表）\n- 适用于 tags / 多关键字匹配\n ③ 前缀搜索：Trie（前缀树）：适用于“搜用户昵称/商品名”这种前缀匹配\n ④ 模糊搜索：第三方库比如 fuse.js（加分）：小数据量直接 fuse.js，非常工程化\n#### 如果现在一个页面要同时展示 300 辆车的实时位置+轨迹，你怎么来优化\n\n数据层面+渲染层面\n\n数据：后续更新只传输增量变化的字段\n\n渲染：分区绘制/懒加载；WebGL/Canvas 渲染；前端聚合（在地图缩放级别较低时，将前端可见的密集点聚合成一个集群图标）；动画优化GPU加速和requestAnimationFrame\n\n**最佳实践组合：** 在后端实现 **视窗过滤** 和 **轨迹简化**，并使用 **WebSocket** 推送增量位置数据。在前端，使用 **WebGL 地图库** (如 Mapbox GL JS) 进行高性能渲染。\n\n\n#### js写倒计时组件代码，长时间怎么解决误差，如果页面需要大量倒计时组件，怎么优化？\n\n1. 误差：\n- 不要用自减计数，因为 `setInterval` 会漂移（后台 tab、主线程忙、定时器 clamp）。正确思路：基于“目标时间戳”计算差值，这样即使定时器延迟 5 秒，下一次也会立刻校正。\n\t- 记录 `endAt = Date.now() + duration`\n\t- 每次 tick 用 `endAt - Date.now()` 计算剩余\n\t- UI 显示取 `Math.max(0, diff)`，再格式化\n- 不复杂的情况，可以减小 setInterval 的时间间隔，通过高频检查降低误差\n- 用 `performance.now()` 做相对计时更稳定（但跨刷新要落到 Date.now）\n- 服务端时间：如果要求对齐服务器（如抢购），做一次 `serverTimeOffset = serverNow - clientNow`\n- 用requestAnimationFrame实现setTimeout，参数timestamp用来计算时间\n\n2. 大量倒计时\n\t核心原则：**不要 N 个组件各自 setInterval**。  \n\t要做**单一时钟源 + 批量订阅 + 按需渲染**。\n\t\n\t1：全局单例 ticker（推荐）\n\t- 页面只有一个 timer（比如 250ms 或 1000ms）\n\t- 所有倒计时订阅它\n\t- 每次 tick 统一计算并分发\n\t好处：\n\t- 定时器数量从 N → 1\n\t- 主线程压力大幅下降\n\t\n\t2：按可见区域更新\n\t- 列表里的倒计时：配合虚拟列表，只更新可见项\n\t- 或 IntersectionObserver：不可见的倒计时暂停更新\n\t\n\t3：降低刷新频率\n\t- UI 只显示“秒”，就没必要 250ms 更新，1s 足够\n\t- Tab 不可见时（`visibilitychange`）降频到 5s 或暂停\n\t\n\t4：减少 React/Vue 重渲染（框架场景）\n\t- 倒计时变化频繁，避免触发整行 item 重渲染：\n\t    - 把倒计时显示拆成最小组件\n\t    - memo / computed 缓存\n\t    - 只更新 text node（极端优化）",
+          "hasAnswer": true
+        },
+        {
+          "id": "open-questions-14",
           "title": "微信登录支付",
           "content": "2025-11-21-22-12-43-image.png\n\n2025-11-21-22-13-18-image.png",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-14",
+          "id": "open-questions-15",
           "title": "微前端",
           "content": "##### 解决：\n多团队共同维护一个大前端项目时，不同团队之前各自维护不同的模块，互相之间又有少量依赖的场景，如何保证项目的长期维护和迭代\n\n##### 技术难点：\n样式隔离，JavaScript 隔离，路由管理和应用切换，公共依赖的打包和互相引用、应用之间事件和数据传输。包括两个角色，主应用和子应用\n\n1. 样式隔离：CSS Modules+CSS-in-JS\n\n2. js隔离：所有微应用共享全局环境（`window` 对象），如果微应用 A 在全局对象上挂载了变量，微应用 B 可能会意外使用或覆盖它。主流方案是：利用 ES6 的 `Proxy` 对象劫持对 `window` 对象的访问。微应用对 `window` 的读写操作都被 `Proxy` 拦截，读操作从全局 `window` 读取，写操作写入到**当前微应用自己的代理对象**中，从而隔离了对真实全局 `window` 的污染\n\n3. 路由管理和应用切换：路由切换时，主应用能正确加载/卸载对应的微应用，并保持 URL 同步。监听 `hashchange` 或 `popstate` 事件，匹配路由，加载/卸载模块\n\n4. 公共依赖：避免每个微应用都打包相同的库。方案两个方向，1是子应用不处理外部模块的打包，主应用负责加载公共包，2是webpack5的联邦模块，允许应用 A **暴露**其内部的模块（如 React 库）给应用 B **消费**，实现真正的运行时共享\n\n5. 事件和数据传输：发布订阅模式/基于全局状态管理\n\n##### 业界常见实现方案：\n\n1. Qiankun：上手难度低，做了css  js隔离，有完整的生命周期钩子，支持多种技术栈。核心是沙箱机制和生命周期管理\n\n2. single-spa：核心作用是作为一个应用路由器（Application Router）和生命周期管理器\n\n3. 联邦模块 (Webpack 5)，只用来处理公共依赖包的情况\n\n**最佳实践**通常是：**使用 Qiankun 或 Single-SPA 来管理应用的隔离和生命周期，同时使用 Webpack 联邦模块来优化公共依赖和公共组件的加载性能。",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-15",
+          "id": "open-questions-16",
           "title": "性能优化",
           "content": "",
           "hasAnswer": false
         },
         {
-          "id": "open-questions-16",
+          "id": "open-questions-17",
           "title": "性能监控&错误监控和上报",
           "content": "#### 前端监控系统如何设计?如何上报和分析数据?\n\n一个完整的前端监控系统通常分为三个维度：\n\n- **错误监控：** JS 运行时错误、Promise 未捕获异常、资源加载失败、HTTP 请求错误。\n    \n- **性能监控：** 核心 Web 指标（LCP, FID, CLS）以及传统指标（FP, FCP, TTI）。\n    \n- **行为监控：** 用户路径跟踪\n\n**上报方式：**\n\n- **`navigator.sendBeacon(url, data)`：** **业界首选**。它能在浏览器卸载页面（如关闭标签页）时异步发送数据，不阻塞主线程，不影响下一页面的加载。\n- 普通HTTP请求\n- **Image 对象 (GIF 上报)：** 传统的 `(new Image()).src = 'url?data=...'`。优点是跨域兼容性极好，且请求体积小。\n\n#### 项目报错如何定位\n\n**定位：** 在生产环境，代码是压缩混淆过的（如 `app.js:1:15234`），无法直接阅读。我们需要将报错的堆栈信息（Line, Column）配合 **SourceMap** 文件还原回原始源码。\n\n**Sourcemap 是源码和编译后代码的映射文件**，让浏览器能将压缩混淆后的代码映射回原始源代码。在复杂的现代前端项目中，代码经过构建工具（如 Webpack、Vite）的打包、压缩、混淆，生产环境在监控工具或浏览器控制台中，错误堆栈显示的是 **压缩后的文件名、行号和列号**（例如 `main.js:123:45`）。当浏览器或监控工具遇到一个指向 `main.js:123:45` 的错误时，根据sourcemap 查找对应的 `main.js.map` 文件。这个 `.map` 文件存储了原始代码和压缩代码之间的**映射关系**（即 `main.js` 的第 123 行第 45 列对应于 `src/components/UserForm.vue` 的第 50 行第 10 列）。map文件建议不部署到生产服务器。而是将 `.map` 文件上传到错z误监控平台（如 Sentry）。\n\n#### 除了sourcemap还有什么方法？\n\n**用户行为回溯 (Replay/Breadcrumbs)：** Sentry 等工具会记录用户报错前的点击路径、路由跳转、Console 日志。即使不知道报错的具体代码行，通过看用户的操作轨迹，也能大概猜出是在哪个业务逻辑出错的。\n#### sourcemap带来的安全性怎么办？\n\n**SourceMap 安全问题：** 如果把 `.map` 文件直接发到线上，任何人都可以在控制台看到你的源码。 **解决方案：**\n\n1. **私有化部署：** 将 `.map` 文件上传到内部的监控平台（如 Sentry），不放在 CDN 静态资源服务器上。\n    \n2. **黑白名单限制：** 只有公司内网 IP 才能访问 `.map` 文件。\n    \n3. **构建后删除：** Webpack 编译完成后，脚本自动将 `.map` 移动到安全的地方，并从 dist 目录中删除。\n\n##### 怎么衡量一个页面的渲染速度和性能？你对首屏时间，可交互时间等概念的理解和看法？\n\n- **首次内容渲染 (First Contentful Paint, FCP)：** 浏览器第一次渲染出任何文本、图像或画布的时间。这是用户感知“页面动了”的关键点。\n- **FP (First Paint):** 像素级首次渲染。\n- **LCP (Largest Contentful Paint):** 最大内容绘制。衡量**加载速度**。常用标准：<$2.5s$。\n- **CLS (Cumulative Layout Shift):** 累积布局偏移。衡量**视觉稳定性**（页面跳来跳去吗）。常用标准：<$0.1$。\n- **可交互时间 (Time to Interactive, TTI)：** 页面内容已渲染，且主线程空闲，能响应用户输入的时间。\n- **INP (Interaction to Next Paint):** 交互到下次绘制。衡量**交互延迟**（取代了旧的 FID）。标准：<$200ms$。\n\n**看法：** 我认为 **LCP (Largest Contentful Paint)** 现在比 FCP 更重要，因为它衡量的是页面“主体内容”什么时候出来。\n\n#### 错误监控和报警业界方案\n\n- **sentry**：Sentry 是目前前端监控领域事实上的“行业标准”。有开箱可用的SDK，会记录用户报错前的点击路径、路由跳转、Console 日志；会自动收集浏览器版本、操作系统等上下文信息；支持**数据清洗与聚合**，将成相同的报错聚合起来避免告警风暴；\n- **阿里云 ARMS / 腾讯云 RUM：** 云服务商提供的成熟商业方案，开箱即用。\n- **app 消息报警：** 通常对接 **企微/钉钉/飞书 Webhook**，设置阈值告警（如：某接口报错率 > 5% 立即触发报警）。",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-17",
+          "id": "open-questions-18",
           "title": "海报绘制",
           "content": "##### 1. 客户端方案（最常用）\n\n这类方案直接在用户的浏览器中运行，优点是响应快、不消耗服务器资源。\n\n- **HTML5 Canvas 绘图 (原生)**\n    \n    - **原理：** 使用 `canvas.drawImage()` 将图片、文字手动绘制到画布上，再通过 `canvas.toDataURL()` 生成 Base64 图片。\n    - **缺点：** 手动计算位置非常痛苦，不适合复杂的 DOM 结构。\n\n```\nconst generatePoster = async () => {\n  // 1. 创建canvas\n  const canvas = document.createElement('canvas');\n  const ctx = canvas.getContext('2d');\n\n  // 2. 设置画布尺寸\n  canvas.width = 600;\n  canvas.height = 800;\n\n  try {\n    // 3. 输出图片\n    const dataURL = canvas.toDataURL('image/png');\n    console.log('生成的海报Base64:', dataURL);\n  } catch (err) {\n    console.error('绘制失败', err);\n  }\n};\n```\n\n- **html2canvas (业界主流标准)**\n    \n    - **原理：** 它并不是真正的“截图”，而是通过 **JS 重新渲染**。它会读取 DOM 结构、解析 CSS 样式，然后在 `<canvas>` 上按像素重新画一遍。\n    - **优点：** 使用简单，支持度高。\n    - **缺点：** * **样式兼容性：** 对某些高级 CSS（如 `box-shadow`、某些 `flex` 布局、复杂的 `filter`）支持不完美。\n        - **跨域：** 图片必须支持跨域，否则会报“画布被污染”错误。\n        - **清晰度：** 在高分屏下容易模糊（需要设置 `scale` 参数，配合 `devicePixelRatio` 优化）。\n\n```\nimport html2canvas from 'html2canvas';\n\nconst captureElement = async () => {\n  const element = document.getElementById('poster-area'); // 要截图的 DOM 节点\n  \n  try {\n    const canvas = await html2canvas(element, {\n      useCORS: true,          // 允许跨域图片\n    });\n\n    // 将 canvas 转为图片下载或预览\n    const imageData = canvas.toDataURL('image/png');\n    const link = document.createElement('a');\n    link.href = imageData;\n    link.download = 'screenshot.png';\n    link.click();\n  } catch (error) {\n    console.error('截图失败:', error);\n  }\n};\n```\n\n- **dom-to-image (SVG 方案)**\n    \n    - **原理：** 利用 SVG 的 `<foreignObject>` 特性。它将 DOM 序列化为 XML，放入 SVG 中，再利用浏览器原生的 SVG 渲染引擎。\n    - **优点：** 性能通常优于 html2canvas，生成的图片更接近真实 DOM 效果。\n\n```\nimport domtoimage from 'dom-to-image';\n\nconst captureBySvg = () => {\n  const node = document.getElementById('my-node');\n\n  // 1. 调用插件的方法，把要截图的元素里的内容转成 PNG 格式的字符串 (dataUrl)\n  domtoimage.toPng(node)\n    .then((dataUrl) => {\n      const img = new Image();\n      img.src = dataUrl;\n      document.body.appendChild(img); // 直接展示生成的图片\n    })\n    .catch((error) => {\n      console.error('生成图片出错!', error);\n    });\n};\n```\n### 2. 服务端方案（高还原度）\n\n如果需要 100% 还原页面（包含复杂动画、阴影、外部字体），或者需要批量生成图片，通常采用服务端截图。\n\n- **Puppeteer / Playwright (Headless Browser)**\n    \n    - **原理：** 在 Node.js 服务端运行一个**无头浏览器**（无界面的 Chrome）。\n    - **流程：** 服务端接收请求 -> 浏览器打开指定 URL -> 等待页面加载完成 -> 调用浏览器底层的 `screenshot` API -> 返回图片。\n    - **优点：** **最完美还原**。页面长什么样，截出来就长什么样。\n    - **缺点：** 实现相对复杂，且消耗服务器 CPU/内存资源巨大，并发量大时会有明显的延迟。\n\n### 3. 常见痛点与解决方案\n\n| **痛点**      | **解决方案**                                              |\n| ----------- | ----------------------------------------------------- |\n| **图片模糊**    | 将 Canvas 放大 `window.devicePixelRatio` 倍，再通过 CSS 缩小显示。 |\n| **图片跨域**    | 后端设置 CORS，或者前端配置 `useCORS: true`。                     |\n| **字体丢失**    | 客户端截图通常无法读取系统外的字体，需将字体转为 Base64 嵌入 CSS。               |\n| **滚动内容截不全** | 截图前临时设置 `height: auto` 或克隆一份 DOM 放到屏幕外隐藏位置进行渲染。       |",
           "hasAnswer": true
         },
         {
-          "id": "open-questions-18",
+          "id": "open-questions-19",
+          "title": "虚环境",
+          "content": "",
+          "hasAnswer": false
+        },
+        {
+          "id": "open-questions-20",
           "title": "设计思想",
           "content": "##### 函数式编程？命令式编程？在项目中的应用?\n\n单例模式\n\n工厂模式",
           "hasAnswer": false
         },
         {
-          "id": "open-questions-19",
+          "id": "open-questions-21",
           "title": "跨浏览器 跨终端开发的兼容性处理方案",
           "content": "##### 跨浏览器 跨终端开发的兼容性处理方案\n\n确保同一个网页或Web应用在**不同的浏览器**上和在**不同类型的设备**上都能具有**一致的外观、布局和功能**，提供**良好的用户体验**。\n\n挑战：\n不同浏览器：CSS 渲染差异，JavaScript API 支持度不同\n不同设备：屏幕尺寸与分辨率，输入方式差异，性能与网络条件\n\n主要分两步：  \n 1️⃣ **识别环境**：通过 UA、屏幕尺寸、触控点数等判断设备类型、操作系统和浏览器环境，以便做差异化处理。  \n 2️⃣ **处理兼容性**： \n1) CSS 层面\n- **前缀处理**：使用 autoprefixer 自动加 `-webkit-` 等\n- **现代 CSS 特性降级**：`flex` → `float` fallback\n- **媒体查询**：针对不同屏幕尺寸适配\n 2) JS / API 层面\n- **特性检测**（Feature Detection）：`if ('IntersectionObserver' in window)`\n- **Polyfill**：为不支持的 API 提供替代实现\n- **事件差异处理**：如触屏事件 `touchstart` / `touchmove` vs 鼠标事件 `mousedown` / `mousemove`\n3) **组件库**：使用成熟的 UI 库（如 Ant Design、Material-UI）\n4) 开发工具链：一些常用的库结合现代化构建工具，自动化进行兼容处理\n```js\n\"@babel/core\": \"^7.20.0\",          // JavaScript 转译\n\"autoprefixer\": \"^10.4.13\",        // CSS 自动前缀\n\"postcss\": \"^8.4.21\",              // CSS 后处理\n\"eslint\": \"^8.30.0\",               // 代码检查\n\"stylelint\": \"^14.16.0\",           // CSS 检查\n```\n\n补充：检测与兼容性查询能力：\n\n```js\nserviceWorker：'serviceWorker' in navigator\nIntersectionObserver：'IntersectionObserver' in window\n响应式图片：<picture> + <source > 等\nwebp：document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0\nCan I Use：caniuse.isSupported(feature, navigator.userAgent)\n```\n\n总体原则和思路：\n\n- **渐进增强**：从基础功能开始，逐步为现代浏览器增强体验\n\n- **优雅降级**：现代功能不可用时，提供可用的降级方案\n\n- **移动优先**：从小屏幕开始设计，逐步适配大屏幕\n\n- **使用标准 API**：优先选择广泛支持的 Web 标准\n\n- **特性检测**：运行时检测浏览器能力，而非浏览器嗅探\n\n- **响应式设计**：使用弹性布局和媒体查询\n\n- **性能考量**：考虑不同设备的性能差异\n\n- **工具自动化**：使用构建工具处理大部分兼容性问题\n\n- **组件库**：使用成熟的 UI 库（如 Ant Design、Material-UI）",
           "hasAnswer": true
@@ -1820,5 +1946,5 @@
       ]
     }
   ],
-  "generatedAt": "2026-01-10T13:00:05.939Z"
+  "generatedAt": "2026-01-11T07:20:40.847Z"
 }

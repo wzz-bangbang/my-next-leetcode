@@ -40,11 +40,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 所有问题都校验一遍答案
 优化编辑器，要不用现成的库或者沙盒
 部署上线
-补充一些算法题以及答案和思路解析
 ssr
-
-代码题优化&增加用例和题目进阶思考
 项目性能&错误监控
+
+代码题优化 思路解析 &增加用例和题目进阶思考
 用户 登录 数据表等
 web worker 缓存离线数据
 
