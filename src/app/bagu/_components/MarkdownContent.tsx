@@ -85,7 +85,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
   }, [content]);
 
   return (
-    <div className="markdown-content text-base">
+    <div className="markdown-content text-lg">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}

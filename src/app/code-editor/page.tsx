@@ -421,16 +421,33 @@ function CodeEditorPage() {
     notifications.show({ autoClose: 1500, title: '已清空', message: '代码已清空', color: 'blue' });
   };
 
-  // 标记为已完成
+  // 切换完成状态
   const handleMarkAsSolved = () => {
     if (!selectedQuestionId) {
       notifications.show({ autoClose: 1500, title: '提示', message: '请先选择一个题目', color: 'yellow' });
       return;
     }
-    setQuestionStatus(selectedQuestionId, QuestionStatus.SOLVED);
+    const statusMap = getQuestionStatusMap();
+    const currentStatus = statusMap[selectedQuestionId];
+    const newStatus = currentStatus === QuestionStatus.SOLVED ? QuestionStatus.NOT_DONE : QuestionStatus.SOLVED;
+    
+    setQuestionStatus(selectedQuestionId, newStatus);
     setSidebarKey(prev => prev + 1);
-    notifications.show({ autoClose: 1500, title: '🎉 恭喜', message: '已标记为完成！', color: 'green' });
+    
+    if (newStatus === QuestionStatus.SOLVED) {
+      notifications.show({ autoClose: 1500, title: '🎉 恭喜', message: '已标记为完成！', color: 'green' });
+    } else {
+      notifications.show({ autoClose: 1500, title: '已取消', message: '已取消完成状态', color: 'gray' });
+    }
   };
+
+  // 当前题目是否已完成
+  const isCurrentSolved = useMemo(() => {
+    if (!selectedQuestionId) return false;
+    const statusMap = getQuestionStatusMap();
+    return statusMap[selectedQuestionId] === QuestionStatus.SOLVED;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedQuestionId, sidebarKey]);
 
   // 当前题目是否已收藏
   const isCurrentFavorited = selectedQuestionId
@@ -639,10 +656,10 @@ function CodeEditorPage() {
             <div className="flex-shrink-0 px-5 py-4 border-b border-gray-200/50 bg-white/30">
               {selectedQuestion ? (
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">{selectedQuestion.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">{selectedQuestion.title}</h3>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span 
-                      className="text-xs px-2 py-1 rounded-full font-medium"
+                      className="text-sm px-2.5 py-1 rounded-full font-medium"
                       style={{ 
                         backgroundColor: `${DifficultyColor[selectedQuestion.difficulty as Difficulty]}20`,
                         color: DifficultyColor[selectedQuestion.difficulty as Difficulty]
@@ -651,33 +668,39 @@ function CodeEditorPage() {
                       {DifficultyLabel[selectedQuestion.difficulty as Difficulty]}
                     </span>
                     {selectedQuestion.tags.map(tag => (
-                      <span key={tag} className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-600">
+                      <span key={tag} className="text-sm px-2.5 py-1 rounded-full bg-purple-100 text-purple-600">
                         {CategoryTagLabel[tag as CategoryTag]}
                       </span>
                     ))}
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-400">请从左侧选择一道题目</p>
+                <p className="text-gray-400 text-base">请从左侧选择一道题目</p>
               )}
             </div>
             
             {/* 操作按钮 */}
             <div className="flex-shrink-0 px-5 py-3 border-b border-gray-200/50 bg-white/20">
               <div className="flex flex-wrap gap-2">
-                <Button onClick={handleSave} variant="light" radius="xl" size="xs" color="violet">
+                <Button onClick={handleSave} variant="light" radius="xl" size="sm" color="violet">
                   💾 保存
                 </Button>
-                <Button onClick={handleLoad} variant="light" radius="xl" size="xs" color="indigo">
+                <Button onClick={handleLoad} variant="light" radius="xl" size="sm" color="indigo">
                   📂 载入
                 </Button>
-                <Button onClick={handleClear} variant="light" radius="xl" size="xs" color="pink">
+                <Button onClick={handleClear} variant="light" radius="xl" size="sm" color="pink">
                   🗑️ 清空
                 </Button>
-                <Button onClick={handleMarkAsSolved} variant="light" radius="xl" size="xs" color="green">
-                  ✅ 标为完成
+                <Button
+                  onClick={handleMarkAsSolved}
+                  variant="light"
+                  radius="xl"
+                  size="sm"
+                  color={isCurrentSolved ? 'green' : 'gray'}
+                >
+                  {isCurrentSolved ? '✅ 已完成' : '⏳ 标为完成'}
                 </Button>
-                <Button onClick={handleToggleFavorite} variant="light" radius="xl" size="xs" color={isCurrentFavorited ? 'yellow' : 'gray'}>
+                <Button onClick={handleToggleFavorite} variant="light" radius="xl" size="sm" color={isCurrentFavorited ? 'yellow' : 'gray'}>
                   {isCurrentFavorited ? '⭐ 已收藏' : '☆ 收藏'}
                 </Button>
               </div>
@@ -686,12 +709,12 @@ function CodeEditorPage() {
             {/* 题目描述 */}
             <div className="flex-1 min-h-0 overflow-y-auto p-5">
               {selectedQuestion?.description ? (
-                <div className="text-gray-600 text-sm leading-relaxed">
-                  <h4 className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">📝 题目描述</h4>
-                  <pre className="whitespace-pre-wrap font-sans text-gray-600">{selectedQuestion.description}</pre>
+                <div className="text-gray-600 text-lg leading-relaxed">
+                  <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">📝 题目描述</h4>
+                  <pre className="whitespace-pre-wrap font-sans text-gray-600 text-lg">{selectedQuestion.description}</pre>
                 </div>
               ) : (
-                <div className="text-gray-400 text-sm">
+                <div className="text-gray-400 text-base">
                   <p>请从左侧选择一道题目</p>
                 </div>
               )}

@@ -41,12 +41,12 @@ button:where(:not(.mantine-Button-root):not([class*='mantine'])) {
 .markdown-content {
   line-height: 1.7;
   color: #374151;
-  font-size: 0.8125rem; /* 13px - 移动端默认 */
+  font-size: 0.9375rem; /* 15px - 移动端默认 */
 }
 
 @media (min-width: 640px) {
   .markdown-content {
-    font-size: 1rem; /* 16px - PC端 */
+    font-size: 1.125rem; /* 18px - PC端 */
     line-height: 1.75;
   }
 }
@@ -113,10 +113,18 @@ button:where(:not(.mantine-Button-root):not([class*='mantine'])) {
   }
 }
 
-.markdown-content ul,
-.markdown-content ol {
+.markdown-content ul {
+  list-style-type: disc;
   margin-left: 1.25em;
   margin-bottom: 0.75em;
+  padding-left: 0.5em;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+  margin-left: 1.25em;
+  margin-bottom: 0.75em;
+  padding-left: 0.5em;
 }
 
 @media (min-width: 640px) {
@@ -124,6 +132,7 @@ button:where(:not(.mantine-Button-root):not([class*='mantine'])) {
   .markdown-content ol {
     margin-left: 1.5em;
     margin-bottom: 1em;
+    padding-left: 0.75em;
   }
 }
 
@@ -245,9 +254,6 @@ button:where(:not(.mantine-Button-root):not([class*='mantine'])) {
   color: #374151;
 }
 
-.markdown-content tr:nth-child(even) {
-  background-color: #f9fafb;
-}
 
 .markdown-content tr:hover {
   background-color: #f3f4f6;

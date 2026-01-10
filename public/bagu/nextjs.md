@@ -9,7 +9,7 @@ Next.js 的伟大之处在于，它让您在同一个项目、同一个文件结
 客户端组件在服务端执行时，只会生成静态 HTML。它的 useEffect、onClick 等逻辑不会运行。这些逻辑只有代码被下载到浏览器并“注水 (Hydrate)”后，才会真正在客户端执行。
 服务端组件 (RSC) 的代码，只在服务器上运行。零 JS 发送：这些组件的 JavaScript 代码永远不会被打包发送给浏览器。浏览器收到了什么？：浏览器接收到的是 RSC 执行后的结果（一种特殊的 JSON 数据格式，描述了 UI 的结构）。![](/Users/wzz/Library/Application%20Support/marktext/images/2025-12-01-00-06-38-image.png)
 
-服务端内容变成了纯数据：<h1>Hello Server</h1> 没有变成 HTML 标签，而是变成了一个描述：“这有一个 h1，内容是 Hello Server”。
+服务端内容变成了纯数据：`<h1>Hello Server</h1>`没有变成 HTML 标签，而是变成了一个描述：“这有一个 h1，内容是 Hello Server”。
 客户端组件变成了“占位符”：注意那个 "$L2"。它告诉浏览器：“这里应该放一个 ClientButton 组件。它的代码在 ClientButton.js 里，请去下载它，并把 initialCount: 10 传给它。”
 浏览器拿到这个 JSON 后做了什么？
 React 读取 JSON。

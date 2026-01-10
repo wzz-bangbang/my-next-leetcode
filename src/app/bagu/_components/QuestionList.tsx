@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
-import { Collapse, Tooltip } from '@mantine/core';
+import { useEffect } from 'react';
+import { Collapse } from '@mantine/core';
 import type { BaguCategory, BaguQuestion } from '@/types/bagu';
 
 interface QuestionListProps {
@@ -46,19 +46,20 @@ export default function QuestionList({
   onSelectQuestion,
   onToggleCategory,
 }: QuestionListProps) {
-  // 获取所有题目的扁平列表（用于键盘导航）
-  const getAllQuestions = useCallback(() => {
-    const result: { question: BaguQuestion; categoryId: string }[] = [];
-    for (const category of categories) {
-      for (const question of category.questions) {
-        result.push({ question, categoryId: category.id });
-      }
-    }
-    return result;
-  }, [categories]);
 
   // 键盘导航
   useEffect(() => {
+      // 获取所有题目的扁平列表（用于键盘导航）
+    const getAllQuestions = () => {
+      const result: { question: BaguQuestion; categoryId: string }[] = [];
+      for (const category of categories) {
+        for (const question of category.questions) {
+          result.push({ question, categoryId: category.id });
+        }
+      }
+      return result;
+    };
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       // 如果在输入框内，不处理
       if (
@@ -105,7 +106,7 @@ export default function QuestionList({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedQuestion, expandedCategories, getAllQuestions, onSelectQuestion, onToggleCategory]);
+  }, [selectedQuestion, expandedCategories, onSelectQuestion, onToggleCategory]);
 
   return (
     <div className="py-1">
@@ -133,7 +134,7 @@ export default function QuestionList({
               </span>
               <span className="flex items-center gap-2">
                 <span className="text-xs text-gray-400">
-                  {completedCount}/{category.questions.length}
+                  {category.questions.length}
                 </span>
                 {hasQuestions && (
                   <span
@@ -150,19 +151,19 @@ export default function QuestionList({
               <div className="bg-white/20">
                 {category.questions.map((question) => {
                   const isSelected = selectedQuestion?.id === question.id;
-                  const isCompleted = completedQuestions.has(question.id);
+                  // const isCompleted = completedQuestions.has(question.id);
 
                   return (
-                    <Tooltip
-                      key={question.id}
-                      label={question.title}
-                      position="right"
-                      withArrow
-                      multiline
-                      w={250}
-                      openDelay={500}
-                      disabled={question.title.length < 20}
-                    >
+                    // <Tooltip
+                    //   key={question.id}
+                    //   label={question.title}
+                    //   position="right"
+                    //   withArrow
+                    //   multiline
+                    //   w={250}
+                    //   openDelay={500}
+                    //   disabled={question.title.length < 20}
+                    // >
                       <button
                         data-question-id={question.id}
                         onClick={() => onSelectQuestion(question, category.id)}
@@ -173,7 +174,7 @@ export default function QuestionList({
                         }`}
                       >
                         {/* 完成状态图标 */}
-                        <Tooltip
+                        {/* <Tooltip
                           label={isCompleted ? '已完成' : '未完成'}
                           position="top"
                           withArrow
@@ -191,14 +192,14 @@ export default function QuestionList({
                           >
                             {isCompleted ? '●' : '○'}
                           </span>
-                        </Tooltip>
+                        </Tooltip> */}
 
                         {/* 题目标题 */}
                         <span className="truncate flex-1 min-w-0">
                           {question.title}
                         </span>
                       </button>
-                    </Tooltip>
+                    // </Tooltip>
                   );
                 })}
               </div>

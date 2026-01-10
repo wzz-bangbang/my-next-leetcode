@@ -70,6 +70,9 @@ export default function BaguPage() {
   // 移动端侧边栏状态
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
+  // 过滤模式：all-全部, incomplete-未完成, favorited-已收藏
+  const [filterMode, setFilterMode] = useState<'all' | 'incomplete' | 'favorited'>('all');
+  
   // 触摸滑动关闭侧边栏
   const touchStartX = useRef(0);
   const touchCurrentX = useRef(0);
@@ -240,6 +243,28 @@ export default function BaguPage() {
     if (!data || !selectedCategoryId) return null;
     return data.categories.find((c) => c.id === selectedCategoryId);
   }, [data, selectedCategoryId]);
+
+  // 过滤后的分类数据
+  const filteredCategories = useMemo(() => {
+    if (!data) return [];
+    if (filterMode === 'all')
+      return data.categories;
+    
+    const newCategories = data.categories
+      .map((cat) => ({
+        ...cat,
+        questions: cat.questions.filter((q) => {
+          if (filterMode === 'incomplete') {
+            return !completedQuestions.has(q.id);
+          } else if (filterMode === 'favorited') {
+            return favoriteQuestions.has(q.id);
+          }
+          return true;
+        }),
+      }))
+      .filter((cat) => cat.questions.length > 0);
+    return newCategories;
+  }, [data, filterMode, completedQuestions, favoriteQuestions]);
 
   // 统计信息
   const stats = useMemo(() => {
@@ -419,13 +444,37 @@ export default function BaguPage() {
               onExpandCategory={expandCategory}
               expandedCategories={expandedCategories}
             />
+            
+            {/* 过滤按钮 */}
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => setFilterMode(filterMode === 'incomplete' ? 'all' : 'incomplete')}
+                className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all ${
+                  filterMode === 'incomplete'
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-white/60 text-gray-600 hover:bg-white/80'
+                }`}
+              >
+                {filterMode === 'incomplete' ? '✓ ' : ''}未完成
+              </button>
+              <button
+                onClick={() => setFilterMode(filterMode === 'favorited' ? 'all' : 'favorited')}
+                className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all ${
+                  filterMode === 'favorited'
+                    ? 'bg-yellow-500 text-white'
+                    : 'bg-white/60 text-gray-600 hover:bg-white/80'
+                }`}
+              >
+                {filterMode === 'favorited' ? '✓ ' : ''}已收藏
+              </button>
+            </div>
           </div>
 
           {/* 分类列表 */}
           <div ref={sidebarRef} className="flex-1 min-h-0 overflow-y-auto">
             {data && (
               <QuestionList
-                categories={data.categories}
+                categories={filteredCategories}
                 selectedQuestion={selectedQuestion}
                 expandedCategories={expandedCategories}
                 completedQuestions={completedQuestions}

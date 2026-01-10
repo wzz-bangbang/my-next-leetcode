@@ -2,7 +2,10 @@
   "bagu": [
     "js-basic-3",
     "js-basic-1",
-    "js-basic-2"
+    "js-basic-2",
+    "typescript-2"
   ],
-  "code": []
+  "code": [
+    "myUseWindowResize"
+  ]
 }

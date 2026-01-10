@@ -203,6 +203,20 @@
     "description": "模拟实现 React 的 useState Hook，理解闭包、状态管理和触发重渲染的机制。"
   },
   {
+    "id": "myUseTimeout",
+    "title": "手写 useTimeout Hook",
+    "difficulty": 1,
+    "tags": [4],
+    "description": "实现一个 useTimeout Hook，在指定延迟后执行回调函数。需要正确处理组件卸载时的清理逻辑，以及回调函数或延迟时间变化时的重置行为。"
+  },
+  {
+    "id": "myUseWindowResize",
+    "title": "手写 useWindowResize Hook",
+    "difficulty": 1,
+    "tags": [4],
+    "description": "实现一个 useWindowResize Hook，监听窗口大小变化并返回当前的 width 和 height。需要正确添加和移除事件监听器，可选支持防抖优化。"
+  },
+  {
     "id": "proxy",
     "title": "手写 Proxy 代理",
     "difficulty": 2,

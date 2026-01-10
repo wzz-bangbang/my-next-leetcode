@@ -215,25 +215,25 @@ export default function SimulationModal({
             <Button
               onClick={generateSimulation}
               variant="gradient"
-              gradient={{ from: 'violet', to: 'purple' }}
+              gradient={{ from: 'pink', to: 'yellow' }}
               radius="xl"
               size="xs"
             >
-              🔄 重新生成
+              重新生成
             </Button>
             <Button
               onClick={copyQuestionList}
-              variant="light"
-              color="gray"
+              variant="gradient"
+              gradient={{ from: 'pink', to: 'red' }}
               radius="xl"
               size="xs"
             >
-              📋 复制
+              复制
             </Button>
           </div>
           <Button
             onClick={() => setIsOpen(false)}
-            variant="subtle"
+            variant="light"
             color="gray"
             radius="xl"
             size="xs"

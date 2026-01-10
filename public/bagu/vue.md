@@ -41,7 +41,8 @@ Vuex 的数据流是**单向**的，遵循以下流程：
 | SSR        | 需要额外配置                          | 开箱即用                                |
 | API 风格     | Options API 风格                  | 同时支持 Options 和 Composition API      |
 
-**选型建议**：新项目直接用 Pinia；Vue 2 老项目可继续用 Vuex，按需迁移。
+**选型建议**：
+Vuex 和 Pinia 更像官方状态管理的代际更替：Vue3 之后组合式 API 和 TS 成为主流，Pinia 在类型推导、样板代码、store 组织方式上都更契合官方心智，而且是官方推荐路线；Vuex 主要保留在存量项目或迁移成本高的场景，新项目默认 Pinia 风险最低。
 
 #### 响应式开发比命令式开发有什么优势？
 
@@ -343,3 +344,15 @@ const count = toRef(state, 'count');
 - `reactive`：用于对象/数组，直接访问属性，解构会丢失响应式
 
 **最佳实践**：统一使用 `ref`，或始终用 `toRefs` 解构 `reactive` 对象。
+
+#### ref和reactive有什么区别？为什么这样设计
+
+#### ref为什么要用.value?为什么模板不需要
+
+#### React 自定义 Hooks 和 Vue 3 的 composable，本质区别是什么？
+
+React 自定义 Hook 本质上是对官方 Hook 的组合，它依赖 Hooks 在 Fiber 中按调用顺序存储状态，因此必须遵守严格的调用顺序规则。
+
+Vue 3 的 composable 则是基于响应式系统的逻辑封装，状态由 ref 或 reactive 对象本身标识，而不是由调用顺序决定，因此机制上更加灵活。
+
+两者在写法上相似，但底层原理不同：React Hook 是“顺序绑定状态”，Vue composable 是“引用绑定状态”。

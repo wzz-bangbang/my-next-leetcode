@@ -177,14 +177,14 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
                             }`}
                           >
                             {/* 状态图标 */}
-                            <Tooltip label={statusInfo.label} position="top" withArrow openDelay={300}>
+                            {/* <Tooltip label={statusInfo.label} position="top" withArrow openDelay={300}>
                               <span 
                                 className="flex-shrink-0 text-xs cursor-help"
                                 style={{ color: isSelected ? 'rgba(255,255,255,0.8)' : statusInfo.color }}
                               >
                                 {statusInfo.icon}
                               </span>
-                            </Tooltip>
+                            </Tooltip> */}
                             
                             {/* 题目标题 */}
                             <span className="truncate flex-1 min-w-0">{q.title}</span>
