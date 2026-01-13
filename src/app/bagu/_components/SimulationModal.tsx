@@ -12,6 +12,8 @@ interface SimulationGroup {
 
 interface SimulationModalProps {
   data: BaguData | null;
+  filteredCategories: BaguCategory[];
+  filterMode: 'all' | 'incomplete' | 'favorited';
   onSelectQuestion: (question: BaguQuestion, categoryId: string) => void;
   onExpandCategory: (categoryId: string) => void;
   expandedCategories: Set<string>;
@@ -19,6 +21,8 @@ interface SimulationModalProps {
 
 export default function SimulationModal({
   data,
+  filteredCategories,
+  filterMode,
   onSelectQuestion,
   onExpandCategory,
   expandedCategories,
@@ -30,11 +34,25 @@ export default function SimulationModal({
   const generateSimulation = useCallback(() => {
     if (!data) return;
 
-    const categories = data.categories.filter((c) => c.questions.length > 0);
+    // 使用过滤后的分类数据（基于未完成/已收藏过滤）
+    const categories = filteredCategories.filter((c) => c.questions.length > 0);
     
-    // 目标：3-6 个分类，12-18 题
-    const targetCategoryCount = Math.floor(Math.random() * 4) + 3; // 3-6
-    const targetTotal = Math.floor(Math.random() * 7) + 12; // 12-18
+    if (categories.length === 0) {
+      notifications.show({
+        autoClose: 2000,
+        title: '⚠️ 无可用题目',
+        message: filterMode === 'incomplete' ? '没有未完成的题目' : filterMode === 'favorited' ? '没有已收藏的题目' : '没有可用题目',
+        color: 'orange',
+      });
+      return;
+    }
+    
+    // 目标：3-6 个分类，12-18 题（根据可用数量调整）
+    const maxCategories = Math.min(6, categories.length);
+    const targetCategoryCount = Math.floor(Math.random() * Math.max(1, maxCategories - 2)) + Math.min(3, maxCategories);
+    
+    const totalAvailable = categories.reduce((sum, c) => sum + c.questions.length, 0);
+    const targetTotal = Math.min(Math.floor(Math.random() * 7) + 12, totalAvailable); // 12-18，但不超过可用数量
 
     // 找到 React 分类（必选）
     const reactCategory = categories.find(
@@ -103,7 +121,7 @@ export default function SimulationModal({
 
     setSimulationQuestions(result);
     setIsOpen(true);
-  }, [data]);
+  }, [data, filteredCategories, filterMode]);
 
   // 复制题目列表
   const copyQuestionList = useCallback(async () => {
@@ -172,6 +190,15 @@ export default function SimulationModal({
             <span className="text-xs text-gray-400 font-normal">
               ({totalCount} 题)
             </span>
+            {filterMode !== 'all' && (
+              <span className={`text-xs px-1.5 py-0.5 rounded ${
+                filterMode === 'incomplete' 
+                  ? 'bg-amber-100 text-amber-600' 
+                  : 'bg-yellow-100 text-yellow-600'
+              }`}>
+                {filterMode === 'incomplete' ? '未完成' : '已收藏'}
+              </span>
+            )}
           </div>
         }
         size="lg"

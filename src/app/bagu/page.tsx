@@ -440,6 +440,8 @@ export default function BaguPage() {
             {/* 随机模拟按钮 */}
             <SimulationModal
               data={data}
+              filteredCategories={filteredCategories}
+              filterMode={filterMode}
               onSelectQuestion={selectQuestion}
               onExpandCategory={expandCategory}
               expandedCategories={expandedCategories}
