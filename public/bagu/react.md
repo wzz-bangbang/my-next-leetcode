@@ -1,7 +1,10 @@
 ###### 谈谈你对 React 的了解
+
 ###### React 中 keys 的作用是什么
+
 ###### 说说对受控组件和非受控组件的理解，以及应用场景
-###### Redux中的connect有什么作用?
+
+###### Redux 中的 connect 有什么作用?
 
 Redux 中的 `connect` 是一个高阶组件，用来把 Redux 的 store 和 React 组件连接起来。
 
@@ -23,10 +26,12 @@ const mapDispatchToProps = {
   increment,
   decrement
 }
-
 ```
-###### 说说你对immutable的理解?如何应用在react项目中
-###### 说说React服务端渲染怎么做?原理是什么?
+
+###### 说说你对 immutable 的理解?如何应用在 react 项目中
+
+###### 说说 React 服务端渲染怎么做?原理是什么?
+
 ###### 什么是无状态组件，与有状态组件的区别？它们的本质区别是什么？现在还推荐这样区分吗？
 
 无状态组件通常指的是不维护自身状态、只依赖 props 渲染 UI 的组件，更多用于展示型组件。
@@ -47,72 +52,83 @@ const mapDispatchToProps = {
 
 但虚拟 DOM 并不一定在所有场景下都更快，例如页面几乎不发生变化、DOM 结构极其简单，或者高频动画、Canvas 等场景下，虚拟 DOM 的计算成本反而可能成为额外开销。
 
-###### 说说react中引入css的方式有哪几种?区别?
+###### 说说 react 中引入 css 的方式有哪几种?区别?
+
 ###### 怎么给 children 添加额外的属性？
+
 ###### 对比类组件和函数组件，有什么本质区别？代码层面如何判断
+
 ###### React 组件高度抽象和复用的自由有没有代价？
 
-###### 为什么说react更适合B端大型项目
+###### 为什么说 react 更适合 B 端大型项目
 
 ###### React 组合能力强会带来哪些坑？
-###### 为什么说react的组件和逻辑抽象和复用比vue强
-###### 组件状态保存keep-alive怎么用？原理是什么？
+
+###### 为什么说 react 的组件和逻辑抽象和复用比 vue 强
+
+###### 组件状态保存 keep-alive 怎么用？原理是什么？
 
 ###### 路由懒加载原理
 
-###### react的link标签和a标签的区别
+###### react 的 link 标签和 a 标签的区别
 
-###### 分别讲讲react16 17 18 19新特性
+###### 分别讲讲 react16 17 18 19 新特性
 
-###### 什么是jsx? 为什么浏览器无法读取 JSX
-###### 说说jsx转DOM过程和原理
+###### 什么是 jsx? 为什么浏览器无法读取 JSX
 
-###### react diff算法核心，和vue的diff有什么区别
+###### 说说 jsx 转 DOM 过程和原理
 
-###### 讲讲react项目的性能优化
+###### react diff 算法核心，和 vue 的 diff 有什么区别
 
-###### 说说你对 React Hook的闭包陷阱的理解，有哪些解决方案
+###### 讲讲 react 项目的性能优化
+
+###### 说说你对 React Hook 的闭包陷阱的理解，有哪些解决方案
 
 React Hook 的闭包陷阱，本质上是**函数组件在某一次 render 时创建的回调函数，会捕获当次 render 的状态快照**。  
 如果这个回调在之后被异步执行（如 effect、事件、定时器），即使组件已经重新 render，回调内部拿到的仍然是**旧作用域里的变量**。
 
 产生原因
+
 1. **函数组件不是实例**，每次 render 都是一次新的函数执行
 2. Hook 回调（useEffect / useCallback 等）**绑定的是创建时的作用域**
 3. 依赖数组为空或不完整时，React 不会重新创建这个回调
 4. 导致回调中使用的 state / props 永远停留在旧值
 
 常见的解决方案包括：
+
 1. 正确声明依赖数组，确保状态变化时重新创建回调
 2. 使用函数式 setState，避免依赖外部状态
 3. 使用 useRef 保存最新值，因为 ref 在多次 render 之间保持同一个引用，可以绕开闭包快照问题
 
 ###### 说说 hooks 的思想和原理
 
-###### react hook如何以链表存储
+###### react hook 如何以链表存储
 
-###### 为什么hook只能写在顶层
+###### 为什么 hook 只能写在顶层
 
 ###### 看过 hooks 相关的草案吗
 
-###### 说说react里你常用的hook
+###### 说说 react 里你常用的 hook
 
 ###### React 中 refs 的作用是什么
-###### useRef和useState的区别
 
-useRef 返回的是一个普通的可变对象 `{ current }`，  这个对象在组件的多次 render 之间**不会被重新创建**，闭包捕获的是这个对象本身，而不是某次 render 的值快照，因此通过 `ref.current` 访问到的始终是最新写入的值。
-###### 为什么usestate返回数组而不是对象
+###### useRef 和 useState 的区别
 
-###### useState如何实现？怎么获得下一次更新后的值
+useRef 返回的是一个普通的可变对象 `{ current }`， 这个对象在组件的多次 render 之间**不会被重新创建**，闭包捕获的是这个对象本身，而不是某次 render 的值快照，因此通过 `ref.current` 访问到的始终是最新写入的值。
+
+###### 为什么 usestate 返回数组而不是对象
+
+###### useState 如何实现？怎么获得下一次更新后的值
 
 ###### 调用 setState 之后发生了什么
+
 ###### setState 何时同步何时异步?
 
-###### useEffect是如何实现的？
+###### useEffect 是如何实现的？
 
-###### useLayoutEffect和useEffect的区别
+###### useLayoutEffect 和 useEffect 的区别
 
-###### useEffect为什么不支持async await？怎么解决？
+###### useEffect 为什么不支持 async await？怎么解决？
 
 useEffect 不能直接写成 async，是因为 effect 的返回值会被 React 当作清理函数，在组件卸载或 effect 重新执行前同步调用。而 async 函数一定返回 Promise，React 不会也不能去 await 这个 Promise，因此无法作为合法的 cleanup。
 
@@ -126,11 +142,11 @@ React.memo 是一个用于函数组件的性能优化手段，它通过对 props
 
 同时，React.memo 也并非适用于所有场景，如果组件本身渲染成本很低，或者 props 变化频繁，使用 memo 反而可能带来额外的比较开销。
 
-###### React.memo的第二个参数是什么 作用
+###### React.memo 的第二个参数是什么 作用
 
 ###### ref useRef forwardRef 区别和作用
 
-###### useContext是什么作用？有什么优缺点？
+###### useContext 是什么作用？有什么优缺点？
 
 useContext 用于在组件树中跨层级共享数据，主要解决 props drilling 的问题，而不是以性能优化为目标。
 
@@ -140,18 +156,19 @@ useContext 用于在组件树中跨层级共享数据，主要解决 props drill
 
 常见的优化方式包括拆分 Context、保持 value 引用稳定，以及在复杂场景下配合 selector 或专门的状态管理库使用。
 
-###### 说说useReducer是什么怎么用
+###### 说说 useReducer 是什么怎么用
 
-###### 对比useReducer和useState
+###### 对比 useReducer 和 useState
 
-###### 18以前为什么useState不能批量更新，18以后为什么可以？
+###### 18 以前为什么 useState 不能批量更新，18 以后为什么可以？
 
- 18以前在浏览器原生事件（如 setTimeout、Promise 回调、addEventListener 内部）中，React 认为已经脱离了控制流，也就是他们的回调是在一个全新的、异步的、与 React 渲染无关的执行上下文中运行的，所以setstate无法批量更新
+18 以前在浏览器原生事件（如 setTimeout、Promise 回调、addEventListener 内部）中，React 认为已经脱离了控制流，也就是他们的回调是在一个全新的、异步的、与 React 渲染无关的执行上下文中运行的，所以 setstate 无法批量更新
 
-######  react自定义hooks 和 Vue3 composable 本质区别？
+###### react 自定义 hooks 和 Vue3 composable 本质区别？
 
-###### React Fiber是什么?  说说fiber 架构的工作原理?
-###### 为什么react需要 fiber架构，而Vue却不需要?
+###### React Fiber 是什么? 说说 fiber 架构的工作原理?
+
+###### 为什么 react 需要 fiber 架构，而 Vue 却不需要?
 
 React 需要 Fiber，而 Vue 不需要，本质原因是两者的更新模型不同。
 
@@ -165,62 +182,78 @@ Fiber 架构的核心作用是把一次大的渲染任务拆分成多个以 Fibe
 
 所以总结来说，**React 由于组件级整体更新的特性，需要 Fiber 来解决可中断调度的问题，而 Vue 基于依赖追踪的更新模型，本身不需要这种级别的调度体系。**
 
-###### 讲讲React Fiber 是如何实现更新过程可控的
+###### 讲讲 React Fiber 是如何实现更新过程可控的
 
-###### react如何确定具体场景的执行优先级
+###### react 如何确定具体场景的执行优先级
 
-###### fiber怎么进行任务的终止和恢复的？为什么不直接使用requestldleCallback?
+###### fiber 怎么进行任务的终止和恢复的？为什么不直接使用 requestldleCallback?
 
- React Fiber 通过把一次渲染拆分成多个小的工作单元（Fiber Node），使渲染过程变成**可中断、可恢复的增量执行过程**。
- 
+React Fiber 通过把一次渲染拆分成多个小的工作单元（Fiber Node），使渲染过程变成**可中断、可恢复的增量执行过程**。
+
 在渲染阶段，React 每次只处理一个 Fiber 节点，处理完成后会判断当前时间片是否用尽，如果有更高优先级任务或者时间不够，就主动让出主线程。
- 
- 中断时，React 会保存当前的 `workInProgress Fiber`，等下次调度继续从这个 Fiber 节点开始执行，而不是从头重新渲染整棵树。
- 
- React 并不是直接依赖浏览器调度，而是自己实现了一套 Scheduler。  通过MessageChannel 来创建一个**稳定、可控、优先级更高的异步调度入口**，用来触发一次新的调度循环，而不是用来通信任务完成状态。
 
-requestIdleCallback 的最大问题是：  **调度时机完全由浏览器决定，React 无法精确控制优先级和执行时长。**
+中断时，React 会保存当前的 `workInProgress Fiber`，等下次调度继续从这个 Fiber 节点开始执行，而不是从头重新渲染整棵树。
+
+React 并不是直接依赖浏览器调度，而是自己实现了一套 Scheduler。 通过 MessageChannel 来创建一个**稳定、可控、优先级更高的异步调度入口**，用来触发一次新的调度循环，而不是用来通信任务完成状态。
+
+requestIdleCallback 的最大问题是： **调度时机完全由浏览器决定，React 无法精确控制优先级和执行时长。**
 回调时机不可预测：浏览器“觉得”空闲才会调用，在动画、输入密集时可能长期不执行
 优先级控制能力弱：只区分是否空闲而没有优先级
 与 React 的调度模型不匹配：React 需要在不同优先级任务之间频繁切换，rIC 不适合高频、精细的任务切分
 
 总结：Fiber 的本质是把同步、不可中断的递归渲染，改造成基于 Fiber Node 的可中断工作流；React 通过自建 Scheduler 控制调度节奏，而不是把渲染节奏完全交给浏览器。
-###### 详细说说fiber架构的commit阶段过程
 
-###### 详细说说fiber架构的render阶段过程
+###### 详细说说 fiber 架构的 commit 阶段过程
 
-###### react如何实现时间切片
+###### 详细说说 fiber 架构的 render 阶段过程
 
-###### fiber为什么是性能飞跃
+###### react 如何实现时间切片
 
-###### redux的使用原则
+###### fiber 为什么是性能飞跃
 
-###### 说说 Redux的核心方法和工作流程
-###### redux的优缺点
-###### 说说对Redux中间件的理解?常用的中间件有哪些?实现原理?
-###### Redux中异步的请求怎么处理
-###### React中组件之间进行数据通信有哪些方式？
+
+
+
+
+
+
+###### redux 的使用原则
+
+###### 说说 Redux 的核心方法和工作流程
+
+###### redux 的优缺点
+
+###### 说说对 Redux 中间件的理解?常用的中间件有哪些?实现原理?
+
+###### Redux 中异步的请求怎么处理
+
+###### React 中组件之间进行数据通信有哪些方式？
+
 ###### 除了 redux mbox dva 还用过其他的 状态管理没
 
-###### 对比redux zustand
+###### 对比 redux zustand
 
-###### 说说react的事件代理机制原理和优缺点
+###### 说说 react 的事件代理机制原理和优缺点
 
-###### 说说react事件和浏览器原生事件执行先后顺序，为什么？
-###### react的事件为什么要委托，有什么好处？
-###### react事件委托如何解决模态框的事件冒泡？
+###### 说说 react 事件和浏览器原生事件执行先后顺序，为什么？
+
+###### react 的事件为什么要委托，有什么好处？
+
+###### react 事件委托如何解决模态框的事件冒泡？
+
 ###### react17 之后的事件机制有什么区别？
 
-###### 子组件portal能冒泡到父组件吗
+###### 子组件 portal 能冒泡到父组件吗
 
 ##### RSC react server component
 
-React Server Components 是 React 提出的 **一种让部分组件只在服务器端执行的渲染模式** 
+React Server Components 是 React 提出的 **一种让部分组件只在服务器端执行的渲染模式**
 它不是传统意义上的 SSR（Server-Side Rendering）那样生成完整 HTML，而是：
 
 **在服务器执行组件逻辑，把渲染结果以特殊协议序列化成数据流发送给客户端，客户端再把这些数据解释成 UI。**
 
 核心特点：
+
 - 组件代码 **永远不发送到客户端**（不会打包到 bundle 里）。
 - 只能运行在服务器上，不能使用浏览器 API 和交互 Hooks（如 `useState`, `useEffect`）。主要用于数据密集型、展示型的 UI。
 - 主要用于数据密集型、展示型的 UI。
