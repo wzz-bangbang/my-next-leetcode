@@ -385,6 +385,624 @@
       ]
     },
     {
+      "id": "css-html",
+      "name": "CSS & HTML",
+      "questions": [
+        {
+          "id": "css-html-1",
+          "title": "tailwind",
+          "content": "Tailwind 是一个原子化 CSS 框架，每个类名对应一个单独的 CSS 属性，通过组合类名来构建组件样式。  \n **优点**：1️⃣ 打包时只包含使用到的类，CSS 文件体积小；2️⃣ 响应式和状态样式有内置支持，熟悉后可快速阅读 HTML/JSX，无需跳转 CSS 文件。  \n **缺点**：1️⃣ HTML/JSX 中类名可能很长，阅读略困难；2️⃣ 对复杂动效和状态管理，需要组合更多类，前期学习成本高。\n\n 简单一句话概括：**Tailwind 用类名组装替代传统 CSS，更轻量、可维护，但初学者上手和复杂交互处理略有挑战。**",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-2",
+          "title": "less sass scss 作用",
+          "content": "Less、Sass、SCSS*都是 CSS 预处理器。它们的作用是：\n\n- **扩展 CSS 语言：** 引入了变量、嵌套、混合 (Mixins)、函数、继承、条件语句等编程特性，让 CSS 的编写更具逻辑性和可维护性。\n\n- **提高开发效率：** 通过嵌套可以减少重复选择器；通过变量可以实现主题和统一管理颜色值。\n\n- **编译到原生 CSS：** 浏览器无法直接识别预处理器的语法，因此它们都需要一个**编译 (Compile)** 过程，将其特有的语法转换为浏览器能理解的 **标准 CSS 文件**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-3",
+          "title": "em rem",
+          "content": "em 是以父元素font-size为基准，常用于局部比例计算\nrem 是以页面根元素font-size为基准，常用于页面的整体适配",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-4",
+          "title": "小程序rpx和px在不同手机上有误差",
+          "content": "rpx 是小程序里的相对单位，规定屏幕宽度等于 750rpx，不同设备上会根据屏幕宽度换算成不同的 px。\npx 是绝对单位，在不同设备上不自适应；  rpx 是相对单位，理论上 rpx 可以适配不同设备，但在实际渲染时，由于屏幕宽度和 DPR 不同，rpx 换算成 px 时会出现小数，最终需要取整，不同平台的取整和渲染机制也存在差异，因此在不同手机上可能会有细微误差。  误差在小尺寸元素上（尤其是 1rpx 边框）表现最明显，因为取整直接影响了元素的显示或隐藏。\n\n解决：\n避免使用极小的 `rpx` 值。尽量使用偶数的 rpx 值，必要时利用 CSS transform 缩放结合微元素 伪类解决\n尽量用 flex / 自适应布局，减少“精确像素依赖”",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-5",
+          "title": "苹果手机1px",
+          "content": "- **设备像素比 (DPR > 1)：** 在 iPhone 等高分屏设备上，`1px` (CSS 像素) 可能等于 $2$ 个或 $3$ 个物理像素。但开发者希望绘制的是**最细的 1 物理像素线**。\n\n- **浏览器最小绘制限制：** 当你使用 `border: 1px solid #000;` 时，浏览器会将这个 CSS 像素值放大。如果你在 JavaScript 或 CSS 中尝试计算出 $0.5px$ 并应用，浏览器（尤其是 iOS 上的 Safari/WebView）可能会认为 $0.5px$ **低于其最小渲染阈值**，从而将该边框**优化（忽略）**掉，导致边框看起来被“隐藏”了。\n\n解决方案：利用 CSS transform 缩放 (主流且有效)\n\n该方案利用伪元素，将元素放大到 2 倍，然后使用 `transform: scale(0.5)` 缩放回 1 倍，达到 1 物理像素的边框效果。",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-6",
+          "title": "meta标签",
+          "content": "`<meta>` 标签用于定义 HTML 文档中的**元数据 (Metadata)**，即描述 HTML 文档本身的信息。它通常放在 `<head>` 标签内。\n\n常见应用场景：\n\n1. **字符集声明:** `<meta charset=\"UTF-8\">`（**最重要**，定义文档的编码方式）。\n\n2. **视口设置 (Viewport):** 移动端适配核心\n   \n   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\">\n   \n   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\">\n   \n   ```html\n   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\">\n   ```",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-7",
+          "title": "script标签有哪些参数？async和defer有什么区别",
+          "content": "`<script>` 用于加载和执行 JavaScript，默认行为是**阻塞 HTML 解析**。\n 常见属性\n- `src`：外部脚本\n- `type=\"module\"`：表示该脚本是 **ES Module**，浏览器会按模块方式加载和执行。\n- `async` 异步请求js，不阻塞html解析，下载完立刻执行，不保证执行顺序\n- `defer`：异步请求js，不阻塞html解析，等待DOM 解析完成后执行，按顺序执行\n- `crossorigin`：控制**跨域资源请求的凭证模式**\n- `nomodule`：`nomodule` 用于 **兼容老浏览器**，加载降级脚本\n\nasync和defer使用场景\n- **async**\n    - 不依赖 DOM\n    - 不依赖其他脚本\n    - 如统计、监控脚本\n- **defer**\n    - 依赖 DOM\n    - 脚本之间有顺序\n    - 主业务 JS\n总结：async 重在‘谁先下完谁先跑’，defer 重在‘等 DOM 好了按顺序跑’。\n工作中：业务脚本优先 `defer`，第三方统计用 `async`，避免阻塞首屏。",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-8",
+          "title": "script link img标签的crossorigin属性作用是什么？",
+          "content": "**面试回答**：\n`script`、`img`、`link` 等标签即使跨域也可以正常加载资源，但默认情况下浏览器会限制这些资源的可用性。\n\n`crossorigin` 属性用于控制跨域资源请求时是否携带凭证，以及这些资源是否可以被 JavaScript 或 Canvas 等进一步使用。\n\n常见的取值有两个：\n- `anonymous`：表示跨域请求不携带 cookie，需要服务端允许当前源或使用 `Access-Control-Allow-Origin`\n- `use-credentials`：表示跨域请求会携带 cookie，服务端必须显式指定允许的源，并返回 `Access-Control-Allow-Credentials: true`\n\n如果不设置 `crossorigin`，资源本身可以加载成功，但在 `img` 场景下 Canvas 会被污染，JavaScript 无法读取像素数据；在 `script` 场景下，跨域脚本报错时只能看到 `Script error.`，无法获取完整的错误堆栈。\n\n讲解：\n参数：默认 anonymous 表示不携带 cookie，use-credentials 表示携带 cookie\n规则：\n1. 默认情况下`<script src=\"https://cdn.xxx.com/app.js\"></script>` ，浏览器**允许跨域加载并执行**，不需要 CORS 头\n2. `type=\"module\"` 下，跨域规则完全不同。ES Module 脚本默认开启 CORS 检查，没有 `Access-Control-Allow-Origin` → 直接加载失败\n\n`crossorigin` 在 script 里的真正意义：\n- 告诉浏览器：  \n    **“这是一个受 CORS 约束的脚本请求”**\n- 前提：\n    - 服务端返回 `Access-Control-Allow-Origin`\n- 结果：\n    - 可以拿到**完整错误堆栈**\n    - 监控系统才能正常工作\n\n为什么：\n根本原因：**防止信息泄露**\n错误堆栈里可能包含：\n- 代码结构\n- 变量名\n- 文件路径\n- 业务逻辑线索\n如果任意网站都能：\n- 引入你的 JS\n- 再读取完整错误信息\n那就是一个 **跨站信息泄露漏洞**。\n\n所以浏览器规定： **跨域脚本，默认只允许“执行”，不允许“读取细节”**，会的，只要是跨域且未通过 CORS 授权的脚本，语法错误、运行时错误、Promise 未捕获异常都会被折叠成 `Script error.`",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-9",
+          "title": "script标签的type=\"module\" 有什么作用",
+          "content": "浏览器规范 **直接规定**：`type=\"module\"` 脚本具有 **类 defer 行为**：不阻塞 HTML 解析；DOM 解析完成后执行；多个 module 按依赖顺序执行\n\n1. 为什么模块脚本必须“类 defer”？\n\t因为模块是「静态依赖系统」\n\t模块脚本在执行前要**先解析 import / export，构建完整的模块依赖图**\n\t这件事要求：\n\t- DOM 可以继续解析（不能阻塞）\n\t- 等依赖关系确定后，再统一调度执行\n\t\n\t如果模块像普通 script 一样“下载完就执行”，会导致：\n\t- DOM 未 ready\n\t- 依赖模块还没准备好\n\t- 执行顺序不稳定\n2. 多个 module 按依赖顺序执行\n\t### defer 的顺序规则\n\t- **按 script 在 HTML 中的顺序执行**\n\t- 和 JS 内部逻辑无关\n\tmodule 的顺序规则\n\t- **按模块依赖图（import 关系）执行**\n\t- 执行顺序由依赖关系决定\n\n初次之外还有自己的特点：自动开启严格模式 / 支持按需加载 / 受 CORS 限制\n1. 自动开启严格模式（use strict）模块脚本默认在 strict mode 下执行，因为：\n\t- 模块是**静态可分析**的\n\t- 容忍 `this === window`、隐式全局、重复参数等行为会破坏分析\n2. 支持依赖的按需加载（动态 import）\n\t- 模块系统是**可控、可缓存、可追踪的**\n\t- 浏览器可以安全地：下载；解析；执行；缓存 模块\n3. 必须走 CORS\n\t- 因为模块脚本：会被解析；会被别的模块 import；会影响执行顺序和依赖\n\t- 如果允许“随便跨域加载模块”：会形成 **跨站代码注入**；会泄露模块结构和依赖关系\n\t- 所以模块脚本：**强制 CORS 校验**；子模块同样受限\n\n总结：\n`type=module` 的类 defer 行为不是因为 defer 本身，而是模块脚本需要先构建依赖图并保证依赖有序执行，这是 ES Module 语义的一部分；\n模块脚本默认严格模式、支持动态 import，并强制 CORS，是因为模块是可分析、可组合的资源，浏览器必须在安全边界内管理它们。",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-10",
+          "title": "什么是css预处理器？",
+          "content": "CSS 预处理器（如 Sass / Less）是在 CSS 之上提供**更强表达能力**的工具，最终会被编译成标准 CSS。\n\n常见能力\n- 变量\n- 嵌套：用结构化写法描述 DOM 层级\n- mixin：封装可复用样式片段，避免重复代码。\n- 继承：复用已有选择器的样式，适合语义化类共享样式。\n- 模块拆分：通过 `@import / @use` 拆分样式文件，提升维护性\n\n解决了什么问题\n- 原生 CSS 在早期缺乏变量和逻辑能力\n- 大型项目样式难以维护\n- 重复代码多\n优势\n- 提升可维护性\n- 降低重复\n- 结构更清晰\n- 方便主题化和换肤\n\n使用：在webpack的Loader中配置；vite原生支持 Sass / Less",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-11",
+          "title": "语义化标签的应用场景和优势",
+          "content": "用恰当的 HTML 元素来描述内容的**结构和含义**，而不是仅仅关注其默认的样式\n\nheader nav main article section footer h1-h6  form等\n\n可访问性 搜索引擎优化 可读性和可维护性  跨设备兼容性",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-12",
+          "title": "Canvas vs SVG 的区别和选择",
+          "content": "1️. Canvas vs SVG 的本质区别\n\n|特性|Canvas|SVG|\n|---|---|---|\n|绘制方式|**基于像素**，一次性绘制，渲染后不保留对象|**基于矢量**，DOM节点形式，每个图形元素可操作|\n|更新|需要重绘整个画布或部分区域|可以单独操作某个元素，自动重渲染|\n|性能|大量动态像素操作（游戏、动画）效率高|大量元素节点多时，性能可能下降|\n|调试|不像 DOM 元素可直接 inspect，调试相对困难|可直接 inspect DOM 节点，样式、位置可见|\n2️. 优缺点\n Canvas\n- **优点**：\n    - 适合大量动态渲染或复杂动画（游戏、可视化图表）\n    - 渲染速度快，像素级控制灵活\n- **缺点**：\n    - 不保留对象，不容易对单个元素操作\n    - 调试困难\n    - 对响应式、交互事件支持有限\n SVG\n- **优点**：\n    - 矢量图形，缩放不失真\n    - DOM 节点可操作，易调试，事件绑定方便\n    - 适合图标、静态或轻量级动画\n- **缺点**：\n    - 大量节点性能开销大，不适合复杂动画或实时渲染\n\n3️. 使用场景参考\n- **Canvas**：游戏渲染、粒子动画、复杂图表、图像处理\n- **SVG**：图标、流程图、矢量图、轻量动画、交互图表\n\n总结：Canvas 是基于像素的绘制方式，渲染后不保留对象，适合大量动态渲染和复杂动画，但调试相对困难；SVG 是基于矢量的，每个元素都是 DOM 节点，可单独操作，适合图标、静态图、轻量动画。选择时一般原则：**动态、像素级操作选 Canvas，静态或矢量图形选 SVG**",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-13",
+          "title": "HTML5 表单验证和自定义验证",
+          "content": "1. HTML5 表单验证，原生提供了**内置验证属性**，常见的有：\n\t- **required**：必填字段\n\t- **type**：比如 `email`、`number`、`url`，浏览器会自动检查格式\n\t- **pattern**：自定义正则，匹配特定格式\n\t- **min / max / step**：数值范围限制\n\t- **maxlength / minlength**：字符长度限制\n\t- 特点：\n\t\t- 浏览器自动触发验证\n\t\t- 不需要 JS 代码\n\t\t- 用户体验好，移动端也会弹出原生提示\n2. 自定义验证：有些场景 HTML5 自带的验证无法满足，比如：\n\t- 复杂密码规则\n\t- 异步验证（用户名是否已存在）\n\t- 联动验证（两个字段必须匹配）\n   这时就需要**JavaScript 自定义验证**，常用方法：\n\t1. **oninput / onchange**：输入实时验证\n\t2. **onSubmit 拦截**：`form.addEventListener('submit', function(e) {...}`\n总结：HTML5 表单验证主要分两类：一是浏览器原生验证，通过 `required`、`type`、`pattern`、`min/max` 等属性自动检查输入；二是自定义验证，通过 JavaScript 检查复杂逻辑或异步条件，并通过 Constraint Validation API 或表单 submit 事件阻止非法提交。原生验证简单易用，但灵活性有限，自定义验证可以覆盖更复杂的场景。",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-14",
+          "title": "CSS3 动画性能优化方案",
+          "content": "性能优化核心是**减少重排 (Reflow/Layout)** 和**重绘 (Repaint)**，并尽可能利用 GPU 加速。\n\n1.使用 `transform` 和 `opacity` 进行动画： 只会触发**合成 (Compositing)**，不会触发重排和重绘，性能最高，可以直接利用 GPU 加速。\n\n2.开启 GPU 硬件加速：`transform: translateZ(0);` 或 `will-change: transform, opacity;`，将元素提升到合成层，利用 GPU 渲染\n\n3.使用 `will-change` 属性：\n\n4.避免使用 `all` 进行transition：\n\n5.**减少 DOM 元素和层次：",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-15",
+          "title": "CSS 模块化和作用域方案",
+          "content": "目的：\n- **解决全局污染：** 默认情况下，CSS 所有的选择器都是全局的。不同组件同名的 `.title` 会相互覆盖。\n- **提高复用性：** 像 JS 模块一样方便地导入、导出样式。\n- **提升维护性：** 明确样式与组件的绑定关系，删除组件时能放心地删除其样式。\n\n核心原理：\n1. **命名约定/空间隔离：** 通过人为约定的规范（如 BEM）来模拟作用域。\n2. **构建转换（哈希化）：** 通过构建工具（Webpack/Vite）自动重命名选择器。\n    - **原理：** 当你导入一个 CSS 模块时，编译器会将你的类名（如 `.button`）转换成一个唯一的哈希字符串（如 `._button_x1y2z`）。\n    - **映射：** 编译器会生成一个 JSON 映射表，让 JS 能够引用这个变色后的类名。\n\n常见方案：\n1. CSS Modules：基于 JS 映射的哈希化。开发者编写正常的 CSS 文件（通常命名为 `.module.css`），打包工具在构建时对类名进行转换增加hash，比如`._title_1a2b3_5`，并把引用处也做相同的修改。\n2. Scoped CSS：基于属性选择器的隔离： 打包工具在编译模板时，会给该组件内所有的 DOM 节点加上一个唯一的属性，例如 `data-v-7ba5bd90`，同时将对应的 CSS 选择器转换增加属性选择。\n3. Tailwind CSS：基于原子类的预扫描方案，不进行类名哈希化。优点是按需编译和极致复用。",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-16",
+          "title": "前端性能优化之 CSS 优化策略",
+          "content": "CSS 性能优化我通常从浏览器渲染链路来做：尽量减少 Layout、Paint，并让动画尽可能走 Composite。\n\n1. **减少 重排重绘**：避免频繁读写会触发布局的属性，比如在循环里交替读 `offsetHeight` 和写样式；需要批量修改样式时尽量合并，或者通过切换 class 一次性生效。对于会改变几何信息的属性（width/height/top/left/margin）要谨慎，尤其在动画里尽量不要用。\n\n2. **动画优化**：优先用 `transform` 和 `opacity` 做动画，避免触发布局；必要时对动画元素使用 `will-change: transform` 预创建合成层，但要控制数量避免占用显存。\n\n3. **降低选择器匹配成本**：选择器尽量简单，避免过深的嵌套、`*` 通配、复杂的后代选择器；类选择器比标签/后代链更稳定高效。复杂的选择器（如 `div > ul > li:last-child`）会增加浏览器计算匹配的成本。\n\n4. **减少阻塞和体积**：首屏关键 CSS 可以内联或拆分，非关键 CSS 延后加载；CSS 体积上做压缩、按路由/组件拆分，减少不必要的全量样式。\n\n5. **利用媒体查询 (Media Queries) 按需加载：**\n\t使用 `<link rel=\"stylesheet\" media=\"(max-width: 600px)\" href=\"mobile.css\">`，只有在符合条件时才加载相应样式。\n\n6. 避免在 HTML 中使用内联样式 (`style=\"...\"`)：内联样式会增加 HTML 文件体积，且不利于样式复用和缓存。",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-17",
+          "title": "解释CSS中的BEM命名方法，并展示如何使用它来组织你的样式表。",
+          "content": "**BEM** 是 **Block (块)、Element (元素)、Modifier (修饰符)** 的缩写，是一种用于组织 CSS 类名的命名规范。它旨在解决 CSS 全局作用域带来的命名冲突和样式依赖问题，使样式代码更具可读性和可维护性。示例：.card__title--large   .card__image--dark\n\n```css\n.user-card {\n    display: flex;\n    padding: 20px;\n    border: 1px solid #ccc;\n\n    /* 2. Modifier: .user-card--vip (变体) */\n    &--vip {\n        border-color: gold;\n        box-shadow: 0 0 5px gold;\n    }\n...\n}\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "css-html-18",
+          "title": "在一个复杂的页面上，用户操作导致多次不必要的DOM操作，你将如何优化它?",
+          "content": "不必要的 DOM 操作是前端性能的常见瓶颈，因为它会频繁触发浏览器的 **重排 (Reflow/Layout)** 和 **重绘 (Repaint)**。优化策略核心是**减少操作次数**和**批量处理操作**。\n\n1. **使用文档片段 (DocumentFragment) 批量操作：**\n   \n   - **原理：** `DocumentFragment` 是一个轻量级的容器，它**不是真实的 DOM 树的一部分**。将所有需要添加或修改的元素先插入到 `DocumentFragment` 中，然后只需进行**一次**操作，将 `DocumentFragment` 整体插入到 DOM 中。\n   \n   - **优化效果：** 只触发**一次**重排和重绘。\n\n2. **避免频繁读写 DOM 属性：**\n   \n   - **问题：** 连续读取（如 `element.offsetWidth`）和写入（如 `element.style.width = '100px'`）操作会导致“强制同步布局”——浏览器为了保证读取到的值是最新的，会立即执行挂起的重排。\n   \n   - **优化：** 应该**先读取**所有需要的 DOM 属性，然后**集中进行写入**操作。\n\n3. **使用防抖 (Debounce) 和节流 (Throttle)：**\n   \n   - **场景：** 针对用户输入、`resize`、`scroll`、`mousemove` 等高频触发的事件。\n   \n   - **防抖：** 将多次触发合并成一次，只在事件停止触发后执行一次（如搜索框输入）。\n   \n   - **节流：** 在一个时间周期内，事件只执行一次（如页面滚动）。\n\n4. **使用 Virtual DOM (适用于组件化框架)：**\n   \n   - React、Vue 等框架通过 **Virtual DOM** 将所有的 DOM 操作放入内存中进行对比，计算出最小的更新路径，然后一次性批量应用到真实 DOM 上，从框架层面解决了不必要的 DOM 操作问题。\n\n5. **用 CSS 类代替内联样式：**\n   \n   - 避免直接操作 `element.style`，因为它会导致样式计算和布局的开销。\n   \n   - **优化：** 预先定义好 CSS 类，通过增删改元素的 `className` 或 `classList` 来改变样式。\n\n6. **将元素脱离文档流：**\n   \n   - 如果必须对一个元素进行多次复杂的 DOM 操作，可以先通过设置 `display: none` 或将其从 DOM 中移除，进行操作，然后重新插入/显示。脱离文档流的操作不会触发整个页面的重排。",
+          "hasAnswer": true
+        }
+      ]
+    },
+    {
+      "id": "react",
+      "name": "React",
+      "questions": [
+        {
+          "id": "react-1",
+          "title": "谈谈你对 React 的了解",
+          "content": "React 是一个用于构建 UI 的库，它的核心是**用组件来描述 UI**，并通过**状态驱动视图**来让 UI 随数据变化而更新。  \n从机制上看，React 有三块比较关键：\n\n1. **声明式渲染 + 单向数据流**：开发者描述“在某个 state 下 UI 应该长什么样”，React 负责把它变成真实 DOM；数据自上而下流动，边界清晰，利于大型项目可维护。\n\n2. **协调与渲染分离（Reconciler + Renderer）**：React 先在 render 阶段计算“需要改什么”（reconcile/diff），再在 commit 阶段把变更提交到宿主环境（DOM/Native）。React DOM 只是其中一个 renderer。\n\n3. **Fiber 架构与并发能力（React 16+，18+ 更明显）**：把更新拆成可调度的小任务，引入优先级与可中断渲染；18 的并发特性让 React 能在交互、动画、数据渲染之间更好地平衡体验（比如自动批处理、Transitions 等）。\n\n工程实践上，我会把 React 当成“**UI 运行时**”：组件设计、状态归属、性能边界（memo、拆分、列表 key、避免无效渲染）和工程化（路由懒加载、SSR/CSR 取舍）是高级前端更看重的点。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-2",
+          "title": "React 中 key 的作用是什么",
+          "content": "key 的作用是帮助 React 在**同一层级的子节点列表**中建立“身份标识”，从而在 diff 时更准确地判断：哪些节点是新增/删除/移动，哪些可以复用。  \n它带来的核心收益是：\n\n- **稳定复用**：key 稳定时，React 能复用对应的 Fiber/DOM，减少不必要的卸载与重建。\n\n- **保持局部状态**：列表项里如果有 input、组件内部 state，稳定 key 能让它们跟随“同一项数据”而不是“同一位置”。\n\n- **更高效的 diff**：在存在插入、排序、过滤时，key 能显著减少误判与 DOM 操作。\n\n最佳实践是：**使用稳定且唯一的业务 id**，不要用 index（除非列表永不重排/增删，且项内无状态/无输入）。index 作为 key 常见问题是：插入/排序会导致“状态串位”和不必要的重渲染。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-3",
+          "title": "说说对受控组件和非受控组件的理解，以及应用场景",
+          "content": "- **受控组件（Controlled Component）**  \n  表单的值完全由 React state 控制，input 的 value / checked 来自 state，用户输入通过 onChange 触发 setState。  \n  优点是**数据来源单一、状态可控**，非常适合做校验、联动、回填、表单回显等复杂逻辑。  \n  缺点是更新频繁时可能带来额外渲染成本，需要注意拆分组件或做性能优化。\n\n- **非受控组件（Uncontrolled Component）**  \n  表单值由 DOM 自己维护，React 只在需要时通过 ref 读取，或者用 defaultValue 初始化。  \n  优点是实现简单、性能开销小，适合一次性提交、简单表单、第三方表单组件或富文本场景。  \n  缺点是状态分散在 DOM 中，不利于复杂业务逻辑管理。\n\n实际项目中更多是**以受控为主、非受控为辅**，在性能或实现成本更重要的场景下使用非受控。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-4",
+          "title": "什么是无状态组件，与有状态组件的区别？本质区别是什么？现在还推荐这样区分吗？",
+          "content": "无状态组件通常指**不维护自身状态、只根据 props 渲染 UI** 的组件，更多承担展示职责。  \n有状态组件则内部维护 state，负责交互和业务逻辑。\n\n在早期 React 中，这种区分基本等同于：\n\n- 无状态组件 → 函数组件\n\n- 有状态组件 → 类组件\n\n但在 Hooks 引入后，函数组件同样可以拥有完整状态和副作用能力，因此**这种区分已经不再是技术层面的限制**。\n\n现在更推荐从**组件职责**出发：\n\n- 状态是否应该属于这个组件\n\n- 是否可以下沉/上提状态\n\n- 是否是纯展示组件\n\n而不是纠结“有没有 state”。\n\n######",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-5",
+          "title": "说说 react 中引入 CSS 的方式有哪几种？区别？",
+          "content": "常见方式包括：\n\n1. **全局 CSS / SCSS**：简单直接，但容易命名冲突\n\n2. **CSS Modules**：通过构建工具生成局部作用域，适合组件化项目\n\n3. **CSS-in-JS（styled-components、emotion）**：样式即组件，动态能力强，但运行时有成本\n\n4. **内联 style**：适合少量动态样式，但不支持伪类、媒体查询\n\n5. **原子化方案（Tailwind）**：通过组合 class 构建 UI，提高一致性，但对团队规范要求高\n\n选择时主要看：**项目规模、团队习惯、动态样式复杂度和运行时性能要求**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-6",
+          "title": "怎么给 children 添加额外的属性？",
+          "content": "常见方式有三种：\n\n1. `React.cloneElement`：在不改变 children 结构的前提下追加 props\n\n2. render props：通过函数形式显式传递参数\n\n3. Context：适合跨层级、全局性信息\n\n其中 `cloneElement` 适合对子组件做增强，但要注意它**只能作用于 ReactElement，且会增加耦合度**，不适合滥用。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-7",
+          "title": "对比类组件和函数组件，有什么本质区别？代码层面如何判断",
+          "content": "本质区别在于：\n\n- 类组件是**基于实例的模型**，状态和生命周期绑定在实例上\n\n- 函数组件是**基于函数执行和闭包的模型**，每次 render 都是一次全新执行\n\n代码层面判断很简单：\n\n- 是否 `extends React.Component`\n\n- 是否存在 `this`、生命周期方法\n\n现代 React 推荐函数组件 + Hooks，它在逻辑复用、组合能力、类型推导上都更有优势。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-8",
+          "title": "React 组件高度抽象和复用的自由有没有代价？",
+          "content": "有，而且代价不小。\n\n常见问题包括：\n\n- 过度抽象导致组件层级过深、调试困难\n\n- props 设计不合理导致使用成本高\n\n- 复用场景被“假设”，反而限制业务演进\n\n高级前端更关注：**恰到好处的抽象**，优先服务当前真实需求，而不是追求“看起来通用”。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-9",
+          "title": "为什么虚拟 DOM 会提高性能？一定能提高性能吗？",
+          "content": "虚拟 DOM 是对真实 DOM 的一层 JS 抽象，用来描述 UI 结构。\n\n它提升性能的关键不在于“操作更快”，而在于：\n\n- **最小化真实 DOM 操作**：通过 diff 算法计算最小更新集\n\n- **批量更新**：多次状态变化合并后统一提交\n\n- **跨平台能力**：让渲染逻辑与宿主环境解耦\n\n但虚拟 DOM **并不保证所有场景都更快**：\n\n- UI 结构极其简单、几乎不更新时，diff 本身是额外成本\n\n- 高频动画、Canvas、WebGL 等场景不适合\n\n- 不合理的组件设计仍然会导致性能问题\n\n虚拟 DOM 的本质价值是：**提升整体可维护性与复杂场景下的性能上限，而不是极限性能**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-10",
+          "title": "为什么说 react 更适合 B 端大型项目",
+          "content": "我觉得 React 更适合 B 端，核心不是“性能更好”，而是**对复杂度的容忍度更高**。\n\n第一，B 端项目的复杂点往往不在页面样式，而在**状态多、交互复杂、业务规则多**。React 是典型的“状态驱动 UI”，组件就是函数，UI = state 的映射，这种模型在复杂场景下更容易拆解和维护。\n\n第二，React 的**组件和逻辑抽象能力非常强**。比如 Hooks，本质就是普通函数，你可以把一整套业务逻辑抽成一个 Hook，在多个页面复用，这在后台系统、配置台里非常常见。\n\n第三，**生态和工程化成熟**。B 端项目通常生命周期很长，React 从状态管理、路由、表单、表格、权限体系，到 SSR、微前端，都有大量成熟方案可选。\n\n简单说，React 更像一个 **UI 运行时 + 架构工具箱**，而不是“拿来即用的完整框架”，这点在大型 B 端项目里反而是优势。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-11",
+          "title": "React 组合能力强会带来哪些坑？",
+          "content": "组合能力强，本身就是一把双刃剑。\n\n最常见的坑是：**抽象过度**。  \n比如 Hook 拆得太细，一个页面引七八个 Hook，逻辑分散在不同文件里，新人根本不知道一段行为是从哪来的。\n\n第二是**隐式依赖**。  \n有些自定义 Hook 内部偷偷用 Context、全局状态，表面上看参数很少，但实际上依赖一大堆外部环境，用错地方就出问题。\n\n第三是**性能问题更隐蔽**。  \n组合之后，谁在触发 re-render、哪个 Hook 闭包不对，很难第一时间看出来，排查成本高。\n\n所以在实际项目里，我会刻意控制：\n\n- Hook 不追求“极致通用”\n\n- 抽象只覆盖真实复用场景\n\n- 组合层级不要太深\n\n否则组合能力反而会变成维护负担。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-12",
+          "title": "为什么说 react 的组件和逻辑抽象和复用比 vue 强",
+          "content": "我觉得本质原因在于：**React 的抽象完全建立在 JavaScript 函数之上**。\n\n在 React 里：\n\n- 组件是函数\n\n- Hook 也是函数\n\n- 逻辑复用就是函数组合\n\n你不需要理解太多框架“特殊规则”，就是 JS 思维，这点在复杂逻辑复用时非常舒服。\n\nVue 虽然现在有了 Composition API，但整体还是**模板 + 指令 + 响应式语法**的模型，抽象能力更多依赖框架约定，而不是纯语言能力。\n\n举个例子：  \n在 React 里，我可以很自然地写一个 `useTable`、`usePermission`，内部怎么拆、怎么组合完全自由；  \n而 Vue 里你要同时考虑响应式、生命周期、模板使用方式，约束会更多。\n\n当然代价也很明显：**React 更考验开发者的架构能力**，自由度越高，犯错空间也越大。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-13",
+          "title": "组件状态保存 keep-alive 怎么用？原理是什么？",
+          "content": "React 本身没有官方 keep-alive，这点和 Vue 不一样。\n\n但本质上，所谓 keep-alive 就一句话：**不要让组件被 unmount**。\n\n常见做法有几类：  \n第一类，最简单的，用 CSS 控制显示隐藏，而不是条件渲染销毁组件。  \n第二类，路由缓存，比如 react-activation，本质是把组件实例缓存起来，下次直接复用。  \n第三类，把关键 state 提到更高层，比如路由外层，这样即使页面切换，状态也还在。\n\n原理上非常简单：  \nReact 一旦 unmount，state、effect、ref 全都会被清掉。  \nkeep-alive 只是想办法绕开“卸载”这一步。\n\n但一定要注意：  \nkeep-alive 是**用内存换体验**，用不好很容易内存膨胀、逻辑混乱。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-14",
+          "title": "路由懒加载原理",
+          "content": "路由懒加载的核心其实就一句话：**按路由拆包，按需加载**。\n\n实现上一般是：\n\n- 使用 `import()`\n\n- 构建工具把不同路由打成不同 chunk\n\n- 用户访问某个路由时，才下载对应 JS\n\n在 React 里常见写法是 `React.lazy + Suspense`。\n\n它解决的是一个非常现实的问题：  \n后台系统路由多、页面多，如果全部打进首包，首屏一定很慢。\n\n懒加载的本质是：**把“第一次看不到的代码”延后加载**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-15",
+          "title": "react 的 Link 标签和 a 标签的区别",
+          "content": "这个问题我一般会直接从“是否刷新页面”讲。\n\n`a` 标签是浏览器原生跳转：\n\n- 会刷新整个页面\n\n- JS 状态全部丢失\n\n- 重新请求资源\n\n`Link` 是前端路由跳转：\n\n- 通过 history API 改 URL\n\n- 不刷新页面\n\n- 应用状态全部保留\n\n- 只切换组件\n\n所以在 SPA 内部跳转，一定用 `Link`；  \n只有跳外部网站，或者明确需要刷新时，才用 `a`。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-16",
+          "title": "分别讲讲 react 16 / 17 / 18 / 19 新特性",
+          "content": "React 16 是一个**架构级版本**，大的变化是引入了 Fiber 架构，把原来同步、不可中断的递归渲染，改成了可拆分、可中断的工作单元模型。为后续并发渲染打地基。但是\n\nReact 17 主要做了两件事：\n一是重构事件系统，把事件从 document 下移到 root，减少对全局的侵入；\n二是为并发模式、渐进升级铺路，让多个 React 版本可以共存。\n\nReact 18 是真正对业务产生明显影响的版本。\n核心是并发特性正式可用，包括：\n\n自动批处理（不再区分 React 事件还是原生事件）\n\nstartTransition / useTransition，区分紧急和非紧急更新\n\n新的 root API，为并发调度提供入口\n\n18 的目标很明确：在复杂更新场景下，保证交互优先级和页面响应性。\n\nReact 19 更偏向方向和能力整合，而不是一次 API 爆炸。\n重点包括：\n\nServer Components 更成熟\n\n编译期优化能力增强，减少手写 memo、useCallback 的心智负担\n\n更进一步弱化“开发者手动性能调优”的必要性",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-17",
+          "title": "什么是 JSX？为什么浏览器无法读取 JSX",
+          "content": "JSX 本质就是 **JavaScript 的语法糖**，用来更直观地写 UI 结构。\n\n浏览器不能直接识别 JSX，是因为 JSX 根本不是合法的 JS 语法。\n\n它必须先经过编译，比如 Babel，把 JSX 转成 `createElement` 调用，浏览器才能执行。\n\n所以 JSX 只是开发体验层面的东西，运行时根本不存在 JSX。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-18",
+          "title": "说说 jsx 转 DOM 的过程和原理",
+          "content": "这个过程我一般会拆成 **三层：编译期、运行时计算、提交阶段**。\n\n第一层是**编译期**。  \nJSX 本身不是合法的 JavaScript，必须通过 Babel 等工具，把 JSX 转成 `React.createElement` 或等价函数调用。  \n这一步做的事情只是：**把语法糖变成普通 JS 表达式**。\n\n第二层是**运行时生成虚拟 DOM**。  \n`createElement` 执行后，会生成一个 React Element，本质是一个普通对象，用来描述节点类型、props、children。  \n注意这里的 React Element 不是 Fiber，也不是 DOM，只是**UI 描述数据**。\n\n第三层是**协调与提交**。  \nReact 在 render 阶段，会根据新旧 React Element 构建 Fiber 树，并通过 diff 算法计算出需要变更的部分；  \n在 commit 阶段，再把这些变更一次性映射成真实 DOM 操作。\n\n所以 JSX 到 DOM 并不是“直接生成 DOM”，而是：  \n**JSX → React Element → Fiber → DOM**  \nJSX 只是最前面的语法入口。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-19",
+          "title": "react diff 算法核心，和 vue 的 diff 有什么区别",
+          "content": "React diff 的核心设计思路是：**在可接受复杂度内，尽量减少 DOM 操作**。\n\n它有几个非常关键的假设：  \n第一，不同类型的节点，直接销毁重建  \n第二，只在**同一层级**做 diff，不跨层比较  \n第三，列表通过 key 来标识节点身份，而不是位置\n\n基于这些假设，React 可以把 diff 的复杂度控制在 O(n)，代价是：  \n如果 key 设计不合理，或者结构变化剧烈，更新效率会下降。\n\nVue 的 diff 思路和 React 不太一样，更依赖 **响应式系统 + 静态分析**：\n\n- 编译阶段标记静态节点\n\n- 运行时 diff 范围更小\n\n- 更新路径更明确\n\n所以可以这样总结：\n\n- React diff 更偏**运行时策略 + 调度能力**\n\n- Vue diff 更偏**编译期优化 + 精确依赖追踪**",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-20",
+          "title": "讲讲 react 项目的性能优化",
+          "content": "一般会从 **“更新为什么会发生、更新发生在哪、怎么减少无效更新”** 这三个层面来讲\n\n第一层是 **渲染边界控制**。  \nReact 的性能问题，本质上大多数都是“**不该 re-render 的组件 re-render 了**”。所以核心是控制 render 边界：\n\n- 拆分组件，让 state 尽量就近\n\n- 对纯展示组件使用 `React.memo`\n\n- 配合 `useMemo / useCallback` 稳定 props 引用  \n  但我会强调一点：memo 不是越多越好，而是用来**明确哪些组件可以跳过更新**。\n\n第二层是 **状态设计和更新粒度**。  \n很多性能问题不是出在 React，而是 state 设计不合理，比如：\n\n- 一个 state 牵动一大片组件\n\n- 把临时状态、派生状态也放进 state  \n  这类问题通过**拆 state、下沉 state、减少不必要的 state**，往往比任何 memo 都有效。\n\n第三层是 **列表和计算场景**。  \n包括：\n\n- key 是否稳定、是否使用 index\n\n- 大列表是否需要虚拟滚动\n\n- 昂贵计算是否需要缓存  \n  这是 React 项目里非常常见、也非常实际的性能瓶颈。\n\n第四层是 **调度和工程层面**。  \n比如：\n\n- 路由懒加载、代码分割\n\n- React 18 的 `startTransition` 区分更新优先级\n\n- 必要时使用 SSR / Streaming  \n  这些是解决“页面是否卡顿”“首屏是否慢”的关键。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-21",
+          "title": "说说 hooks 的思想和原理",
+          "content": "Hooks 的思想核心不是“语法糖”，而是**组件模型的转变**。\n\n在 class 组件里，state 和生命周期是挂在实例上的，逻辑复用只能通过继承或 HOC，这会带来很强的结构耦合。  \nHooks 做的是：**把状态和副作用能力，从实例模型，转移到函数执行模型中**。\n\n从原理上讲：\n\n- 每个函数组件在 render 时，React 都会为它维护一份 Hook 状态\n\n- `useState / useEffect` 这些 Hook，本质是在当前组件对应的 Fiber 上，按顺序读写这份状态\n\n- React 并不关心 Hook 的名字，而是**依赖调用顺序来关联状态**\n\n所以 Hooks 能够做到：\n\n- 不依赖 class\n\n- 逻辑可以自由拆分、组合  \n  代价就是：**必须保证调用顺序稳定**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-22",
+          "title": "react hook 如何以链表存储",
+          "content": "在实现层面，React 是用**链表**来存 Hook 状态的。\n\n每个函数组件对应一个 Fiber 节点，Fiber 上有一个 `memoizedState`，它指向 Hook 链表的头。  \n在 render 阶段：\n\n- React 会维护一个指针\n\n- 每调用一次 Hook，就顺序访问或创建一个 Hook 节点\n\n- Hook 节点里会存 state、更新队列、effect 信息等\n\n选择链表而不是数组，主要是为了：\n\n- 更好地配合 Fiber 的 workInProgress 机制\n\n- 在更新、复用时成本更低\n\n但这个设计直接导致了一个前提：**Hook 的调用顺序必须一致**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-23",
+          "title": "为什么 hook 只能写在顶层",
+          "content": "这是一个**实现层面的硬约束**。\n\nReact 是通过“第 N 次调用 Hook ↔ 第 N 个 Hook 节点”来匹配状态的。  \n如果 Hook 写在条件、循环或提前 return 里，那么某次 render 调用顺序发生变化，后面的 Hook 就会全部错位。\n\n一旦错位：\n\n- state 会读错\n\n- effect 会乱执行\n\n- 行为不可预测\n\n所以 Hook 只能写在顶层，不是语法限制，而是**为了保证 Hook 链表和调用顺序的一致性**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-24",
+          "title": "看过 hooks 相关的草案吗",
+          "content": "看过 Hooks 的 RFC。\n\n当时的设计思路其实非常明确：\n\n- 目标是解决 class 组件的复用和复杂度问题\n\n- 明确接受“依赖调用顺序”和“规则约束”这类 trade-off\n\n- 优先选择工程上可落地、可维护的方案，而不是理论最优\n\n总体来说 Hooks 的设计是一次**非常务实、非常工程化的取舍**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-25",
+          "title": "说说 react 里你常用的 hook",
+          "content": "在实际项目中，我常用的 Hook 基本分几类：\n\n- **状态类**：`useState`，复杂状态时用 `useReducer`\n\n- **副作用类**：`useEffect`，处理请求、订阅、生命周期逻辑\n\n- **性能与引用控制**：`useMemo`、`useCallback`，明确 render 边界\n\n- **引用类**：`useRef`，保存跨 render 的可变值、解决闭包问题\n\n- **共享状态**：`useContext`，用于低频、全局性数据\n\n但从工程角度看，最有价值的是**自定义 Hook**，它能把状态、副作用和业务规则封装成可复用的逻辑单元，让组件本身保持非常“薄”。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-26",
+          "title": "React 中 refs 的作用是什么",
+          "content": "refs 的核心作用可以概括为一句话：**在 React 的声明式渲染模型之外，持有一个稳定、可变的引用**。\n\nReact 的 state / props 都是参与渲染的，只要变了就会触发一次 render；但在实际工程中，总会存在一些数据或对象：\n\n- **变化不应该触发重新渲染**\n\n- 但又需要在多次 render 之间被保留下来\n\n这正是 refs 存在的意义。\n\n在实践中，refs 主要有三类典型用途：  \n第一，**直接访问或操作 DOM**，比如 focus、scroll、测量尺寸，这是声明式模型无法完全覆盖的场景。  \n第二，**保存跨 render 的可变数据**，例如定时器 id、上一次的值、外部实例对象，这类数据如果用 state 反而会制造多余更新。  \n第三，**与非 React 管理的第三方库对接**，比如图表、编辑器，它们往往需要一个长期存在的实例引用。\n\n关键点在于：**ref 的变化不会触发组件重新渲染**，它是 React 提供的一条“逃生通道”，但不应该被滥用。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-27",
+          "title": "useRef 和 useState 的区别",
+          "content": "useRef 和 useState 的本质区别并不在“是不是 Hook”，而在于**是否参与渲染流程**。\n\n`useState` 的语义是：\n\n- 状态变化会影响 UI\n\n- 更新会触发重新 render\n\n- React 会基于新 state 重新计算 UI\n\n`useRef` 的语义是：\n\n- 只是保存一个可变引用\n\n- 更新 `ref.current` 不会触发 render\n\n- 更像是一个“组件级的实例变量”\n\n还有一个在高级场景里非常重要的差异：  \n**闭包捕获行为不同**。  \n函数组件的闭包会捕获某一次 render 的 state 值，但捕获到的 ref 是同一个对象引用，因此通过 `ref.current` 读取到的永远是最新值，这也是 useRef 常被用来解决闭包问题的原因。\n\n所以结论很明确：\n\n- 影响 UI 的，用 state\n\n- 不影响 UI、但要跨 render 保存的，用 ref",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-28",
+          "title": "为什么 useState 返回数组而不是对象",
+          "content": "这是一个典型的 **API 设计取舍问题**。\n\n从使用层面看，数组有两个明显优势：  \n第一，**解构时可以自由命名**，不依赖固定的 key 名，这对 API 使用体验更友好。  \n第二，数组的语义是“有顺序的返回值”，而 Hooks 的实现恰好是**强依赖调用顺序**的。\n\n从实现角度看，React 内部并不关心返回值的结构，它只关心：  \n“这是当前组件第几个 Hook”。  \n数组这种形式，正好和 Hooks 依赖顺序的模型保持一致。\n\n所以 useState 返回数组，并不是随意选择，而是**和 Hooks 整体设计哲学高度一致的结果**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-29",
+          "title": "useState 如何实现？怎么获得下一次更新后的值",
+          "content": "useState 在内部并不是“直接改值”，而是基于 **更新队列（update queue）** 的模型。\n\n每一个 useState 对应一个 Hook 节点，这个节点上会维护：\n\n- 当前 state\n\n- 一个 update queue，用来存储多次 setState 产生的更新\n\n当调用 `setState` 时，React 做的事情是：\n\n- 创建一个 update\n\n- 把 update 放进当前 Hook 的更新队列\n\n- 标记当前 Fiber 需要更新\n\n真正的 state 计算发生在**下一次 render 阶段**，React 会按顺序处理 update queue，得到新的 state。\n\n如果需要基于旧值计算新值，正确且唯一可靠的方式是：\n\n`setState(prev => next)`\n\n至于“怎么拿到更新后的值”，答案其实是：  \n**拿不到同步结果**。  \nReact 不提供同步读取“下一次 state”的能力，只能在下一次 render 或通过 `useEffect` 感知 state 变化，这也是 React 保持渲染可控性的一个重要前提。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-30",
+          "title": "调用 setState 之后发生了什么",
+          "content": "从内部机制上看，调用 setState 之后大致会经历这样一条链路：\n\n第一步，**生成 update 对象**  \nsetState 不会立刻修改 state，而是生成一条“状态更新描述”。\n\n第二步，**update 入队**  \nupdate 被放入当前 Hook 或 class 组件对应的更新队列中。\n\n第三步，**调度更新**  \nReact 会根据当前更新的优先级，把这个 Fiber 标记为需要更新，并交给调度器决定何时执行。\n\n第四步，**render 阶段**  \nReact 从当前 Fiber 开始，重新执行函数组件或调用 render，构建新的 Fiber 树，并计算 UI 差异。\n\n第五步，**commit 阶段**  \n把 render 阶段计算出的结果一次性提交到 DOM，并执行副作用（effect、ref 更新等）。\n\n所以从设计上讲，`setState` 做的事情非常克制：  \n它只是**发起一次更新请求**，而不是“命令 React 立刻更新 UI”，这也是 React 能做调度、并发和批处理的基础。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-31",
+          "title": "setState 何时同步何时异步?",
+          "content": "严格来说，**setState 从来不是“同步或异步”的问题，而是“是否被批处理”**。\n\n在 React 的模型里，setState 做的事情只是**创建 update 并触发一次更新调度**，并不等价于“立刻改 state”。\n\n- **React 18 之前**\n  \n  - 在 React 事件系统（如 onClick）中，更新会被批处理\n  \n  - 在原生事件、Promise、setTimeout 中，更新不会被批处理，看起来像“同步”\n\n- **React 18 之后**\n  \n  - 默认开启 **自动批处理（automatic batching）**\n  \n  - 不论是 React 事件、Promise、setTimeout，都会合并更新\n  \n  - 统一交给 Scheduler 决定何时 render\n\n如果真的需要强制同步更新，只能使用 `flushSync`，但这会打断调度机制，属于兜底手段，不建议常用。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-32",
+          "title": "useEffect 是如何实现的？",
+          "content": "useEffect 的实现要分清 **render 阶段** 和 **commit 阶段**。\n\n在 **render 阶段**：\n\n- React 只做一件事：**收集 effect 描述**\n\n- 判断依赖数组是否变化，决定这个 effect 是否需要在本次提交后执行\n\n在 **commit 阶段**：\n\n- DOM 更新完成后\n\n- 先执行上一次 effect 的 cleanup\n\n- 再执行新的 effect 回调\n\n这也是为什么 useEffect：\n\n- 不会阻塞页面渲染\n\n- 执行时机一定晚于 DOM 更新\n\n本质上，useEffect 是一个**延迟到提交之后执行的副作用调度机制**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-33",
+          "title": "useLayoutEffect 和 useEffect 的区别",
+          "content": "两者的核心区别只有一个：**执行时机不同**。\n\n- **useLayoutEffect**\n  \n  - DOM 更新完成\n  \n  - 浏览器绘制之前\n  \n  - 同步执行，会阻塞浏览器绘制\n\n- **useEffect**\n  \n  - 浏览器完成绘制之后\n  \n  - 异步执行\n\n因此 useLayoutEffect 适合：\n\n- 读取布局信息（如 getBoundingClientRect）\n\n- 需要在首帧绘制前同步修改 DOM 的场景\n\n其余绝大多数情况，优先使用 useEffect，避免阻塞渲染。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-34",
+          "title": "React.memo 的第二个参数是什么？作用是什么",
+          "content": "React.memo 的第二个参数是一个 **自定义 props 比较函数**：\n\n`React.memo(Component, (prevProps, nextProps) => boolean)`\n\n默认情况下，React.memo 使用 **浅比较**。  \n提供第二个参数后，你可以**完全接管“是否重新渲染”的判断逻辑**。\n\n适用场景：\n\n- props 结构复杂\n\n- 默认浅比较不够用\n\n- 组件渲染成本很高\n\n但需要注意：\n\n- 比较函数本身有执行成本\n\n- 写错容易导致组件不更新或状态不一致\n\n所以它是一个**高风险、高收益**的优化点，一般只在性能瓶颈明确时使用。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-35",
+          "title": "ref / useRef / forwardRef 区别和作用",
+          "content": "这三个概念解决的是同一类问题：如何在函数组件体系中持有和传递引用，但分工不同。\n\nref：引用这个概念本身，最终目的是访问或控制某个对象（通常是 DOM 或实例）\n\nuseRef：在函数组件中创建一个稳定的 ref，对应 { current }，在多次 render 之间保持同一个引用\n\nforwardRef：让函数组件能够接收父组件传下来的 ref，并继续向内部传递\n\nuseRef 的关键特性是：\n\n修改 ref.current 不会触发重新渲染\n\n闭包捕获的是 ref 对象本身，而不是某次 render 的值\n\nforwardRef 的核心价值在于：\n在不破坏组件封装的前提下，向外暴露必要的控制能力，\n这在组件库（Input、Select、Modal 等）中几乎是必需的能力。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-36",
+          "title": "说说 useReducer 是什么，怎么用",
+          "content": "useReducer 是 useState 的一种“结构化升级”。\n\n它引入了 reducer 的概念：\n\n- state 的变化不再分散在各处\n\n- 所有更新逻辑集中在 reducer 中\n\n- 通过 dispatch action 驱动状态变化\n\n适合的场景是：\n\n- state 结构复杂\n\n- 更新规则清晰\n\n- 多种行为影响同一份 state\n\n从模型上看，useReducer 更接近一个**局部状态机**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-37",
+          "title": "对比 useReducer 和 useState",
+          "content": "这两个 Hook 的**底层能力是等价的**，差异主要体现在**状态建模方式和复杂度管理**上。\n\n`useState` 更偏向**值级别的状态管理**：\n\n- 一个 state 对应一块独立的值\n\n- 更新逻辑通常写在调用点\n\n- 适合状态简单、更新路径单一的场景\n\n`useReducer` 更偏向**行为驱动的状态管理**：\n\n- state 的变化由 reducer 统一描述\n\n- 通过 dispatch action 驱动更新\n\n- 更新逻辑集中，可读性和可维护性更好\n\n从实现上看，`useState` 本质上就是一个**简化版的 useReducer**（内部同样是 update queue + reducer 逻辑）。  \n所以在实际项目里，一般的选择策略是：\n\n- **状态简单 → useState**\n\n- **状态复杂 / 多种行为影响同一状态 → useReducer**\n\n关键不是“哪个更高级”，而是**状态复杂度是否已经超过 useState 的舒适区**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-38",
+          "title": "18 以前为什么 useState 不能批量更新，18 以后为什么可以？",
+          "content": "这个问题的核心不在 useState，而在 **React 的调度模型是否统一**。\n\n**React 18 以前**：\n\n- 只有 React 自己控制的事件系统（如 onClick）里，更新才会被批处理\n\n- 原生事件、Promise、setTimeout 中的 setState，被认为处在“脱离 React 控制流”的执行上下文\n\n- React 无法安全地判断这些更新是否属于同一批次，因此默认不合并\n\n**React 18 之后**：\n\n- 引入了统一的调度入口（Scheduler）\n\n- 不再根据“事件来源”决定是否批处理\n\n- 所有更新都会先进入调度系统，再由调度器决定合并和执行时机\n\n所以 18 之后 useState 能批量更新，不是 API 行为改变，而是：  \n**React 终于具备了跨异步边界统一调度更新的能力**，这是并发架构的直接结果。\n\nReact 18 之所以能跨异步边界批量更新，本质原因是它把所有状态更新统一收编进 Scheduler，通过 concurrent root + lane 模型，让 React 自己掌握更新的合并和调度时机，而不再依赖事件来源是否“可控”。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-39",
+          "title": "react 自定义 hooks 和 Vue3 composable 本质区别？",
+          "content": "两者在“形式”上很像，但**底层模型完全不同**。\n\nReact 自定义 Hook：\n\n- 本质是**普通函数**\n\n- 状态管理依赖 **Hook 调用顺序 + 内部链表**\n\n- 不具备自动依赖追踪\n\n- 数据流完全由开发者显式控制\n\nVue3 composable：\n\n- 基于 **响应式系统**\n\n- 状态是 reactive / ref\n\n- 依赖关系由系统自动收集\n\n- 更偏“声明数据 → 自动更新”\n\n这带来的差异是：\n\n- React Hook 更自由、更贴近 JavaScript 语义，但规则更严格（调用顺序、依赖数组）\n\n- Vue composable 更自动化、心智负担更低，但抽象层更厚，对框架依赖更强\n\n从工程角度看：  \nReact 的自定义 Hook 更像**逻辑层抽象工具**；  \nVue 的 composable 更像**响应式能力的复用单元**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-40",
+          "title": "useContext 是什么作用？有什么优缺点？",
+          "content": "useContext 的作用是**跨层级共享数据，避免 props drilling**。\n\n优点：\n\n- 使用简单\n\n- 数据流清晰\n\n- 适合全局配置、主题、权限等低频变化数据\n\n缺点：\n\n- 更新粒度粗\n\n- Context value 变化会导致所有消费者重新渲染\n\n- 不适合高频、复杂状态\n\n常见优化方式包括：\n\n- 拆分 Context\n\n- 保持 value 引用稳定\n\n- 在复杂场景中配合 selector 或状态管理库使用",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-41",
+          "title": "React Fiber 是什么? 说说 fiber 架构的工作原理?",
+          "content": "React Fiber 本质上是 **React 的新协调（reconciliation）架构**，它解决的核心问题只有一个：  \n**让渲染过程从“同步、不可中断”，变成“可中断、可恢复、可调度”。**\n\n在 Fiber 之前（Stack Reconciler），React 渲染是一次深度递归：\n\n- 一旦开始 render，就必须把整棵组件树算完\n\n- 过程中无法中断\n\n- 主线程被长期占用，容易造成掉帧、输入卡顿\n\nFiber 引入之后，React 把“一次 render”拆成了很多**以 Fiber Node 为单位的小任务**。\n\n从结构上看：\n\n- 每个组件实例对应一个 Fiber Node\n\n- Fiber Node 同时是：\n  \n  - 组件的“数据结构表示”\n  \n  - 一个“工作单元（work unit）”\n\n从执行模型上看：\n\n- render 阶段不再是递归，而是**可暂停的循环**\n\n- React 每处理完一个 Fiber，就判断：\n  \n  - 时间片是否用完\n  \n  - 是否有更高优先级任务\n\n- 如果需要，就中断当前渲染，稍后从中断点继续\n\n一句话总结 Fiber 的工作原理：**把一次大而不可控的渲染任务，拆成很多可调度的小任务，由 React 自己掌控执行节奏。**",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-42",
+          "title": "为什么 react 需要 fiber 架构，而 Vue 却不需要?",
+          "content": "React 需要 Fiber，而 Vue 不需要，本质原因是两者的更新模型不同。\n\nVue 是**以数据为核心的响应式系统**，通过依赖收集和发布订阅机制，精确地知道哪些组件、哪些计算属性依赖了某个数据，因此在数据变化时，可以直接定位到需要更新的最小范围，更新路径是明确且可控的。\n\n而 React 是**以组件为核心的更新模型**，当组件状态发生变化时，默认会从该组件开始，重新执行组件函数，并向下递归子组件来计算新的 UI，这在组件树很大时，可能会形成一次耗时很长的渲染任务。\n\n在 Fiber 架构之前，React 的 reconciler 是同步、不可中断的，一旦开始渲染，就会一直占用主线程，容易造成页面卡顿，影响用户输入和滚动等交互。\n\nFiber 架构的核心作用是把一次大的渲染任务拆分成多个以 Fiber 节点为单位的小任务，引入时间切片和优先级调度机制，在 render 阶段可以随时中断，把执行权交还给浏览器，等空闲时再继续执行，而 commit 阶段则一次性提交所有副作用，保证 UI 一致性。\n\n所以总结来说，**React 由于组件级整体更新的特性，需要 Fiber 来解决可中断调度的问题，而 Vue 基于依赖追踪的更新模型，本身不需要这种级别的调度体系。**",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-43",
+          "title": "讲讲 React Fiber 是如何实现更新过程可控的",
+          "content": "“可控”是 Fiber 的核心价值，具体体现在 **三件事** 上：\n\n1. 第一，渲染任务可拆分（incremental work）\n\nFiber 把渲染拆成一个个 Fiber Node：\n\n- 每个 Fiber 只做很小的一步工作\n\n- React 可以在任意 Fiber 节点处暂停\n\n这让 React 能避免“长时间霸占主线程”。\n\n2. 第二，渲染过程可中断、可恢复\n\n在 render 阶段：\n\n- React 使用 `workInProgress` Fiber 树\n\n- 每完成一个 Fiber，就记录当前进度\n\n- 一旦被打断，下次可以从中断的 Fiber 继续，而不是重来\n\n这是 Fiber 和旧架构**本质上的差异**。\n\n3. 第三，render 和 commit 严格分离\n\nFiber 明确区分两个阶段：\n\n- **render 阶段**：\n  \n  - 纯计算\n  \n  - 可中断\n  \n  - 不产生副作用\n\n- **commit 阶段**：\n  \n  - 一次性提交 DOM\n  \n  - 不可中断\n  \n  - 保证 UI 一致性\n\n这种分离，是 React 能做并发调度的前提。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-44",
+          "title": "react 如何确定具体场景的执行优先级",
+          "content": "React 的优先级系统在 Fiber 中是通过 **Lane 模型 + Scheduler** 实现的。\n\n1. Lane：优先级的“数据表示”\n\n每一次更新（setState）都会被分配一个 lane：\n\n- lane 是一个 bitmask\n\n- 不同 lane 表示不同紧急程度\n  \n  - 同步输入（点击、输入）\n  \n  - 动画\n  \n  - 普通更新\n  \n  - transition\n  \n  - idle\n\nlane 的本质作用是：**告诉 React：这个更新有多急，能不能等。**\n\n2. Scheduler：优先级的“执行者”\n\nScheduler 会：\n\n- 收集当前所有 pending updates\n\n- 根据 lane 决定：\n  \n  - 先执行哪个\n  \n  - 哪些可以合并\n  \n  - 是否可以打断当前 render\n\nReact 会优先保证输入响应，而不是把时间花在低优先级渲染上。\n\n3. 场景优先级的来源\n\n优先级的来源主要包括：\n\n- 更新发生的上下文（事件、transition）\n\n- 开发者显式标记（如 `startTransition`）\n\n- 内部默认策略（如初次渲染、同步更新）\n\nReact 18 的并发特性，本质上就是**开发者可以参与优先级标注**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-45",
+          "title": "fiber 怎么进行任务的终止和恢复的？为什么不直接使用 requestldleCallback?",
+          "content": "React Fiber 通过把一次渲染拆分成多个小的工作单元（Fiber Node），使渲染过程变成**可中断、可恢复的增量执行过程**。\n\n在渲染阶段，React 每次只处理一个 Fiber 节点，处理完成后会判断当前时间片是否用尽，如果有更高优先级任务或者时间不够，就主动让出主线程。\n\n中断时，React 会保存当前的 `workInProgress Fiber`，等下次调度继续从这个 Fiber 节点开始执行，而不是从头重新渲染整棵树。\n\nReact 并不是直接依赖浏览器调度，而是自己实现了一套 Scheduler。 通过 MessageChannel 来创建一个**稳定、可控、优先级更高的异步调度入口**，用来触发一次新的调度循环，而不是用来通信任务完成状态。\n\nrequestIdleCallback 的最大问题是： **调度时机完全由浏览器决定，React 无法精确控制优先级和执行时长。** 回调时机不可预测：浏览器“觉得”空闲才会调用，在动画、输入密集时可能长期不执行\n优先级控制能力弱：只区分是否空闲而没有优先级\n与 React 的调度模型不匹配：React 需要在不同优先级任务之间频繁切换，rIC 不适合高频、精细的任务切分\n\n总结：Fiber 的本质是把同步、不可中断的递归渲染，改造成基于 Fiber Node 的可中断工作流；React 通过自建 Scheduler 控制调度节奏，而不是把渲染节奏完全交给浏览器。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-46",
+          "title": "详细说说 fiber 架构的 commit 阶段过程",
+          "content": "commit 阶段的核心特征只有一句话：  \n**不可中断，一次性提交所有副作用。**\n\ncommit 阶段通常分为 **三个子阶段**：\n\n1. 第一阶段：before mutation\n\n这一阶段主要做两件事：\n\n- 执行 `getSnapshotBeforeUpdate`\n\n- 读取 DOM 状态（在 DOM 变更之前）\n\n这是给类组件和部分底层逻辑用的。\n\n2. 第二阶段：mutation\n\n这是 commit 的核心阶段：\n\n- 执行 DOM 插入、更新、删除\n\n- 更新 ref\n\n- 执行 layout effect 的 cleanup（旧的）\n\n所有 DOM 变更都发生在这里，而且**顺序是严格保证的**。\n\n3. 第三阶段：layout\n\n在 DOM 已经更新完成后：\n\n- 执行 `useLayoutEffect`\n\n- 执行 class 组件的 `componentDidMount / componentDidUpdate`\n\n这一阶段仍然是同步的，会阻塞浏览器绘制。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-47",
+          "title": "详细说说 fiber 架构的 render 阶段过程",
+          "content": "render 阶段是 **Fiber 的核心工作阶段**，特点是：  \n**纯计算、可中断、不触碰 DOM。**\n\n整个过程可以理解为一个循环，而不是递归。\n\n1. beginWork（向下）\n- 从 root Fiber 开始\n\n- 对每个 Fiber 执行 `beginWork`\n\n- 根据 props/state 计算子 Fiber\n\n- 标记副作用（flags）\n\n这是“向下构建 Fiber 树”的过程。\n\n2. completeWork（向上）\n- 当一个 Fiber 的子节点处理完成\n\n- 执行 `completeWork`\n\n- 收集子节点的副作用\n\n- 构建 effect list（flags 链）\n\n这是“向上归并结果”的过程。\n\n3. 可中断点\n\n在任意一个 Fiber 处理完成后：\n\n- React 都可以检查时间片\n\n- 如果需要：\n  \n  - 暂停 render\n  \n  - 把控制权还给浏览器\n  \n  - 之后从当前 Fiber 继续\n4. render 阶段的产出\n\nrender 阶段的最终产物是：\n\n- 一棵 **workInProgress Fiber Tree**\n\n- 一份完整的副作用描述（flags）\n\n但 **不会产生任何真实 DOM 变更**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-48",
+          "title": "react 如何实现时间切片",
+          "content": "时间切片（Time Slicing）本质上是：  **把一次长时间占用主线程的渲染任务，拆成多个短任务，在合适的时机主动让出主线程。**\n\nReact 能实现时间切片，靠的是 **Fiber + Scheduler + cooperative scheduling（协作式调度）** 这一整套机制。\n\n**第一步：把渲染任务拆成最小工作单元**\n\n在 Fiber 架构下：\n\n- 每一个 Fiber Node 就是一个**最小可执行单元**\n\n- render 阶段不再是递归调用，而是一个循环\n\n- 每处理完一个 Fiber，React 都有机会“停下来看看要不要继续”\n\n这是时间切片的**结构前提**。  \n如果还是递归，一次函数调用栈跑完，根本没有中断点。\n\n**第二步：在 render 阶段引入“可让出点”**\n\nReact 在 render 阶段，每完成一个 Fiber 的 `beginWork / completeWork` 后，都会检查：\n\n- 当前时间是否超过了本次分配的时间片\n\n- 是否有更高优先级的任务（如用户输入）\n\n一旦判断“该让出主线程了”：\n\n- 当前 render 立即暂停\n\n- 保存当前 `workInProgress` 指针\n\n- 把控制权还给浏览器（让输入、动画先执行）\n\n**第三步：通过 Scheduler 决定何时继续**\n\nReact 并不是随便继续渲染的，而是通过 Scheduler：\n\n- 把剩余的 Fiber 工作挂到一个任务队列里\n\n- 等浏览器空闲、或者当前优先级允许时\n\n- 从上一次中断的 Fiber 继续执行，而不是重头开始\n\n这一步的关键在于：  \n**render 阶段是可恢复的**，这是 Fiber 架构才能做到的事情。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-49",
+          "title": "fiber 为什么是性能飞跃",
+          "content": "Fiber 被称为性能飞跃，不是因为“单次渲染更快”，而是因为**性能模型发生了根本变化**。\n\n可以从三个层面理解。\n\n**第一，Fiber 解决的是“卡顿问题”，不是“跑得快不快”**\n旧架构的问题不是平均性能，而是**最坏情况**：\n- 一次更新渲染几百个组件\n- 主线程被占用几十毫秒\n- 用户输入、滚动直接卡死\nFiber 的价值在于：  \n👉 **把不可控的长任务，变成可控的短任务**\n这直接提升的是**交互稳定性**，而不是 benchmark 分数。\n\n**第二，Fiber 让“优先级”成为调度原则**\n在 Fiber 之前：\n- 更新基本是 FIFO\n- 用户输入和低优先级更新没有本质区别\nFiber 之后：\n- 每个更新都有优先级（lane）\n- 高优先级更新可以打断低优先级渲染\n- 非紧急更新可以被延后甚至丢弃重算\n这让 React 能做到：  \n**页面再复杂，也优先保证用户交互不卡。**\n\n**第三，Fiber 为并发能力打开了天花板**\nFiber 本身不是并发，但它是并发的**必要前提**。\n没有 Fiber：\n- render 不可中断\n- 无法调度\n- 不可能并发\n有了 Fiber：\n- render 可暂停、可恢复\n- Scheduler 可以插队、合并、延迟\n- 才有 React 18 的并发渲染、自动批处理、transition\n\n**一句话总结 Fiber 为什么是性能飞跃**：Fiber 的性能飞跃不在于加快一次渲染，而在于把渲染从同步、不可控的长任务，变成可调度、可中断的工作流，从而在复杂场景下保证交互优先级和系统稳定性，这也是 React 并发能力的基础。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-50",
+          "title": "redux 的使用原则",
+          "content": "我理解 Redux 的使用原则可以总结为三点：**该不该用、怎么用、用到什么程度**。\n\n第一，**不是所有状态都适合放 Redux**。  \nRedux 主要解决的是**跨组件、跨页面、生命周期长、需要可预测性的状态**，比如用户信息、权限、全局配置、复杂业务流程状态。  \n组件内部 UI 状态、临时状态，用 Redux 反而会增加复杂度。\n\n第二，**Redux store 里的状态必须是“业务状态”**。  \n不要把派生状态、纯 UI 状态、一次性状态塞进 store，否则 reducer 会变得难以维护。\n\n第三，**更新路径必须可追踪、可预测**。  \nRedux 的核心价值在于“状态变更有明确入口”，如果 dispatch 到处乱飞、action 语义混乱，Redux 的优势会被完全抵消。\n\n一句话原则是：\n\n> Redux 用来管理“重要且复杂的共享状态”，而不是“所有状态”。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-51",
+          "title": "说说 Redux 的核心方法和工作流程",
+          "content": "Redux 的核心其实非常少，主要就是 **store、action、reducer** 这三件事。\n\n从工作流程看是一个**严格的单向数据流**：\n\n1）UI 触发一个 action（一个普通对象，描述发生了什么）  \n2）action 被 dispatch 到 store  \n3）store 调用 reducer，传入旧 state 和 action  \n4）reducer 根据 action 返回一个新的 state  \n5）store 保存新 state，并通知所有订阅者  \n6）UI 读取最新 state，重新渲染\n\n这里有两个非常关键的点：\n- reducer 必须是**纯函数**\n- state 必须是**不可变更新**\n\n正是这两个约束，保证了 Redux 的可预测性和可调试性。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-52",
+          "title": "redux 的优缺点",
+          "content": "Redux 的优点：\n第一，**状态可预测、可追溯**。  \n所有状态变化都通过 action 发生，时间线非常清晰，调试和回溯成本低。\n第二，**适合复杂业务状态**。  \n当状态更新逻辑变复杂时，Redux 反而更清晰，因为规则都集中在 reducer 里。\n第三，**生态成熟**。  \n中间件、调试工具、最佳实践非常完善。\n\n但缺点也同样明显：\n第一，**样板代码多**。  \naction、reducer、types，一旦规模不控制，很容易膨胀。\n第二，**心智负担偏重**。  \n对简单场景来说，Redux 明显是“重武器”。\n\n所以 Redux 非常适合复杂中大型项目，但并不适合所有项目。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-53",
+          "title": "说说对 Redux 中间件的理解？常用的中间件有哪些？实现原理？",
+          "content": "Redux 中间件的本质是：  \n**在 dispatch action 和 reducer 处理 action 之间，插入一层可扩展的拦截逻辑**。\n\n常见中间件包括：\n- `redux-thunk`：支持 action 返回函数\n- `redux-saga`：用 generator 处理复杂异步流程\n- `redux-logger`：日志和调试\n- `redux-promise`：处理 Promise action\n\n实现原理并不复杂：  \nRedux 在创建 store 时，会把原始的 `dispatch` 包装成一层层函数链，每个中间件都可以：\n- 拦截 action\n- 执行额外逻辑\n- 决定是否、何时、以什么形式继续 dispatch\n\n所以中间件解决的是：  \n**扩展 Redux 能力，但不污染 reducer 纯度**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-54",
+          "title": "Redux 中异步的请求怎么处理",
+          "content": "Redux 本身是同步的，不支持直接在 reducer 里做异步。\n\n处理异步主要有三类方案：\n第一类，**Thunk 模式**。  \naction 返回一个函数，在函数里做异步请求，完成后再 dispatch 普通 action，适合简单异步。\n第二类，**Saga 模式**。  \n通过 generator + effect 描述异步流程，更适合复杂的并发、取消、重试场景。\n第三类，**请求层与 Redux 解耦**。  \n比如请求在组件或 service 层完成，只把结果 dispatch 进 Redux，这在工程实践中非常常见。\n\n选择哪种，取决于**异步复杂度**，而不是“哪个更高级”。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-55",
+          "title": "React 中组件之间进行数据通信有哪些方式？",
+          "content": "从低到高大致可以分几层：\n\n第一，**props 传递**，父子组件最基本方式  \n第二，**回调函数**，子组件向父组件通信  \n第三，**Context**，解决跨层级传参  \n第四，**全局状态管理（Redux、Zustand 等）**  \n第五，**外部事件系统 / pub-sub**，极少数特殊场景\n\n原则是：\n\n> 优先选择最简单的通信方式，复杂度不够时再升级方案。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-56",
+          "title": "对比 redux 和 zustand",
+          "content": "Redux 和 Zustand 的核心差异，不在 API，而在**设计目标和约束强度**。\n\n**Redux 的定位是“强约束的全局状态管理方案”**：\n- 单一 store、单向数据流\n- 所有状态变化必须通过 action → reducer\n- 强调可预测性、可追溯性、可调试性\n这使得 Redux 非常适合：\n- 复杂业务状态\n- 状态变更规则多、流程长\n- 多人协作、长期维护的项目\n代价也很明显：\n- 样板代码多\n- 心智负担重\n- 简单场景下显得过度设计\n\n**Zustand 的定位是“轻量、贴近 React 的状态容器”**：\n- 基于 hook\n- 没有 reducer、action 的强制约束\n- 按需订阅，更新粒度细\nZustand 更像是： “一个可共享的 useState + useCallback 集合”\n它非常适合：\n- 中小规模项目\n- 对开发效率和简洁性要求高的场景\n\n总结一句话：\n- **Redux 用规则换确定性**\n- **Zustand 用自由换效率**\n\n在实际工程中，我更倾向于：\n- 复杂业务核心状态 → Redux\n- 中小型项目，强调开发效率 → Zustand",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-57",
+          "title": "React 中组件之间进行数据通信有哪些方式？",
+          "content": "我一般会按**“通信距离 + 状态生命周期”**来回答。\n\n第一层，**父子组件**：\n- props 向下传递\n- 回调函数向上传值  \n    这是最基本、也是最推荐的方式。\n\n第二层，**兄弟组件 / 跨层级组件**：\n- 状态提升到最近的公共父组件\n- 再通过 props 分发\n\n第三层，**Context**：\n- 解决 props drilling\n- 适合低频变化、全局性数据（主题、权限、配置）\n- 缺点是：Context 更新会导致所有消费组件重新 render，粒度比较粗。\n\n第四层，**全局状态管理**：\n- Redux、Zustand、MobX 等\n- 用于生命周期长、影响范围广的状态\n\n核心原则是： **优先用最近、最局部的通信方式，复杂度不够时再升级方案。**",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-58",
+          "title": "说说 react 的事件代理机制原理和优缺点",
+          "content": "React 的事件系统是**合成事件（Synthetic Event）机制**，核心是**事件代理**。\n\n**原理**上：\n- React 并不会在每个 DOM 节点上绑定事件\n- 而是把事件统一绑定在**根节点（React 17 之后是 root container）**\n- 事件触发后，通过事件冒泡捕获到根节点\n- React 再根据 Fiber 树，模拟捕获和冒泡阶段，分发给对应组件的事件处理函数\n\n**优点**：\n- 性能稳定，避免大量事件监听\n- 事件系统一致，跨浏览器行为统一，框架统一处理浏览器兼容性\n- React 可以完全控制事件触发时机和优先级，为批量更新、优先级调度提供基础\n\n**缺点**：\n- 事件不完全等同于原生事件\n- 在极端场景（如 document 级别监听）下可能产生困惑\n- 需要理解合成事件与原生事件的差异（如事件对象复用、时机差异）",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-59",
+          "title": "说说 react 事件和浏览器原生事件执行先后顺序，为什么？",
+          "content": "这个问题的关键在于：  \n**React 事件本质上是绑定在 react 根元素上（在 React 17 之后）的原生事件监听器。**\n\n在同一个元素上挂载的事件，顺序是：\n- → **React 捕获阶段事件**\n- → **原生捕获阶段事件**\n- → **React 冒泡阶段事件**\n- → **原生冒泡阶段事件**\n\n原因在于：\n- React 在 react oot container 上注册了原生事件监听\n- React 可以选择在捕获阶段或冒泡阶段拦截事件\n- 然后在内部模拟完整的捕获/冒泡流程",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-60",
+          "title": "react 的事件为什么要委托，有什么好处？",
+          "content": "React 之所以做事件委托，本质原因是：**React 需要一个“可控、统一、可调度”的事件入口**，而不是简单的性能优化。\n\n从实现上看，React 并不会在每个 DOM 节点上绑定事件，而是：\n- 在根节点（React 17 之后是 root container）\n- 统一注册一组原生事件监听\n- 事件触发后，再由 React 自己根据 Fiber 树分发给对应组件\n\n这样做有几个关键好处：\n\n第一，**统一事件模型，屏蔽浏览器差异**  \nReact 的合成事件层可以抹平不同浏览器在事件对象、冒泡行为上的差异，保证行为一致。\n\n第二，**为批量更新和调度提供控制点**  \n事件回调是 React 非常重要的“更新边界”。  \n通过委托，React 可以在事件回调结束后，统一做 batching、优先级调度，而不是被分散在各个 DOM listener 里。\n\n第三，**避免大量事件监听带来的管理成本**  \n在复杂应用中，组件频繁挂载、卸载，如果每个节点都绑事件，清理和维护成本非常高。  \n集中委托让事件生命周期和 React 树保持一致。\n\n所以总结一句话： React 做事件委托，不只是为了少绑事件，而是为了**完全掌控事件 → 更新 → 渲染这一整条链路**。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-61",
+          "title": "react 事件委托如何解决模态框的事件冒泡？",
+          "content": "这个问题其实考的是：**“React 里的事件冒泡，是按 DOM 树，还是按 React 树？”**\n答案是：  **React 的事件冒泡是按 React Fiber 树，而不是 DOM 树。**\n\n在模态框（Modal）场景中，经常是：\n- Modal 的 DOM 被渲染到 `document.body`（通过 Portal）\n- 但在 React 组件结构上，它仍然是某个父组件的子节点\n\nReact 的做法是：\n- 原生事件先在真实 DOM 上冒泡到 root\n- React 拿到事件后\n- **根据 Fiber 树关系重新模拟捕获和冒泡**\n\n因此即使 Modal 的 DOM 在 body 下：\n- React 仍然能正确判断它“逻辑上属于谁”\n- 冒泡顺序仍然符合组件层级预期\n\n总结：React 通过“事件委托 + Fiber 映射”，把**DOM 位置和组件层级解耦**了。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-62",
+          "title": "react 17 之后的事件机制有什么区别？",
+          "content": "React 17 的事件系统变化是一个**非常典型的架构级调整**，**最关键的变化只有一个**：  **事件不再委托到 `document`，而是委托到 root container。**\n\n在 React 16 及之前：\n- 所有 React 事件都绑定在 `document` 上\n- 多个 React 应用会共享同一套事件系统\n在 React 17 之后：\n- 事件绑定在 `createRoot` 对应的容器上\n- 每个 React 应用拥有独立的事件系统\n\n这样改的核心原因是：\n第一，**支持多个 React 版本共存**  \ndocument 级别委托会导致不同版本的 React 互相干扰。\n\n第二，**降低对全局环境的侵入性**  \nReact 不再“劫持”整个 document，更像一个普通应用。\n\n第三，**为并发特性和渐进升级铺路**  \n事件边界更清晰，调度模型更容易控制。\n\n这次改动对业务代码几乎无感，但对架构非常关键。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-63",
+          "title": "子组件 portal 能冒泡到父组件吗？",
+          "content": "结论先给： **能，React 事件可以，原生事件不行。**\n\n更准确地说：\n- **React 合成事件：可以冒泡到逻辑父组件**\n- **原生 DOM 事件：只按真实 DOM 结构冒泡**\n\n原因在于：  \nReact 的事件冒泡是基于 **Fiber 树**，而不是 DOM 树。\nPortal 的特点是：\n- DOM 节点被插入到别的地方（比如 body）\n- 但 Fiber 关系不变\n\n所以：\n- React 在事件分发阶段\n- 会“无视 DOM 位置”\n- 按组件层级模拟冒泡\n\n这也是为什么在 Portal 场景下：\n- `e.stopPropagation()` 有时要特别注意\n- 原生事件和 React 事件的行为可能不同 \n\n一句话总结就是： Portal 打破的是 DOM 层级，不是 React 的组件层级。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-64",
+          "title": "Redux 中的 connect 有什么作用?",
+          "content": "Redux 中的 `connect` 是一个高阶组件，用来把 Redux 的 store 和 React 组件连接起来。\n\n它的核心作用有三个：  \n第一，通过 `mapStateToProps` 精准地选取组件真正依赖的状态，并在这些状态发生变化时才触发组件更新，从而避免不必要的重渲染。  \n第二，通过 `mapDispatchToProps` 封装 dispatch，让组件只关心业务行为，而不直接依赖 Redux 的实现细节。  \n第三，`connect` 内部自动完成 store 的订阅和取消订阅，简化了组件的生命周期管理。\n\n本质上，`connect` 起到的是**状态管理层和视图层之间的桥梁作用**。  \n在 Hooks 出现后，`useSelector / useDispatch` 在使用体验上更直观，但 `connect` 在性能可控性和老项目中依然很常见。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-65",
+          "title": "说说你对 immutable 的理解？如何应用在 React 项目中",
+          "content": "Immutable 的核心思想是：**数据一旦创建就不被修改，任何变更都会生成一个新的引用**。\n\n在 React 中它的价值主要体现在两点：\n\n1. **状态可预测**：避免隐式修改带来的副作用，数据流更清晰\n\n2. **性能优化基础**：通过引用变化配合 `===`、`memo`、`PureComponent`、`shouldComponentUpdate` 实现高效更新判断\n\n实际应用方式包括：\n\n- 遵守不可变更新原则（展开运算符、slice、map 等）\n\n- 在复杂嵌套结构中使用工具库（如 Immer）降低心智成本\n\n- 配合 Redux / React.memo / useMemo 做更新边界控制\n\n需要注意的是，immutable 是**手段而不是目的**，在性能敏感或结构简单的场景下不必过度追求。",
+          "hasAnswer": true
+        },
+        {
+          "id": "react-66",
+          "title": "RSC react server component",
+          "content": "React Server Components 是 React 提出的 **一种让部分组件只在服务器端执行的渲染模式**\n它不是传统意义上的 SSR（Server-Side Rendering）那样生成完整 HTML，而是：\n\n**在服务器执行组件逻辑，把渲染结果以特殊协议序列化成数据流发送给客户端，客户端再把这些数据解释成 UI。**\n\n核心特点：\n\n- 组件代码 **永远不发送到客户端**（不会打包到 bundle 里）。\n- 只能运行在服务器上，不能使用浏览器 API 和交互 Hooks（如 `useState`, `useEffect`）。主要用于数据密集型、展示型的 UI。\n- 主要用于数据密集型、展示型的 UI。\n\n这就能让 React 应用更“轻巧、高效、按需加载”。\n\n| 渲染方式        | JS 发送到客户端       | 数据获取模式         | 互动能力                 |\n| ----------- | --------------- | -------------- | -------------------- |\n| CSR (客户端渲染) | 全组件 JS          | 客户端请求 API      | 强                    |\n| SSR (服务端渲染) | 全组件 JS + HTML   | 服务端预取数据 → HTML | 交互需要 hydrate         |\n| **RSC**     | **只发送必要的交互 JS** | 服务器直接数据访问      | 交互需 Client Component |\n\nReact Server Components 是一种服务器执行的组件模式，它让 UI 的渲染和数据获取在服务端完成，只把 UI 结构通过序列化协议发送给客户端，从而减少 JS bundle、提高性能并简化数据获取，同时和交互组件协同工作，适配复杂应用。\n\n**RSC 适合：数据驱动、多页面/大列表/复杂查询、多数据源聚合，但客户端交互较轻**的页面。\n\n**不适合：交互复杂、状态频繁变化、强实时响应**的组件。",
+          "hasAnswer": true
+        }
+      ]
+    },
+    {
+      "id": "vue",
+      "name": "Vue",
+      "questions": [
+        {
+          "id": "vue-1",
+          "title": "Vuex 的核心概念和工作流程",
+          "content": "**State** 单一状态树，存储应用的全部状态，作为\"唯一数据源\"。\n\n**Getter** 类似于计算属性，用于从 State 派生出新状态，具有缓存特性。\n\n**Mutation** 唯一允许修改 State 的方法。必须是**同步**函数，便于 DevTools 追踪状态变化。\n\n**Action** 负责提交 (`commit`) Mutation，可以包含**异步**操作或复杂的业务逻辑。\n\n**Module** 将 Store 分割成模块，每个模块拥有自己的 State、Getter、Mutation、Action，支持命名空间 (`namespaced: true`)。\n\nVuex 的数据流是**单向**的，遵循以下流程：\n\n1. **View (视图)**：用户在组件中触发一个操作。\n\n2. **Dispatch (分发)**：组件通过 `store.dispatch('actionName', payload)` 提交一个 **Action**。\n\n3. **Action (动作)**：Action 执行异步逻辑（如 API 调用）。一旦数据准备好，Action 会通过 `store.commit('mutationName', payload)` 提交一个 **Mutation**。\n\n4. **Commit (提交)**：**Mutation** 是唯一能修改 **State** 的地方。它同步地修改状态。\n\n5. **State (状态)**：状态被更新。\n\n6. **Render (渲染)**：由于 State 是响应式的，所有依赖此 State 的 **View** 组件会自动更新。",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-2",
+          "title": "对比 Vuex 和 Pinia",
+          "content": "**Vuex** 是 Vue 2 时代的官方状态管理库，采用 Flux 架构，强调**单向数据流**和**严格的状态修改规范**（必须通过 Mutation）。适合大型项目，但模板代码较多，TS 支持需要额外配置。\n\n**Pinia** 是 Vue 3 官方推荐的状态管理库，可视为 Vuex 5。设计更简洁，去掉了 Mutation，原生支持 TypeScript，每个 Store 独立无需命名空间。\n\n| 特性         | Vuex                            | Pinia                               |\n| ---------- | ------------------------------- | ----------------------------------- |\n| 核心概念       | State, Getter, Mutation, Action | State, Getter, Action (去掉 Mutation) |\n| 修改状态       | 必须通过 Mutation（同步）               | Action 中直接修改 State                  |\n| TypeScript | 需要额外类型声明，配置繁琐                   | **原生支持**，类型自动推导                     |\n| 模块化        | 嵌套 Module，需要 `namespaced: true` | **独立 Store 实例**，按需导入，无需命名空间         |\n| 体积         | ~10KB                           | **~1KB**，更轻量                        |\n| DevTools   | 支持                              | 支持，体验更好                             |\n| SSR        | 需要额外配置                          | 开箱即用                                |\n| API 风格     | Options API 风格                  | 同时支持 Options 和 Composition API      |\n\n**选型建议**：\nVuex 和 Pinia 更像官方状态管理的代际更替：Vue3 之后组合式 API 和 TS 成为主流，Pinia 在类型推导、样板代码、store 组织方式上都更契合官方心智，而且是官方推荐路线；Vuex 主要保留在存量项目或迁移成本高的场景，新项目默认 Pinia 风险最低。",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-3",
+          "title": "响应式开发比命令式开发有什么优势？",
+          "content": "1. **声明式编程**：只需描述**状态与视图的映射关系**，无需手动操作 DOM，代码更易读易维护。\n\n2. **自动更新**：状态变化时，框架自动处理 DOM 更新，开发者无需关心\"何时更新、更新哪里\"。\n\n3. **高效渲染**：Virtual DOM + Diff 算法，**精确计算最小 DOM 变化集**，避免不必要的 DOM 操作。\n\n4. **减少 Bug**：手动 DOM 操作容易遗漏或出错，响应式系统保证状态与视图一致性。\n\n5. **组件化开发**：状态封装在组件内部，提高代码复用性和可测试性。",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-4",
+          "title": "什么是装饰器？在 Vue 中怎么用？",
+          "content": "装饰器 (Decorator) 是一种特殊的声明，用于**修改类或类成员的行为**，本质是一个函数。\n\n**在 Vue 中的应用**（主要是 Vue 2 + TypeScript）：\n\n```typescript\nimport { Component, Prop, Watch } from 'vue-property-decorator';\n\n@Component\nexport default class MyComponent extends Vue {\n  @Prop({ default: '' }) readonly title!: string; // 声明 props\n\n  @Watch('title') // 监听属性变化\n  onTitleChange(val: string) {}\n}\n```\n\n**Vue 3 现状**：Composition API 已取代装饰器方案，官方不再推荐使用装饰器。原因：\n\n- Composition API 提供更好的类型推导\n- 装饰器提案尚未稳定\n- 函数式组合比类继承更灵活",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-5",
+          "title": "如何保持组件状态、避免重复渲染？（keep-alive）",
+          "content": "主要通过 Vue 的内置抽象组件 **`<keep-alive>`** 来实现。\n\n作用： ` <keep-alive>` 包裹动态组件或路由组件时，会**缓存不活动的组件实例**，而不是销毁它们。这可以避免组件在切换时被重复创建和渲染，从而**保持组件的状态**（如表单输入内容、滚动位置等），并提升性能。\n\n实现原理与钩子函数\n\n1. **缓存机制**：内部使用 `Map` 缓存 VNode，key 为组件名或自定义 key。\n\n2. **生命周期变化**：缓存后 `unmounted`/`destroyed` 不会触发，新增两个钩子：\n   \n   - **`activated()`**：组件被激活时（切换进来）触发\n   - **`deactivated()`**：组件被停用时（切换出去）触发\n\n3. **常用属性**：\n   \n   - `include`：只缓存匹配的组件（字符串/正则/数组）\n   - `exclude`：排除匹配的组件\n   - `max`：最大缓存数量，超出时使用 **LRU 算法**淘汰最久未使用的\n\n```html\n<keep-alive :include=\"['Home', 'List']\" :max=\"10\">\n  <router-view />\n</keep-alive>\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-6",
+          "title": "Vue 2 和 Vue 3 响应式原理的区别？为什么改用 Proxy？",
+          "content": "| 对比项  | Vue 2 (Object.defineProperty) | Vue 3 (Proxy)   |\n| ---- | ----------------------------- | --------------- |\n| 初始化  | 递归遍历所有属性，开销大                  | **惰性处理**，访问时才递归 |\n| 新增属性 | ❌ 无法检测，需用 `$set`              | ✅ 自动响应          |\n| 删除属性 | ❌ 无法检测，需用 `$delete`           | ✅ 自动响应          |\n| 数组索引 | ❌ 无法检测 `arr[0] = x`           | ✅ 自动响应          |\n| 数组长度 | ❌ 无法检测 `arr.length = 0`       | ✅ 自动响应          |\n\n**Vue 3 改用 Proxy 的原因**：\n\n1. **功能更全面**：Proxy 可拦截 13 种操作（get/set/delete/has/ownKeys 等）\n2. **性能更优**：惰性响应式，减少初始化开销\n3. **代码更简洁**：无需为数组方法打补丁",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-7",
+          "title": "Vue 的渲染过程（模板 → DOM）",
+          "content": "总结：\n\n初次：1 编译模板（解析 AST+标记+生成渲染函数）2 执行渲染函数生成 VDOM 3 渲染\n\n后续数据更新：1 执行渲染函数生成新 VDOM 2 diff 获得 patch 3 更新 DOM\n\n阶段一：模板编译 (Template Compilation)\n\n1. **解析 (Parse)**：将 HTML 模板字符串解析成抽象语法树 (AST - Abstract Syntax Tree)。AST 是一种用 JavaScript 对象来描述模板结构的树形结构。\n\n2. **优化 (Optimize)**：遍历 AST，标记静态节点 (Static nodes)。静态节点是指内容不会变化的节点。Vue 在后续的 Diff 过程中会跳过这些节点，**大幅提高性能**。\n\n3. **代码生成 (Generate)**：将优化后的 AST 转换成 **Render Function (渲染函数)**。渲染函数返回的就是 VNode (Virtual Node) 树。\n\n阶段二：创建虚拟 DOM (Virtual DOM Creation)\n\n1. **首次渲染**：执行第一步生成的 **Render Function**，它返回一棵 **VNode Tree (虚拟 DOM 树)**。\n\n阶段三：渲染和更新 (Patching & DOM Update)\n\n1. **首次渲染**：将 VNode Tree 转换成真实的 DOM 元素，并插入到页面中。同时，Vue 将这棵 VNode Tree 保存为 `oldVNode`。\n\n2. **数据更新**：响应式数据发生变化时，会触发组件的 Watcher，重新执行 Render Function，生成一棵 **`newVNode` Tree**。\n\n3. **比对 (Patch)**：Vue 运行 **Diff 算法**（Patch 过程），将 `newVNode` 与 `oldVNode` 进行递归比对。\n\n4. **最小化 DOM 操作**：Diff 算法找出两棵树之间**最小的差异集**。\n\n5. **更新 DOM**：Vue 只对这些有差异的真实 DOM 节点进行必要的创建、更新、移动或删除操作，从而完成视图更新。",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-8",
+          "title": "Vue Router 原理？Hash 和 History 模式的区别？",
+          "content": "Vue Router 的核心是监听 URL 的变化，并根据配置的路由映射表，动态地渲染对应的组件。\n\n1. **路由映射 (Route Mapping)**：定义 URL 路径 (`path`) 与组件 (`component`) 的映射关系。\n\n2. **监听 URL 变化**：根据配置的模式（Hash 或 History），监听浏览器地址栏 URL 的变化事件。\n\n3. **匹配路由**：当 URL 变化时，Router 捕获新 URL，并在路由映射表中查找匹配的配置。\n\n4. **渲染组件**：将匹配到的组件渲染到 `<router-view>` 占位符的位置上。\n\n| 对比项    | Hash 模式               | History 模式                       |\n| ------ | --------------------- | -------------------------------- |\n| URL 形式 | `example.com/#/user`  | `example.com/user`               |\n| 原理     | `window.onhashchange` | `history.pushState/replaceState` |\n| 服务器配置  | 无需配置                  | **需要配置回退**（所有路由返回 index.html）    |\n| SEO    | 不友好（爬虫忽略 # 后内容）       | 友好                               |\n| 兼容性    | 所有浏览器                 | IE10+                            |\n\n**导航守卫**（补充高频考点）：\n\n- `beforeEach`：全局前置守卫，常用于登录验证\n- `beforeResolve`：全局解析守卫\n- `afterEach`：全局后置钩子\n- `beforeEnter`：路由独享守卫\n- `beforeRouteEnter/Update/Leave`：组件内守卫",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-9",
+          "title": "如何自定义 Vue 指令？有哪些钩子函数？",
+          "content": "自定义指令用于对 DOM 元素进行**底层操作**，实现可复用的 DOM 行为。例如：自动获取焦点、权限控制、拖拽功能等。\n\n```js\n// main.js\nimport { createApp } from 'vue';\nimport App from './App.vue';\nconst app = createApp(App);\n\n// 注册一个全局自定义指令 v-focus\napp.directive('focus', {\n  // 元素挂载到 DOM 时调用\n  mounted(el) {\n    el.focus(); // 使元素自动获取焦点\n  },\n});\n\napp.mount('#app');\n\n//组件内用directives注册\n```\n\n**Vue 3 指令钩子函数**：\n\n- `created`：元素属性/事件监听器应用前\n- `beforeMount`：挂载前\n- `mounted`：挂载后（常用）\n- `beforeUpdate`：更新前\n- `updated`：更新后\n- `beforeUnmount`：卸载前\n- `unmounted`：卸载后\n\n**常见应用场景**：自动聚焦、权限控制（v-permission）、防抖点击、图片懒加载、拖拽",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-10",
+          "title": "Vue 应用性能优化有哪些方向？",
+          "content": "- **运行时性能优化 (Runtime Performance)**\n  \n  - **合理使用 `v-if` 和 `v-show`**：\n    \n    - **`v-if`**：真正销毁/重建组件，适用于不频繁切换的场景。\n    \n    - **`v-show`**：仅切换 CSS `display` 属性，适用于频繁切换的场景。\n  \n  - **`v-for` 必须使用 `key`**：帮助 Vue Diff 算法更高效地进行元素追踪和复用。\n  \n  - **使用 `v-once`**：对于内容不依赖数据的静态子树，使用 `v-once` 只渲染一次，避免了后续的更新开销。\n  \n  - **组件拆分和懒加载 (Async Components)**：将大组件拆分为小组件，并使用动态 `import()` 实现组件的按需加载。\n  \n  - 精准依赖，对 store 或外部属性，精准引入，依靠 vue 对响应式数据的优化\n  \n  - **大列表优化 (虚拟滚动/Virtual Scrolling)**：对于包含数千个项目的长列表，只渲染可见区域的 DOM，大幅减少 DOM 节点数量。\n  \n  - **合理使用 `computed` vs `watch`**：`computed` 具有缓存机制，只有依赖项变化时才会重新计算，比 `watch` 更高效。\n  \n  - **使用 Vue 3 的 `shallowRef` (如果可以)**：对于嵌套层级很深但我们只关心顶层引用的数据，使用 `shallowRef` 来减少不必要的深度响应式处理。\n\n- **加载性能优化 (Loading Performance)**\n  \n  - **图片优化**：WebP 格式、懒加载、响应式图片\n  \n  - **路由懒加载**：使用 `const route = () => import('./components/Path')`，将不同路由组件的代码分割成不同的 chunk，实现按需加载。\n  \n  - **第三方库按需引入**：如使用 Babel 插件或 Vite 插件，对 Element-UI/Plus、Ant Design Vue 等库进行按需导入，而不是全量导入。\n\n- **工程化优化**\n  \n  - **Tree Shaking**：确保使用 ES Module，移除未使用代码\n  \n  - **代码分割**：Webpack/Vite 的 splitChunks，合理拆分 vendor 和业务代码\n  \n  - **Gzip 压缩**：服务端开启压缩，减少传输体积\n  \n  - **CDN 加速**：静态资源上 CDN，利用边缘节点加速\n  \n  - **预加载/预获取**：`<link rel=\"prefetch/preload\">` 提前加载关键资源\n  \n  - **缓存策略**：合理配置 HTTP 缓存头，利用浏览器缓存",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-11",
+          "title": "项目中遇到过哪些 Vue 相关的难题？如何解决？",
+          "content": "**示例回答框架**（根据实际经验调整）：\n\n**场景 1：大列表性能问题**\n\n- 问题：渲染上万条数据导致页面卡顿\n- 方案：引入虚拟滚动（vue-virtual-scroller），只渲染可视区域 DOM\n- 效果：DOM 节点从 10000+ 降到 ~50，滚动流畅\n\n**场景 2：组件通信复杂**\n\n- 问题：多层嵌套组件间状态共享困难，props 层层传递\n- 方案：引入 Pinia 管理全局状态 + provide/inject 处理局部共享\n- 效果：代码解耦，维护性提升\n\n**场景 3：内存泄漏**\n\n- 问题：组件卸载后定时器/事件监听未清理\n- 方案：在 `onUnmounted` 中统一清理，封装 `useInterval` 等 hooks\n- 效果：内存占用稳定\n\n**回答技巧**：描述具体场景 → 分析原因 → 解决方案 → 量化效果",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-12",
+          "title": "nextTick 的作用和原理？",
+          "content": "**作用**：在下次 DOM 更新循环结束之后执行回调，确保操作的是最新 DOM。\n\n**原理**：\n\n1. Vue 的数据变化触发 DOM 更新是**异步批量**的（同一事件循环内的多次修改合并为一次更新）\n2. DOM 更新任务被推入**微任务队列**（优先使用 `Promise.then`，降级用 `MutationObserver`、`setImmediate`、`setTimeout`）\n3. `nextTick(callback)` 将回调推入同一个微任务队列，排在 DOM 更新之后执行\n\n**执行顺序**：数据变化 → Setter → 派发更新 → 收集 Watcher → **微任务队列**（DOM 更新 → nextTick 回调）\n\n**常见使用场景**：\n\n```javascript\nthis.show = true;\nthis.$nextTick(() => {\n  this.$refs.input.focus(); // 确保 DOM 已渲染\n});\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-13",
+          "title": "Vue 3 响应式丢失的原因和解决方案？",
+          "content": "常发生在解构（Destructuring）**或**展开（Spreading）响应式对象时。\n\n```javascript\nconst state = reactive({\n  count: 0, // 这是一个被 Proxy 追踪的属性\n  name: 'Alice',\n});\n\n// --- ❌ 错误做法：响应式丢失 ---\n// 解构：将 state.count 的原始值赋给了新的局部变量 count。\n// 这两个变量已经没有任何关联。\nconst { count, name } = state;\n```\n\n**解决方案**：\n\n```javascript\n// 方案1：使用 toRefs 保持响应式\nconst { count, name } = toRefs(state); // count.value 是响应式的\n\n// 方案2：直接引用，不解构\nstate.count;\n\n// 方案3：使用 toRef 获取单个属性\nconst count = toRef(state, 'count');\n```\n\n**延伸：ref vs reactive**\n\n- `ref`：用于基本类型，通过 `.value` 访问，解构不丢失响应式\n- `reactive`：用于对象/数组，直接访问属性，解构会丢失响应式\n\n**最佳实践**：统一使用 `ref`，或始终用 `toRefs` 解构 `reactive` 对象。",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-14",
+          "title": "ref和reactive有什么区别？为什么这样设计",
+          "content": "先给一个**本质层面的结论**：**reactive 是“面向对象的响应式”，ref 是“面向值的响应式”。** 两者解决的是**不同层级的问题**。\n1️. reactive：设计目标是 **让一个对象整体变成响应式**。\n特点很明确：\n- 返回的是 **Proxy**\n- 直接通过 `state.xxx` 访问\n- 适合表示**有结构、有多个字段的状态**\n- 深层属性天然响应式（递归代理）\n为什么 reactive **只能用于对象**？  \n因为 Proxy 的拦截目标必须是 object，没法代理：\n\n2️. ref：设计目标完全不同：  **让「单个值 / 基础类型」也能拥有响应式能力**。\n特点是：\n- 内部用对象包了一层：`{ value: 0 }`\n- 响应式发生在 `.value` 上\n- 可以包裹 **基础类型 / 对象 / 函数**\n也就是说，ref 解决的是一个 reactive 无法解决的问题：**“如何让 number / string / boolean 也参与响应式系统？**\n\n3️. 为什么 Vue 需要同时提供 ref 和 reactive？\n这是一个**设计取舍问题**\n如果只有 reactive：基础类型没法响应式；解构会丢失响应式（核心问题）\n如果只有 ref：对象每一层都要 `.value.xxx`\n\n一句话总结设计动机： **reactive 负责“结构”，ref 负责“原子值”，两者互补而不是替代关系。**",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-15",
+          "title": "ref为什么要用.value?为什么模板不需要",
+          "content": "1️. 为什么 ref 必须用 `.value`？\n核心原因一句话就够： **JavaScript 没有办法拦截“变量本身”的读写。**\n解决：用一个 `{value: }` 对象来包裹，然后用 Proxy / getter / setter 拦截\n\n2️. 那为什么模板里不用 `.value`？\n这是 Vue3 做的一个**非常重要的 DX（开发体验）优化**，叫：**Ref Unwrapping（自动解包）**\n在模板编译阶段，Vue 会做一件事：`{{ count }}` 编译成 `_count.value`\n设计原因：\n- 如果每个 ref 都写 `.value`，模板可读性会非常差\n- 但在 JS 逻辑里，显式 `.value` 反而更清晰",
+          "hasAnswer": true
+        },
+        {
+          "id": "vue-16",
+          "title": "React 自定义 Hooks 和 Vue 3 的 composable，本质区别是什么？",
+          "content": "React 自定义 Hook 本质上是对官方 Hook 的组合，它依赖 Hooks 在 Fiber 中按调用顺序存储状态，因此必须遵守严格的调用顺序规则。\n\nVue 3 的 composable 则是基于响应式系统的逻辑封装，状态由 ref 或 reactive 对象本身标识，而不是由调用顺序决定，因此机制上更加灵活。\n\n两者在写法上相似，但底层原理不同：React Hook 是“顺序绑定状态”，Vue composable 是“引用绑定状态”。",
+          "hasAnswer": true
+        }
+      ]
+    },
+    {
       "id": "browser",
       "name": "浏览器",
       "questions": [
@@ -494,6 +1112,144 @@
           "id": "browser-18",
           "title": "如何判断页面要离开/卸载/隐藏",
           "content": "1. `pagehide`（最推荐，离开/进入 bfcache 都覆盖）\n**用途**：页面即将被卸载，或被放入 **bfcache**（前进后退缓存）时触发。  \n**优点**：比 `unload/beforeunload` 更可靠，移动端也相对稳。\n\n2.  `visibilitychange` + `document.visibilityState === 'hidden'`（隐藏/切后台最通用）\n**用途**：页面从可见变为隐藏（切 Tab、切后台、锁屏、打开系统任务切换）时触发。  \n**优点**：覆盖“隐藏”场景很全面；不一定意味着卸载，但对上报很实用。\n\n3. `beforeunload`（老方案：可拦截离开，但限制多）\n**用途**：尝试在离开页面前做确认提示（比如表单未保存）。  \n**现实**：现代浏览器对自定义文案基本禁用，而且触发时机/条件很多限制。\n\n4. 辅助方案：结合 组件卸载，路由变化等",
+          "hasAnswer": true
+        }
+      ]
+    },
+    {
+      "id": "nextjs",
+      "name": "Next.js",
+      "questions": [
+        {
+          "id": "nextjs-1",
+          "title": "nextjs 是什么？适用场景？",
+          "content": "Next.js 本质是一个 React 的全栈框架，它通过内置 SSR、SSG、ISR 和 Server Components，解决了传统 React SPA 在首屏性能、SEO 和工程复杂度上的问题。  \n在新版本中，Next.js 以 App Router 和 RSC 为核心，通过默认服务端渲染和精细化缓存，大幅减少客户端 JS 体积，是目前 React 生态中性能和工程化最成熟的方案之一。\n\n1. **SEO 要求高的网站**：官网、博客、电商等需要搜索引擎收录的场景\n2. **内容型网站**：新闻、文档站点，适合 SSG/ISR 预渲染\n3. **全栈应用**：前后端一体化开发，API Routes 可直接写后端逻辑\n4. **性能敏感场景**：首屏加载要求高，需要 SSR + 流式渲染\n5. **团队协作项目**：约定式路由 + 文件结构清晰，降低沟通成本",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-2",
+          "title": "Next.js 解决了 React 的哪些核心问题",
+          "content": "1. **SEO 问题**：React默认CSR，首屏 JS 大、白屏时间长、SEO 差，Next.js 提供 **SSR / RSC** \n2. **服务端能力**：React 只负责 UI，Next.js = **前端 + BFF + API 层**，服务端组件 / Server Actions / Middleware\n3. **工程复杂度**：SSR开箱即用，Next.js 提供文件系统路由，自动按页面代码分割，零配置起步，约定大于配置\n4. **开发体验**：Fast Refresh、内置 TypeScript 支持、API Routes 等",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-3",
+          "title": "Next.js 和 React 的区别？",
+          "content": "| 维度   | React            | Next.js                     |\n| ---- | ---------------- | --------------------------- |\n| 定位   |                  | 全栈框架                        |\n| 路由   | 需要 react-router  | 内置文件系统路由                    |\n| 渲染   | 默认仅 CSR          | RSC/SSR/SSG/ISR/CSR 都支持     |\n| 后端能力 | 19 开始官方支持 RSC 协议 | API Routes + Server Actions |\n| 构建工具 | 需自行配置            | 内置 Turbopack/Webpack        |\n| SEO  | 需额外处理            | 原生支持                        |\n\n**一句话**：React 是造轮子的原料，Next.js 是装好轮子的车。\n\n追问：\nNext.js 的 RSC 和 React 19 是不是“一样”？\nReact 的**RSC 是“框架能力”，不是库能力。** React 19 开始正式支持 RSC 的协议和运行时，但它并不提供完整的服务端渲染和构建体系。RSC 在 React 中更多是作为一种规范存在，主要是给 **框架作者** 用的，不是给普通业务开发者直接用的。而 Next.js 在 App Router 中实现了完整的 RSC 工程化方案，包括 bundle 拆分、缓存、Streaming 和 Server Actions，因此两者在能力完整度上差异很大。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-4",
+          "title": "Next.js 支持哪些渲染模式？",
+          "content": "1. **CSR（Client-Side Rendering）**：纯客户端渲染，用 `use client` 组件实现\n2. **RSC（React Server Components）**：默认在服务端执行，不进入 JS bundle，减少客户端 JS 体积\n3. **SSR（Server-Side Rendering）**：每次请求时服务端渲染，首屏渲染快，SEO更优秀，页面实时性高，适合动态数据，但成本高\n4. **SSG（Static Site Generation）**：构建时生成 HTML，适合静态内容，不适合频繁变化内容\n5. **ISR（Incremental Static Regeneration）**：SSG + 定时重新生成，兼顾性能和数据新鲜度\n\n**一句话总结**：  \nCSR 是兜底，SSR 是实时，SSG 是极致性能，ISR 是折中方案，RSC 是未来方向",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-5",
+          "title": "Next.js 的 SSR",
+          "content": "在传统的 SSR 架构（如早期的 React SSR）中，您确实需要维护两套入口（client-entry.js 和 server-entry.js），配置两套 Webpack，处理注水 (Hydration) 的各种样板代码。\nNext.js 把这一切都封装了。您只需要写一个 page.tsx，Next.js 会自动在服务器上把它渲染成 HTML，然后在客户端把它\"激活\"。对于开发者来说，只有一套代码，一套逻辑\nNext.js 的伟大之处在于，它让您在同一个项目、同一个文件结构、同一种语言中，流畅地穿梭于\"服务端\"和\"客户端\"之间。您不需要配置复杂的环境，但您需要清晰地知道\"我现在是在服务器上（获取数据）\"还是\"我现在是在浏览器里（处理交互）\"。这种无缝融合，正是它作为全栈框架的体验确实是目前业界领先于业界的关键。\n\n客户端组件在服务端执行时，只会生成静态 HTML。它的 useEffect、onClick 等逻辑不会运行。这些逻辑只有代码被下载到浏览器并\"注水 (Hydrate)\"后，才会真正在客户端执行。\n服务端组件 (RSC) 的代码，只在服务器上运行。零 JS 发送：这些组件的 JavaScript 代码永远不会被打包发送给浏览器。浏览器收到了什么？：浏览器接收到的是 RSC 执行后的结果（一种特殊的 JSON 数据格式，描述了 UI 的结构）。![](/Users/wzz/Library/Application%20Support/marktext/images/2025-12-01-00-06-38-image.png)\n\n服务端内容变成了纯数据：`<h1>Hello Server</h1>`没有变成 HTML 标签，而是变成了一个描述：\"这有一个 h1，内容是 Hello Server\"。\n客户端组件变成了\"占位符\"：注意那个 \"$L2\"。它告诉浏览器：\"这里应该放一个 ClientButton 组件。它的代码在 ClientButton.js 里，请去下载它，并把 initialCount: 10 传给它。\"\n浏览器拿到这个 JSON 后做了什么？\nReact 读取 JSON。\n把 div 和 h1 渲染出来（或者更新现有的）。\n看到 $L2，去加载客户端组件的代码。\n最关键的一步：如果页面上本来就有一个 ClientButton，React 会保留它现在的状态（比如用户已经把 count 点到了 15），然后只更新必要的 props，实现了无缝衔接。\n\n在首次加载页面时，RSC Payload 是内嵌在 HTML 源码中的。浏览器拿到这个 JSON 后做了什么？\nReact 读取 JSON。\n把 div 和 h1 渲染出来（或者更新现有的）。\n看到 $L2，去加载客户端组件的代码。\n最关键的一步：如果页面上本来就有一个 ClientButton，React 会保留它现在的状态（比如用户已经把 count 点到了 15），然后只更新必要的 props，实现了无缝衔接。\n\n服务端组件只在服务端执行，所以不能调客户端的方法包括 window 等（Node.js 里根本就没有浏览器窗口的概念），也不能 useeffect usestate，这些 Hooks 的作用是\"在浏览器里管理状态和副作用\"。既然 RSC 的代码都不发送给浏览器，这些 Hooks 自然也就毫无用武之地。\n\n客户端组件则是提前再服务端执行得到初始样式和 HTML，浏览器加载完 HTML 后再下载并执行 js 文件进行水合（React 在浏览器里再次运行这个组件，这次它会执行 useEffect，并且把 onClick 事件监听器挂载到那个已经存在的按钮上。）\n\n当 Next.js 在服务器（Node.js）上渲染一个客户端组件时，它其实是在执行一个\"阉割版\"的 React 渲染流程：\n执行组件函数：Node.js 会像浏览器一样，去调用组件函数\n处理 Hooks (有特殊规则)：useState 只取初始值；useEffect / useLayoutEffect: 直接跳过；useContext: 正常执行读取组件树上层的 Provider 里的值；\n生成 Virtual DOM：函数执行完，React 得到了一棵组件树。\n序列化为 HTML：React 的服务端渲染器 (ReactDOMServer) 遍历这棵树，把它转换成纯文本的 HTML 字符串（例如. \\<div>\\<button>Click</button></div> ）。\n\nApp Router 是 Next.js 13.4 之后推出的全新路由和渲染架构\n基于 app/ 目录：以前的页面写在 pages/ 里，现在的页面写在 app/ 里。\n默认 RSC：这是最大的区别。在 app/ 里写的组件，默认全是服务端组件。这彻底改变了开发模式。\n嵌套布局 (Nested Layouts)：支持 layout.tsx 嵌套，这是 Pages Router 做不到的。\n流式传输 (Streaming)：利用 React Suspense，可以把页面拆成碎片，一部分一部分地发给浏览器（比如先发个 loading 骨架屏，再发数据），极大地优化了 TTFB。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-6",
+          "title": "什么是 React Server Components？",
+          "content": "**核心概念**：只在服务端执行的 React 组件，JS 代码不会发送到客户端。\n\n**特点**：\n1. **零客户端 JS**：组件代码不打包到 bundle，减小体积\n2. **直接访问后端资源**：可以直接读数据库、文件系统、调用内部 API\n3. **输出是 RSC Payload**：一种特殊 JSON 格式，描述 UI 结构\n\n**限制**：\n- 不能用 useState、useEffect 等 Hooks\n- 不能绑定事件（onClick 等）\n- 不能访问浏览器 API（window、document）\n\n**使用场景**：数据获取、静态展示、包裹客户端组件\n\n总结：React Server Components 是一种服务器执行的组件模式，本质是**把 React 的一部分计算前移到服务端**，它让 UI 的渲染和数据获取在服务端完成，只把 UI 结构通过序列化协议发送给客户端，从而减少 JS bundle、提高性能并简化数据获取，同时和交互组件协同工作，适配复杂应用。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-7",
+          "title": "Next.js RSC 漏洞",
+          "content": "这个漏洞（2024–2025 问题）本质是 **反序列化不可信数据 → 服务端执行恶意构造的代码（RCE）**\n\n漏洞点：服务端反序列化 RSC payload 时，默认信任客户端的数据，服务端代码，没有校验 actionId 和 payload 结构是否可信，而是直接可以执行\n\n导致只要攻击者伪造结构正确的 payload，就能执行任意的 Server Action 函数\n\n正确的校验应该：\n\n**校验 1：payload 引用的 actionId 必须属于当前构建生成的 action map**\n\n**校验 2：反序列化过程中禁止还原任意类型对象，只允许白名单类型**",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-8",
+          "title": "use client 是做什么的？",
+          "content": "**作用**：声明一个组件为客户端组件，标记「服务端 → 客户端」的边界。\n\n**使用时机**：\n1. 需要用 useState、useEffect 等 Hooks\n2. 需要绑定事件（onClick、onChange）\n3. 需要访问浏览器 API（window、localStorage）\n4. 使用仅客户端的第三方库\n\n**注意事项**：\n- 放在文件顶部第一行\n- 该文件及其导入的所有模块都会打包到客户端\n- 客户端组件可以渲染服务端组件（通过 children）",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-9",
+          "title": "Next.js 如何做 SEO？",
+          "content": "1. **渲染策略**\n\t- 需要 SEO 的页面用 **SSG/ISR/SSR** 输出完整 HTML。\n\t- 内容稳定：SSG / ISR；强实时：SSR。\n\t- App Router 里默认 Server Component，本身就更利于首屏和可索引内容。\n2. **Meta / OpenGraph / 结构化数据**\n\t- **App Router 用 `generateMetadata()` 或 `metadata` 导出（更结构化）。\n\t- Pages Router 用 `next/head` 写 title、description、canonical、OG、twitter card。\n\t- App Router 用 `generateMetadata()` 或 `metadata` 导出（更结构化）。\n\t- 对文章页加 JSON-LD（结构化数据），提高 rich result 概率。\n3. **站点工程化**\n\t- `sitemap.xml`、`robots.txt`、规范化 URL（canonical）、国际化 hreflang（如果有）。\n\t- 避免重复内容，控制分页/筛选页索引策略。\n\t- \n**加分点：**\n- SEO 不只看“能不能爬”，还看 **Core Web Vitals（LCP/INP/CLS）**，Next.js 通过图片优化、代码分割、RSC 降 JS 等改善性能指标。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-10",
+          "title": "Pages Router vs App Router 有什么区别？",
+          "content": "两者的本质差异在于：**App Router 是围绕 RSC（Server Components）重新设计的路由与渲染体系**，而 Pages Router 是传统的 SSR/SSG 模型。\n\n| 维度   | Pages Router                         | App Router                         |\n| ---- | ------------------------------------ | ---------------------------------- |\n| 目录   | `pages/`                             | `app/`                             |\n| 组件模型 | 默认客户端组件                              | 服务端组件，标 `use client` 才会进客户端 bundle |\n| 布局   | `_app.tsx` 全局                        | `layout.tsx` 嵌套                    |\n| 数据获取 | getServerSideProps /getStaticProps 等 | 直接 async/await                     |\n| 流式渲染 | 不支持                                  | 支持 Suspense                        |\n| 错误处理 | `_error.tsx`                         | `error.tsx` 嵌套                     |\n\n**迁移建议**：新项目直接用 App Router，老项目可渐进式迁移。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-11",
+          "title": "layout.tsx 和 page.tsx 的区别？",
+          "content": "**layout.tsx**：定义该路由段及其所有子路由共享的布局（导航栏、侧边栏等）\n- **路由切换时保持状态**不会重新渲染\n- 可以嵌套，子路由继承父布局\n- 必须接收 `children` 并渲染\n- 在 App Router 下 layout 默认是 Server Component（除非 `use client`）\n**page.tsx**：\n- 定义路由的实际内容，对应一个 URL 的最终页面\n- 每次访问都会重新渲染\n- 是路由可访问的必要条件\n- 接收 `params` 和 `searchParams`\n\n**执行顺序**：layout 包裹 page，从外到内渲染。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-12",
+          "title": "图片优化 Image 组件的原理？",
+          "content": "Next.js 的 `next/image` 做的是“**端到端的图片性能优化**”，核心目标是降低 LCP、节省带宽。\n1. **按需生成与压缩**：Image 不是简单 `<img>`，它会请求 Next 的图片优化服务（loader），在服务端做 resize 压缩 格式转换（优先 WebP/AVIF）\n2. **响应式尺寸**：根据 `sizes` 属性生成多尺寸 srcset，让浏览器按 DPR 与视口选择合适的资源\n3. **懒加载**：默认 `loading=\"lazy\"`，进入视口才加载；首屏关键图用 `priority` 提升加载优先级\n4. **占位符**：`placeholder=\"blur\"` 显示模糊预览图（**必须**有 `blurDataURL` 才生效）\n5. **防止布局偏移**：通过 width/height 或 fill + container 约束，提前占位，减少布局抖动\n\n**核心**：不是构建时处理，而是请求时按需优化 + 缓存。\n\n**常见坑：**\n- 外链域名没配 `images.domains/remotePatterns` 会失败。\n- `fill` 必须给父容器明确尺寸/position，否则布局异常。\n- 首屏大图不加 `priority` 容易拉高 LCP。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-13",
+          "title": "loading.tsx 的渲染时机？",
+          "content": "**原理**：Next.js 自动将 loading.tsx 包装成 Suspense 的 fallback。\n\n**触发时机**：页面首次加载时/路由切换时，Server Components 在等待数据或组件异步加载导致挂起，Next 会先返回并显示该段的 `loading.tsx`，等数据 ready 后再把真实内容“流式替换”进来。\n\n**特点**：\n- 每个路由段可以有自己的 loading.tsx\n- 支持流式传输，先返回 loading 状态\n- 布局（layout.tsx）不会触发 loading",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-14",
+          "title": "路由跳转是如何避免整页刷新的？",
+          "content": "Next.js 的客户端路由（`next/link` / `router.push`）本质是 **SPA 导航**：\n1. **拦截点击事件**：`<Link>` 阻止浏览器默认跳转（不触发整页 reload）。\n2. **History API**：使用 `pushState/replaceState` 改 URL，不刷新页面。\n3. **预取与增量请求**：Next 会预取目标路由所需的 JS chunk / 数据（空闲时或可见时），导航时只做最小增量加载。\n4. **差异化更新**：只重新渲染变化的路由段，保留共享布局状态\n5. **按需 hydration**：只对需要交互的 Client Components 做 hydration（RSC 场景下客户端 JS 更少）。\n\n**补一句加分：**  \n如果你用 `<a href>` 且没用 Link，或跳到外域，就会整页刷新，这是预期行为。`",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-15",
+          "title": "Next.js 中如何做代码分割？",
+          "content": "Next.js 默认就做了非常多代码分割，核心是 **按路由、按组件、按依赖** 三层：\n\n1. **路由级分割（自动）**：每个页面/路由会生成独立 chunk，只有访问该路由才加载对应 JS。\n2. **动态导入（手动控制）**\n\t- 用 `next/dynamic` 对重组件（富文本、图表、地图）做按需加载：\n\t    - 只在需要时加载\n\t    - 可以 SSR: false（例如只在浏览器可用的库）\n\t\n3. **组件边界与 RSC**\n\t- App Router 默认 Server Components 不进客户端 bundle，本质上把很多 UI 逻辑“分割”到服务端，减少客户端 JS。\n\t- `use client` 会把该组件及其依赖打进客户端 chunk，所以要控制 client 边界尽量小。\n\n4. **第三方依赖优化**\n\t- 把大依赖放到动态 import 或只在 Server Component 使用，避免进主包。\n\n**常见坑：**\n- 一个顶层组件加了 `use client`，会把它依赖的很多东西都拖进客户端包（client 边界扩散）。\n- 动态 import 过多会产生大量小 chunk，可能增加请求开销，需要平衡。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-16",
+          "title": "Next.js 中如何做鉴权？",
+          "content": "**正确的 Next.js 鉴权思路是“分层”**：登录（Authentication）+ 会话（Session）+ 授权（Authorization）。官方指南就是这么拆的。\n常见落地方案（面试说这套就稳）\n1. **登录/注册**： 用 **Server Actions** 接表单，执行在服务端，适合放敏感逻辑。\n2. **会话管理**：Session 放 **HTTP-only Cookie**（或配合 session store / JWT）\n3. 授权：不能只在 middleware 做粗过滤，真正的数据读取处也要校验\n\n**常用对比**：\n1. **Middleware**：\n   - 在请求到达页面前拦截\n   - 适合路由级别的权限控制\n2. **Server Component**：\n   - 直接读取 cookies/headers 验证\n   - 适合页面级数据权限\n3. **Server Actions**：\n   - 每个 action 内部校验用户身份\n   - 适合操作级别的权限\n4. **第三方库**：NextAuth.js / Clerk / Auth0\n\n**最佳实践**：\n用 middleware 做快速跳转和粗过滤，但真正的数据读取必须在 Server Components / Route Handlers / Server Actions 的数据访问层再做一次授权校验。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-17",
+          "title": "middleware 能做什么？不能做什么？",
+          "content": "**能做**：核心就是“改请求/改响应/改去向”\n1. 重定向 / 重写 URL\n2. 设置/读取 cookies 和 headers\n3. 直接返回一个响应，比如鉴权拦截\n4. 请求日志\n\n**不能做**：\n1. 访问 Node.js API（fs、path 等）—— 运行在 Edge Runtime\n2. 直接连接数据库（需通过 API 调用）\n3. 执行耗时操作（会把每次请求的“最前置链路”拖慢）\n4. 使用大型 npm 包（bundle 大小限制）\n\n**执行时机**：在缓存之前、路由匹配之后。\n实战建议：middleware/proxy 只做**快速、轻量、可失败**的事：重定向、locale、A/B、粗鉴权、灰度、加 header",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-18",
+          "title": "Next.js 的数据请求是怎么缓存的？",
+          "content": "**四层缓存机制**：\n\n1. **Request Memoization**：同一渲染过程中，相同请求自动去重\n2. **Data Cache**：fetch 结果持久化缓存（跨请求/部署）\n3. **Full Route Cache**：SSG 页面的 HTML + RSC Payload 缓存\n4. **Router Cache**：客户端缓存已访问的路由段（30s/5min）\n\n并且（重要）：Next 默认倾向于“**尽可能缓存**”，除非你显式 opt-out 或触发动态渲染条件。\n\n**控制缓存**示例：\n```tsx\nfetch(url, { cache: 'no-store' }); // 不缓存\nfetch(url, { next: { revalidate: 60 } }); // 60秒后重新验证\n```",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-19",
+          "title": "fetch 在 Server Component 中和浏览器 fetch 有什么不同？",
+          "content": "**相同点：**API 形状一样，都是 Web fetch。  \n**不同点（关键）：`cache` 的含义完全不同**：\n- 在**浏览器**：`cache` 表示怎么和浏览器 HTTP cache 交互。\n- 在 **Next 服务端**：`cache` 表示怎么和 Next 的 **Data Cache** 交互；并且 Next 给 fetch 增加了 `next.revalidate`、`next.tags` 等语义来做持久缓存与失效。\n- 默认是 auto：能静态 → 静态（等价于 force-cache）；发现动态 API → 退化成 no-store\n- Server Component 的 fetch：是 **服务端到服务端请求**，不受浏览器 CORS 限制\n- cookie 不是“隐式自动注入到所有 fetch”，而是由开发者显式控制。\n\n| 维度      | Server Component，注意执行在服务端       | 浏览器                |\n| ------- | ------------------------------- | ------------------ |\n| 执行环境    | Node.js / Edge                  | 浏览器                |\n| 默认缓存    | 默认是 auto，`cache: 'force-cache'` | `cache: 'default'` |\n| 请求去重    | 自动 memoization                  | 无                  |\n| 跨域限制    | 无 CORS 限制                       | 受 CORS 约束          |\n| Cookies | 需手动加参数控制                        | 自动携带               |\n| 扩展选项    | `next: { revalidate, tags }`    | 无                  |\n\n**注意**：Server Component 中的 fetch 运行在真正的服务端环境中，被 Next.js 增强过，不是原生 fetch。",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-20",
+          "title": "Fast Refresh 是什么？",
+          "content": "**Fast Refresh 是 Next.js 的开发态热更新机制**。\n**Fast Refresh 是在不丢失组件 state 的前提下，实时刷新修改过的模块，用来提升开发体验。**\n\n它解决什么问题？\n- 普通 HMR：一改代码 → 整页刷新 → state 全丢\n- Fast Refresh：\n    - 只刷新受影响组件\n    - **尽量保留 React state**\n    - 错误修复后自动恢复页面\n\n面试官想听到的关键词\n- 开发态（development only）\n- 基于 React Refresh\n- 保留 state（如果是函数组件 & hooks 结构没破坏）\n- 修改 hooks 顺序 / export 结构会触发 full reload",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-21",
+          "title": "API Routes 是什么？",
+          "content": "**API Routes 是 Next.js 内置的后端接口能力（BFF）**\n**API Routes 允许在 Next.js 项目中直接编写服务端接口，用来承接前端请求或作为 BFF 层。**\n\n本质是什么？\n- 运行在 **Node.js / Edge Runtime**\n- 不进浏览器 bundle\n- 本质是一个 HTTP handler\n\n面试官想听的点\n- BFF（Backend For Frontend）\n- 鉴权、聚合接口、隐藏后端结构\n- 不适合复杂业务（不是完整后端）",
+          "hasAnswer": true
+        },
+        {
+          "id": "nextjs-22",
+          "title": "Edge Runtime",
+          "content": "Edge Runtime 本质是一个运行在 CDN 边缘的“请求拦截与改写层”，不是完整服务器，也不是浏览器。\n本质\n- 运行在 **CDN 边缘节点**\n- 执行的是 **Web 标准 API**\n- **不是 Node.js**\n- **比浏览器多权限，比 Node.js 少能力**\n\n可以把它理解成： **一个“增强版 Service Worker + 网络代理层”**",
           "hasAnswer": true
         }
       ]
@@ -776,7 +1532,7 @@
         {
           "id": "open-questions-5",
           "title": "与外部协作场景",
-          "content": "##### 如果要集成一个船上的摄像监控系统（第三方页面，但它不能改代码，只能iframe嵌进去，而且还要求根据用户权限控制展示内容，你会怎么处理\n\n方案1：通过代理服务器实现内容过滤，iframe嵌套后端路径，有权限时跳转，无权限时返回一个兜底\n\n方案2：利用 **第三方系统自身的 URL 参数** 进行控制，前提是第三方已有支持\n\n方案3：用前端遮罩进行视觉控制，只控制是否展示，内容有泄漏风险\n\n##### 提供给其他协作方的H5要注意什么？\n\n##### 如果要写一个公共库需要考量哪些？比如模块化，打包，版本，暴露的参数方法，文档等等",
+          "content": "##### 如果要集成一个船上的摄像监控系统（第三方页面，但它不能改代码，只能iframe嵌进去，而且还要求根据用户权限控制展示内容，你会怎么处理\n\n方案1：通过代理服务器实现内容过滤，iframe嵌套后端路径，有权限时跳转，无权限时返回一个兜底\n\n方案2：利用 **第三方系统自身的 URL 参数** 进行控制，前提是第三方已有支持\n\n方案3：用前端遮罩进行视觉控制，只控制是否展示，内容有泄漏风险\n\n##### 提供给其他协作方的H5要注意什么？\n\n把它当成“可被集成的 SDK 页面”，核心目标：**可嵌、可控、可观测、可降级**。\n通用能力：参数、路由、权限、风控\n\n- **接入参数规范**：URL 参数建议只放“非敏感、可短期失效”的东西（例如 `scene, channel, traceId`），敏感数据走一次性 code 换 token。\n- **鉴权与防篡改**：可用 `签名 + 时间戳 + nonce`，避免参数被改导致越权。\n- **埋点与日志**：至少要有：\n    - 宿主信息（app/mini/iframe + 版本）\n    - traceId（贯穿宿主→H5→后端）\n    - 关键错误上报（JS error、资源加载失败、接口失败）\n- **资源与缓存**：公共 H5 一般需要更稳：\n    - 静态资源 hash + 长缓存\n    - HTML 短缓存或不缓存，避免发布后白屏\n    - Service Worker 谨慎：一旦宿主 WebView 缓存怪异，排查成本很高\n- **首屏与体积**：嵌套场景用户耐心更低，尽量：\n    - 关键路径代码拆分\n    - skeleton/占位\n    - 兜底页（加载失败可重试/反馈）\n- **样式隔离**：如果是 iframe 还好；如果是同页嵌入（微前端非 iframe），要做 CSS 隔离（BEM/前缀、Shadow DOM、css-modules）。\n\n##### 如果要写一个公共库需要考量哪些？比如模块化，打包，版本，暴露的参数方法，文档等等\n\n把公共库当“产品”来做，核心就是：**API 稳定、兼容可靠、发布可控、可维护**。\n\n A. 定位与边界\n- **这是工具库、组件库、还是 SDK（bridge/埋点/鉴权）？**\n- 明确：\n    - 负责什么、不负责什么\n    - 运行环境（浏览器/Node/小程序/React/Vue）\n    - 兼容范围（最低浏览器、WebView、React/Vue 版本）\n\n B. API 设计（最关键）\n- **稳定、少而精**：先设计“最小可用 API”，避免一次性暴露一堆未来要背兼容包袱的方法。\n- **输入输出要可预测**：参数默认值、错误场景、返回值结构固定。\n- **异步统一 Promise**：不要一会回调一会 Promise。\n- **错误处理**：明确错误类型（如 `ErrorCode`）、可观测（日志钩子、debug 开关）。\n- **可扩展性**：插件机制/中间件机制（比如拦截请求、注入自定义实现）。\n\n C. 模块化与产物形态（面向消费者）\n通常考虑这几种输出：\n- **ESM**：给现代构建（tree-shaking）\n- **CJS**：Node 或老构建\n- **UMD/IIFE**：直接 script 引入（可选）\n- **Types**：`.d.ts`（TS 项目必需）\n要考虑：\n- **Tree-shaking 友好**：尽量用具名导出、避免副作用（配置 `sideEffects: false` 或精确标注）。\n- **跨环境依赖**：避免在顶层直接引用 `window/document`（SSR 会炸），用惰性访问。\n\nD. 打包与依赖管理\n- 打包工具：Rollup / tsup / Vite library mode（都行，关键是产物正确）。\n- **external / peerDependencies**：\n    - React/Vue 这类大依赖通常放 `peerDependencies`，避免打进包导致重复实例。\n- **多入口**：按模块拆入口（`lib/core`, `lib/react`, `lib/vue`）降低体积。\n- **Polyfill 策略**：不要默认全量 polyfill；给出兼容说明或提供“compat 构建”。\n\n E. 版本与发布（SemVer）\n- **遵循 SemVer**：\n- **发布流程自动化**：\n    - changeset / conventional commits 自动生成 changelog\n    - CI 跑 lint/test/build，tag 后发布\n- **废弃策略**：API 要下线必须先 `deprecate`，给迁移期和替代方案。\n\nG. 文档与可用性\n- **README 不够**：至少要有：\n    - 快速开始（3 分钟跑通）\n    - API 文档（参数、返回、错误码）\n    - 示例（常见场景）\n    - 迁移指南（版本升级）\n- **示例项目 / playground**：真实接入更能暴露问题。\n- **变更日志**：每次发布要能让使用方快速判断“要不要升级”。\n\nH. 兼容与运行时保护\n- **feature detect** + fallback\n- 防御式编程：参数校验、空值处理、重复调用幂等\n- **避免全局污染**：尤其 UMD/IIFE，命名空间固定、可配置。\n\n\n##### 如何平衡暴露出的参数或者api的数量和复杂度？\n\n平衡“暴露多少 API/参数”和“复杂度”本质上是：**把变化隔离在库内部，把稳定点暴露给外部**。\n\n 1）先定“用户路径”，只为路径设计 API\n不要从“能力清单”出发（会越做越多），而是从**Top 3 接入场景**出发：\n- 80% 使用方只需要 1～2 步就能跑通（默认配置足够好）    \n- 只有少数高级场景才需要扩展点\n落地：先做主干 API，其余能力走扩展。\n\n 2）用“分层 API”控制复杂度：基础层稳定，高级层可选\n推荐三层：\n\t**L1：默认开箱即用（最少参数）**\n\t**L2：可配置但有限（参数有边界）**（参数数量控制在“人能读懂”的范围，比如 5～10 个以内）\n\t**L3：扩展点（不把所有开关都做成参数）**，而是通过插件/中间件/回调钩子，复杂能力通过“注入实现”而不是“堆参数”。\n\n 3）优先“聚合参数”而不是“散装开关”，当参数开始变多（>10）通常就该收敛：\n- 对一组相关参数打包\n- 用 `preset` 提供预设方案\n好处：**外部认知负担低**，内部还能不断演进。\n\n4）避免“布尔参数爆炸”，改成枚举/配置对象\n布尔开关特别容易无限增长，更好的方式是使用枚举或配置对象\n\n5）保持 API “可组合”，避免“万能函数”\n不要做一个 `request(url, {…几十个参数})` 试图覆盖全部场景。\n更好的思路：\n- 主函数只做核心能力\n- 辅助能力通过组合实现：\n\n6）用“数据驱动”决定是否暴露参数\n每增加一个参数，都要回答：\n- 这个需求出现频率高吗（>=20% 用户）？\n- 没这个参数能不能通过扩展点解决？\n- 这个参数未来会不会变（变就别暴露，做策略/插件）\n- 文档能不能用一句话说明白？说不清就说明太复杂\n**规则**：能内部推导的不要暴露；能通过注入实现的不要暴露成参数。\n\n我会用 **“默认好用 + 分层暴露 + 扩展点替代堆参数”** 来控制 API 数量：  \n**高频需求做成主干 API + 少量配置，低频和变化大的需求走插件/注入，不轻易增加布尔开关**。并通过 preset、策略对象、escape hatch 保证既简单又不失去扩展性。",
           "hasAnswer": true
         },
         {
@@ -800,8 +1556,8 @@
         {
           "id": "open-questions-9",
           "title": "前端调试和单测",
-          "content": "",
-          "hasAnswer": false
+          "content": "#### 说说常用的chrome调试工具，具体怎么用 \n\n常用的 DevTools 主要有：Elements / Console / Sources / Network / Performance / Application /Memory\n\n**Elements（查样式、定位布局问题）**\n- **选元素**\n- **查样式覆盖链路**：Styles 里看哪条规则生效/被划线，点规则跳到来源文件。\n- **强制状态**：`:hov` 强制 hover/active/focus，复现交互样式问题。\n- **改 DOM/样式做验证**：临时改 class/style 验证方案可行，再回代码修复。\n\n**Console（看日志、现场验证表达式）**\n- **过滤日志**：按 level/关键字过滤，快速找到报错链路。\n- **抓 DOM**：`$0` 代表当前选中元素，`$()`/`$$()` 快速 query。\n- **监控事件**：`monitorEvents(node, 'click')` 临时监控事件触发（排查重复绑定/冒泡问题）。\n\n**Sources（断点、单步、定位是谁改了数据）**\n- **Source map**：确保线上/本地 sourcemap 正常，能从 bundle 映射回源码。\n- **断点**：行断点、条件断点（例如 `id === xxx` 才停）、`logpoint`（不改代码直接打印）。\n- **异步栈**：开启 async stack traces，排查 Promise/async 调用链。 \n- **XHR/Fetch 断点**：对某个接口 URL 设置断点，接口一发就停，查是谁触发的请求。\n- **Event Listener Breakpoints**：勾选 `click`/`keydown` 等，事件一触发就停，查是谁绑的、为什么触发多次。\n\n**Network（接口、缓存、跨域、性能）**\n- **保留日志 & 禁用缓存**：勾 `Preserve log`（避免跳转丢请求），开发排查勾 `Disable cache`。\n- **看请求构成**：Headers/Query/Payload/Response，重点：请求头、cookie、CORS、返回码。\n- **看耗时**：Timing 里 DNS/TCP/TTFB/Content download，判断是后端慢还是前端阻塞。\n- **模拟弱网和低端机**\n- **缓存策略**：看 `from memory cache / from disk cache`、`cache-control/etag`，排查“明明改了但没生效”。\n\n**Performance（卡顿、长任务、掉帧）**\n- **录制一次操作**：录制→做一次交互→停止，找 Main 线程长任务（Long Task）和 layout/recalc style。\n- **看火焰图**：确认时间花在哪：脚本执行、布局、绘制、合成。\n- **定位 React/Vue 渲染问题**：配合框架 DevTools（React Profiler / Vue devtools）一起看 commit、重复渲染、组件耗时。\n\n**Application（存储、SW、PWA、缓存）**\n- **Storage**：LocalStorage/SessionStorage/IndexedDB/Cookies，排查登录态、缓存数据是否污染。\n- **Clear site data**：一键清站点数据，快速验证“是不是缓存导致的问题”。\n\n**Memory（内存泄漏/频繁 GC）**\n- **Heap snapshot**：对比快照，找 detached DOM、事件监听未解绑。\n\n 面试里可以补一句“排查路径”：**Network 定位请求→Console 看报错→Sources 断点定位逻辑→Elements 验证 DOM/CSS→Performance 看卡顿→Application/Memory 查缓存/泄漏**。\n\n#### 平时开发中怎么进行自测？写不写单测\n\n开发中自测一般分三层：**功能正确性、边界与异常、线上一致性**，尽量用“可复现步骤 + 可观测指标”把问题提前暴露。\n\n**功能正确性**\n- 按需求 checklist 逐条走：主流程、关键交互、表单校验、空态/加载态/错误态。\n- 控制台无报错、埋点/日志关键字段符合预期（比如上报参数、跳转参数）。\n\n**边界与异常**\n- 弱网/超时/500/重试：Network 里模拟慢网，或用 mock 返回不同 code，确保 UI 有兜底。\n- 极端数据：空数组、超长文本、超大列表、特殊字符、时间/时区问题。\n- 权限与登录态：cookie 失效、无权限、token 刷新等。\n\n**线上一致性**\n- 对齐环境配置：域名、灰度开关、feature flag、缓存策略（disable cache 复现）。\n- 多端验证：至少 Chrome + Safari（Mac），移动端用真机/模拟器看触控和字体渲染。\n\n**关于单测：写，但看模块类型**\n- **会写单测**，但不追求“为写而写”。我通常把单测优先放在：\n    1. **纯函数/工具函数**（格式化、计算、解析）\n    2. **复杂业务规则**（价格/权限/状态机）\n    3. **容易回归的公共组件**（表单组件、表格组件）\n- UI 强依赖样式、频繁变动的页面，可能更多用 **集成测试/E2E** 或 Storybook 回归，而不是堆大量脆弱的快照。\n\n#### 怎么看待前端单测？了解哪些库\n\n**怎么看待**\n- 单测的价值主要是：**防回归、提升重构信心、降低联调成本**。特别是多人协作和组件库/平台型项目，收益很明显。\n- 但单测也有成本：**写/维护时间、测试脆弱性（尤其是实现细节驱动的测试）**。所以我倾向于：\n    - **测行为，不测实现**（不强依赖内部 state/私有方法）\n    - 优先覆盖 **稳定的业务规则** 和 **高风险模块**\n    - 控制投入产出：关键路径 + 易错边界 > 追求 100% 覆盖率\n\n**了解/使用的库（按场景）**\n- **测试框架/运行器**：Jest、Vitest（Vite 项目更顺手，速度快）\n- **断言库**：Jest expect、Chai（不一定单独用）\n- **组件测试**：\n    - React：React Testing Library（RTL）+ user-event（更贴近用户行为）\n    - Vue：Vue Test Utils + Testing Library/Vitest\n    - Enzyme（了解，偏旧，更多测实现细节）\n- **E2E**：Cypress、Playwright（Playwright 多浏览器更强，适合关键链路回归）\n- **Mock**：\n    - MSW（拦截 fetch/xhr，做“更接近真实网络”的 mock）\n    - nock（Node 环境接口 mock，了解即可）\n- **覆盖率**：istanbul（Jest/Vitest 集成）\n- **补充**：Storybook + interaction test / visual regression（了解，有条件时用于组件回归）",
+          "hasAnswer": true
         },
         {
           "id": "open-questions-10",
@@ -986,8 +1742,8 @@
         {
           "id": "ai-7",
           "title": "说说 mcp 的原理和底层架构",
-          "content": "",
-          "hasAnswer": false
+          "content": "**MCP（Model Context Protocol）是一套标准化协议，用来把 LLM 与外部工具/数据源解耦连接**。  \n它通过 **Host → Client → Server** 的分层架构，把“模型如何思考”和“工具如何实现”彻底分开，使模型可以在不改代码的情况下安全、可控地调用外部能力。\n\n1. MCP 要解决的核心问题是什么？\n\t在 MCP 之前，LLM 调工具通常有几个痛点：\n\t- 工具接口**不统一**（每个工具一套 schema）\n\t- LLM **强绑定实现细节**（换个工具就要改 prompt / 代码）\n\t- **权限、安全、环境**混在一起（LLM 直接碰真实系统）\n\t- 工具发现、能力描述不规范（模型“猜着用”）\n\t**MCP 的目标**：把「能力」标准化、把「执行」隔离出去，让 LLM 只做“决策”，不做“执行”。\n\t\n2. MCP 整体架构和角色\n\t1. Host（宿主）：用户交互入口（IDE、Chat App），负责：\n\t\t- 管理 MCP Server 配置\n\t\t- 启动/连接 MCP Server\n\t\t- 把 LLM 的 MCP 调用转成真实请求\n\t2. LLM（模型）\n\t\t- **不直接访问任何系统** \n\t\t- 理解用户意图\n\t\t- 决定“要不要调用 MCP”\n\t\t- 生成 **符合 MCP schema 的结构化请求** \n\t3. MCP Client（协议客户端），通常是 **Host 内部的一个模块**\n\t\t- 校验 MCP 请求是否合法\n\t\t- 路由到正确的 MCP Server\n\t\t- 做协议层通信（stdio / http / ws）\n\t4. MCP Server（能力提供方）\n\t\t- 独立进程 / 服务\n\t\t- 向外声明：\n\t\t    - 自己有哪些能力（tools / resources / prompts）\n\t\t    - 每个能力的 schema（JSON Schema）\n\t\t- 负责：\n\t\t    - 真正执行系统操作\n\t\t    - 返回结构化结果\n\t\t- **可以是任何语言实现**\n\t\n3. MCP 的调用流程\n\t1. 用户提问\n\t2. Host 把上下文 + MCP 能力列表给 LLM\n\t3. LLM 判断：需要调用 MCP\n\t4. LLM 输出 **结构化 MCP 调用**\n\t5. Host 解析 → MCP Client\n\t6. MCP Client → MCP Server\n\t7. MCP Server 执行真实操作\n\t8. 返回结果\n\t9. Host 把结果再交给 LLM\n\t10. LLM 生成最终自然语言回复\n\t\n4. MCP Server的内部结构（底层视角）\n\t1. Transport Layer（传输层）\n\t\t- 常见的 stdio（本地工具） / http / ws\n\t2. Protocol Layer（协议层）负责 MCP 的 **schema 的结构化协议**\n\t\t- schema核心特征：\n\t\t    - 明确的 request / response\n\t\t    - 参数、返回值都有 JSON Schema\n\t\t    - 不靠 prompt 文本约定\n\t3. Capability Layer（能力声明层）这是 MCP 的灵魂\n\t\tMCP Server 可以暴露三类能力：\n\t\t- tools：可执行动作（最常见），类似函数调用\n\t\t- resources：只读或半结构化数据，类似“数据源”\n\t\t- prompts：可复用 prompt 模板\n\t4. Adapter Layer（适配层）\n\t\t- 真正对接：\n\t\t    - 文件系统\n\t\t    - Git\n\t\t    - 数据库\n\t\t    - 内部服务",
+          "hasAnswer": true
         }
       ]
     },
@@ -1130,5 +1886,5 @@
       ]
     }
   ],
-  "generatedAt": "2026-01-17T13:11:36.025Z"
+  "generatedAt": "2026-01-18T06:07:17.848Z"
 }

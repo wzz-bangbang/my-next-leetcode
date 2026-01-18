@@ -120,3 +120,70 @@
 Tab 补全解决“写得快”，Agent 解决“做成事”，MCP 解决“做得安全、可控”。
 
 #### 说说 mcp 的原理和底层架构
+
+**MCP（Model Context Protocol）是一套标准化协议，用来把 LLM 与外部工具/数据源解耦连接**。  
+它通过 **Host → Client → Server** 的分层架构，把“模型如何思考”和“工具如何实现”彻底分开，使模型可以在不改代码的情况下安全、可控地调用外部能力。
+
+1. MCP 要解决的核心问题是什么？
+	在 MCP 之前，LLM 调工具通常有几个痛点：
+	- 工具接口**不统一**（每个工具一套 schema）
+	- LLM **强绑定实现细节**（换个工具就要改 prompt / 代码）
+	- **权限、安全、环境**混在一起（LLM 直接碰真实系统）
+	- 工具发现、能力描述不规范（模型“猜着用”）
+	**MCP 的目标**：把「能力」标准化、把「执行」隔离出去，让 LLM 只做“决策”，不做“执行”。
+	
+2. MCP 整体架构和角色
+	1. Host（宿主）：用户交互入口（IDE、Chat App），负责：
+		- 管理 MCP Server 配置
+		- 启动/连接 MCP Server
+		- 把 LLM 的 MCP 调用转成真实请求
+	2. LLM（模型）
+		- **不直接访问任何系统** 
+		- 理解用户意图
+		- 决定“要不要调用 MCP”
+		- 生成 **符合 MCP schema 的结构化请求** 
+	3. MCP Client（协议客户端），通常是 **Host 内部的一个模块**
+		- 校验 MCP 请求是否合法
+		- 路由到正确的 MCP Server
+		- 做协议层通信（stdio / http / ws）
+	4. MCP Server（能力提供方）
+		- 独立进程 / 服务
+		- 向外声明：
+		    - 自己有哪些能力（tools / resources / prompts）
+		    - 每个能力的 schema（JSON Schema）
+		- 负责：
+		    - 真正执行系统操作
+		    - 返回结构化结果
+		- **可以是任何语言实现**
+	
+3. MCP 的调用流程
+	1. 用户提问
+	2. Host 把上下文 + MCP 能力列表给 LLM
+	3. LLM 判断：需要调用 MCP
+	4. LLM 输出 **结构化 MCP 调用**
+	5. Host 解析 → MCP Client
+	6. MCP Client → MCP Server
+	7. MCP Server 执行真实操作
+	8. 返回结果
+	9. Host 把结果再交给 LLM
+	10. LLM 生成最终自然语言回复
+	
+4. MCP Server的内部结构（底层视角）
+	1. Transport Layer（传输层）
+		- 常见的 stdio（本地工具） / http / ws
+	2. Protocol Layer（协议层）负责 MCP 的 **schema 的结构化协议**
+		- schema核心特征：
+		    - 明确的 request / response
+		    - 参数、返回值都有 JSON Schema
+		    - 不靠 prompt 文本约定
+	3. Capability Layer（能力声明层）这是 MCP 的灵魂
+		MCP Server 可以暴露三类能力：
+		- tools：可执行动作（最常见），类似函数调用
+		- resources：只读或半结构化数据，类似“数据源”
+		- prompts：可复用 prompt 模板
+	4. Adapter Layer（适配层）
+		- 真正对接：
+		    - 文件系统
+		    - Git
+		    - 数据库
+		    - 内部服务

@@ -18,7 +18,7 @@ const CATEGORY_CONFIG = {
   '浏览器.md': { id: 'browser', name: '浏览器' },
   '网络与安全.md': { id: 'network', name: '网络' },
   '工程化.md': { id: 'engineering', name: '工程化' },
-  'Node.md': { id: 'node', name: 'Node.js' },
+  // 'Node.md': { id: 'node', name: 'Node.js' },
   'Nextjs.md': { id: 'nextjs', name: 'Next.js' },
   '小程序.md': { id: 'miniprogram', name: '小程序' },
   'Ai及应用.md': { id: 'ai', name: 'AI' },
