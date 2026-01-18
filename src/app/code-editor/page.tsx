@@ -30,9 +30,20 @@ function CodeEditorPage() {
   const [pendingCategoryTag, setPendingCategoryTag] = useState<CategoryTag | null>(null);
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
   const [clearModalOpened, { open: openClearModal, close: closeClearModal }] = useDisclosure(false);
-  const [executionResult, setExecutionResult] = useState<string>('执行结果将在这里显示');
+  const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
+  const [returnValue, setReturnValue] = useState<string>('');
+  const [executionError, setExecutionError] = useState<string>('');
+  
+  // 重置执行结果
+  const resetExecutionResult = () => {
+    setConsoleLogs([]);
+    setReturnValue('');
+    setExecutionError('');
+  };
+  
   const sandboxRef = useRef<HTMLIFrameElement | null>(null);
   const [isSandboxReady, setIsSandboxReady] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
   
   // 展开的分类
   const [expandedCategories, setExpandedCategories] = useState<Set<CategoryTag>>(new Set());
@@ -121,7 +132,7 @@ function CodeEditorPage() {
     setSelectedQuestionId(question.id);
     setSelectedCategoryTag(categoryTag);
     setCode('');
-    setExecutionResult('执行结果将在这里显示');
+    resetExecutionResult();
     // 自动展开选中的分类
     setExpandedCategories(prev => {
       if (prev.has(categoryTag)) return prev;
@@ -176,27 +187,44 @@ function CodeEditorPage() {
     setIsClient(true);
 
     const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) {
-        return;
-      }
-
-      if (event.data.type === 'sandbox-ready') {
-        setIsSandboxReady(true);
+      // 安全检查：接受同源消息或来自 sandbox 的 "null" origin
+      const isFromSandbox = event.source === sandboxRef.current?.contentWindow;
+      const isFromSameOrigin = event.origin === window.location.origin;
+      
+      if (!isFromSandbox && !isFromSameOrigin) {
         return;
       }
 
       const { type, result, logs, error } = event.data;
-      let output = logs ? logs.join('\n') : '';
 
-      if (type === 'result') {
-        if (result !== 'undefined') {
-           output += `\n\nReturn Value:\n${result}`;
-        }
-      } else if (type === 'error') {
-        output += `\n\nError:\n${error}`;
+      if (type === 'sandbox-ready') {
+        setIsSandboxReady(true);
+        return;
       }
       
-      setExecutionResult(output || '代码已执行');
+      // 实时日志更新
+      if (type === 'log') {
+        setConsoleLogs(logs || []);
+        return;
+      }
+      
+      // 执行结果
+      if (type === 'result') {
+        setConsoleLogs(logs || []);
+        setReturnValue(result || '');
+        setExecutionError('');
+        setIsExecuting(false);
+        return;
+      }
+      
+      // 执行错误
+      if (type === 'error') {
+        setConsoleLogs(logs || []);
+        setReturnValue('');
+        setExecutionError(error || '未知错误');
+        setIsExecuting(false);
+        return;
+      }
     };
 
     window.addEventListener('message', handleMessage);
@@ -269,7 +297,7 @@ function CodeEditorPage() {
 
   useEffect(() => {
     if (selectedQuestionId && isClient) {
-      setExecutionResult('执行结果将在这里显示');
+      resetExecutionResult();
       loadSavedCode(selectedQuestionId);
     }
   }, [selectedQuestionId, isClient, loadSavedCode]);
@@ -304,7 +332,7 @@ function CodeEditorPage() {
         setSelectedQuestionId(value);
         setSelectedCategoryTag(categoryTag ?? null);
         setCode('');
-        setExecutionResult('执行结果将在这里显示');
+        resetExecutionResult();
       }
     }
   };
@@ -314,7 +342,7 @@ function CodeEditorPage() {
       setSelectedQuestionId(pendingQuestionId);
       setSelectedCategoryTag(pendingCategoryTag);
       setCode('');
-      setExecutionResult('执行结果将在这里显示');
+      resetExecutionResult();
       setPendingQuestionId(null);
       setPendingCategoryTag(null);
     }
@@ -322,9 +350,11 @@ function CodeEditorPage() {
   };
 
   const handleExecute = () => {
-    if (sandboxRef.current && sandboxRef.current.contentWindow) {
-      setExecutionResult('执行中...');
-      sandboxRef.current.contentWindow.postMessage({ code }, window.location.origin);
+    if (sandboxRef.current && sandboxRef.current.contentWindow && !isExecuting) {
+      setIsExecuting(true);
+      resetExecutionResult();
+      // 使用 '*' 因为 sandbox 去掉了 allow-same-origin，origin 变成 "null"
+      sandboxRef.current.contentWindow.postMessage({ code }, '*');
     }
   };
 
@@ -360,7 +390,7 @@ function CodeEditorPage() {
       notifications.show({ autoClose: 1500, title: '提示', message: '请先选择一个题目', color: 'blue' });
       return;
     }
-    setExecutionResult('执行结果将在这里显示');
+    resetExecutionResult();
     try {
       const res = await fetch(`/api/answers?questionId=${selectedQuestionId}`);
       if (res.ok) {
@@ -380,8 +410,8 @@ function CodeEditorPage() {
     }
   };
 
-  // 清空代码 - 打开确认弹窗
-  const handleClear = () => {
+  // 还原代码 - 打开确认弹窗
+  const handleReset = () => {
     if (!code.trim()) {
       notifications.show({ autoClose: 1500, title: '提示', message: '代码已经是空的', color: 'blue' });
       return;
@@ -389,8 +419,8 @@ function CodeEditorPage() {
     openClearModal();
   };
 
-  // 清空并保存
-  const handleClearWithSave = async () => {
+  // 还原并保存当前代码
+  const handleResetWithSave = async () => {
     if (!selectedQuestionId) {
       closeClearModal();
       return;
@@ -409,16 +439,16 @@ function CodeEditorPage() {
       console.error('Save failed:', error);
     }
     setCode('');
-    setExecutionResult('执行结果将在这里显示');
+    resetExecutionResult();
     closeClearModal();
   };
 
-  // 直接清空不保存
-  const handleClearWithoutSave = () => {
+  // 直接还原不保存
+  const handleResetWithoutSave = () => {
     setCode('');
-    setExecutionResult('执行结果将在这里显示');
+    resetExecutionResult();
     closeClearModal();
-    notifications.show({ autoClose: 1500, title: '已清空', message: '代码已清空', color: 'blue' });
+    notifications.show({ autoClose: 1500, title: '已还原', message: '代码已还原到初始状态', color: 'blue' });
   };
 
   // 切换完成状态
@@ -618,14 +648,14 @@ function CodeEditorPage() {
         </Modal>
       )}
 
-      {/* 清空代码确认弹窗 */}
+      {/* 还原代码确认弹窗 */}
       {isClient && (
-        <Modal opened={clearModalOpened} onClose={closeClearModal} title="清空代码" centered>
-          <p>是否保存当前代码后再清空？</p>
+        <Modal opened={clearModalOpened} onClose={closeClearModal} title="还原代码" centered>
+          <p>是否保存当前代码后再还原？</p>
           <Group justify="flex-end" mt="md">
             <Button variant="default" onClick={closeClearModal}>取消</Button>
-            <Button color="orange" onClick={handleClearWithoutSave}>不保存</Button>
-            <Button color="violet" onClick={handleClearWithSave}>保存后清空</Button>
+            <Button color="orange" onClick={handleResetWithoutSave}>不保存</Button>
+            <Button color="violet" onClick={handleResetWithSave}>保存后还原</Button>
           </Group>
         </Modal>
       )}
@@ -688,8 +718,8 @@ function CodeEditorPage() {
                 <Button onClick={handleLoad} variant="light" radius="xl" size="sm" color="indigo">
                   📂 载入
                 </Button>
-                <Button onClick={handleClear} variant="light" radius="xl" size="sm" color="pink">
-                  🗑️ 清空
+                <Button onClick={handleReset} variant="light" radius="xl" size="sm" color="pink">
+                  ↩️ 还原
                 </Button>
                 <Button
                   onClick={handleMarkAsSolved}
@@ -745,7 +775,7 @@ function CodeEditorPage() {
               ref={sandboxRef}
               src="/sandbox.html"
               style={{ display: 'none' }}
-              sandbox="allow-scripts allow-same-origin"
+              sandbox="allow-scripts"
             />
 
             {/* 垂直分隔条 */}
@@ -759,9 +789,12 @@ function CodeEditorPage() {
             {/* 输出区域 */}
             <div className="flex-1 min-h-0">
               <ExecutionResultPanel
-                result={executionResult}
+                consoleLogs={consoleLogs}
+                returnValue={returnValue}
+                error={executionError}
                 onExecute={handleExecute}
                 isReady={isSandboxReady}
+                isExecuting={isExecuting}
               />
             </div>
           </div>

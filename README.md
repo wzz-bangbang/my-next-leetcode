@@ -37,13 +37,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## 后续优化方向
 
-所有问题都校验一遍答案
-优化编辑器，要不用现成的库或者沙盒
+代码题优化，完善题目描述，增加用例、模板，思路解析，进阶思考题
 部署上线
 ssr
 项目性能&错误监控
 
-代码题优化 思路解析 &增加用例和题目进阶思考
 用户 登录 数据表等
 web worker 缓存离线数据
 

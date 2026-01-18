@@ -521,9 +521,9 @@ export default function BaguPage() {
               {/* 题目标题栏 - PC端 */}
               <div className="hidden md:block flex-shrink-0 px-6 py-4 border-b border-gray-200/50 bg-white/50 backdrop-blur-sm">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-600">
-                    {selectedCategory?.name}
-                  </span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-600">
+                      {selectedCategory?.name}
+                    </span>
                   <div className="flex items-center gap-2">
                     <Button
                       onClick={handleToggleFavorite}
@@ -534,15 +534,15 @@ export default function BaguPage() {
                     >
                       {isCurrentFavorited ? '⭐ 已收藏' : '☆ 收藏'}
                     </Button>
-                    <Button
-                      onClick={toggleCompleted}
-                      variant="light"
-                      radius="xl"
-                      size="xs"
+                  <Button
+                    onClick={toggleCompleted}
+                    variant="light"
+                    radius="xl"
+                    size="xs"
                       color={isCurrentCompleted ? 'green' : 'gray'}
-                    >
+                  >
                       {isCurrentCompleted ? '✅ 已完成' : '⏳ 标为完成'}
-                    </Button>
+                  </Button>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -589,9 +589,9 @@ export default function BaguPage() {
                       <span className="text-xs">← 上一题</span>
                     </Button>
 
-                    <span className="text-xs text-gray-400">
-                      {currentIndex + 1} / {allQuestions.length}
-                    </span>
+                      <span className="text-xs text-gray-400">
+                        {currentIndex + 1} / {allQuestions.length}
+                      </span>
 
                     <Button
                       onClick={goToNext}

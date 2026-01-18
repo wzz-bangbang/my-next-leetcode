@@ -129,14 +129,14 @@
     "id": "async-concurrency-controller",
     "title": "手写异步并发控制器",
     "difficulty": 3,
-    "tags": [2],
+    "tags": [2, 6],
     "description": "实现一个异步任务调度器，可以控制同时执行的异步任务数量。当正在执行的任务数小于限制时，立即执行新任务；否则将任务加入等待队列。"
   },
   {
     "id": "class-scheduler",
     "title": "并发限制的异步调度器类",
     "difficulty": 3,
-    "tags": [2],
+    "tags": [2, 6],
     "description": "并发限制的异步调度器:保证同时运行的任务最多有两个，完善代码中Scheduler类，使得以下程序能正确输出"
   },
   {
@@ -198,7 +198,7 @@
   {
     "id": "myUseState",
     "title": "手写 useState Hook",
-    "difficulty": 3,
+    "difficulty": 2,
     "tags": [4],
     "description": "模拟实现 React 的 useState Hook，理解闭包、状态管理和触发重渲染的机制。"
   },

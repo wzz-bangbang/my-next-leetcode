@@ -24,7 +24,7 @@ export enum CategoryTag {
   JS_HANDWRITE = 2,
   TS_TYPES = 3,
   REACT = 4,
-  HTML_CSS = 5,
+  // HTML_CSS = 5,
   ALGORITHM = 6,
 }
 
@@ -34,7 +34,7 @@ export const CategoryTagLabel: Record<CategoryTag, string> = {
   [CategoryTag.JS_HANDWRITE]: 'JS手写题',
   [CategoryTag.TS_TYPES]: 'TS类型题',
   [CategoryTag.REACT]: 'React代码题',
-  [CategoryTag.HTML_CSS]: 'HTML和CSS',
+  // [CategoryTag.HTML_CSS]: 'HTML和CSS',
   [CategoryTag.ALGORITHM]: '算法题',
 };
 

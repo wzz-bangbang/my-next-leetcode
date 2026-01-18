@@ -1,78 +1,117 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Sandbox</title>
-  </head>
-  <body>
-    <script>
-      const safeJsonStringify = (obj) => {
-        const cache = new Set();
-        try {
-          return JSON.stringify(
-            obj,
-            (key, value) => {
-              if (typeof value === 'object' && value !== null) {
-                if (cache.has(value)) {
-                  return '[Circular]';
-                }
-                cache.add(value);
-              }
-              if (typeof value === 'function') {
-                return `[Function: ${value.name || 'anonymous'}]`;
-              }
-              return value;
-            },
-            2,
-          );
-        } catch (e) {
-          return '[Unserializable Object]';
-        }
-      };
+<head>
+  <!-- CSP: 禁止所有外部请求，只允许内联脚本 -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline';">
+  <title>Sandbox</title>
+</head>
+<body>
+<script>
+  // ========== 状态 ==========
+  let logs = [];
 
-      window.addEventListener('message', (event) => {
-        // Basic security check
-        if (event.source !== window.parent) {
-          return;
-        }
+  // ========== 过滤 import/export ==========
+  function filterImports(code) {
+    // 多行 import { ... } from '...'
+    code = code.replace(/^\s*import\s*\{[\s\S]*?\}\s*from\s*['"][^'"]*['"]\s*;?/gm, '/* [import removed] */');
+    // 单行 import xxx from '...'
+    code = code.replace(/^\s*import\s+[\w\s,*{}]+\s+from\s*['"][^'"]*['"]\s*;?/gm, '/* [import removed] */');
+    // 副作用 import '...'
+    code = code.replace(/^\s*import\s*['"][^'"]*['"]\s*;?/gm, '/* [import removed] */');
+    // 动态 import('...')
+    code = code.replace(/\bimport\s*\(\s*['"][^'"]*['"]\s*\)/g, '(Promise.resolve({}))');
+    // export
+    code = code.replace(/^\s*export\s+default\s+/gm, '');
+    code = code.replace(/^\s*export\s+(?=const|let|var|function|class)/gm, '');
+    return code;
+  }
 
-        const { code } = event.data;
-        const logs = [];
-        const originalConsoleLog = console.log;
+  // ========== 错误格式化 ==========
+  function formatError(error) {
+    const msg = error.toString().toLowerCase();
+    if (msg.includes('import') || msg.includes('export') || msg.includes('cannot use import')) {
+      return '⚠️ 检测到模块语法（import/export），当前环境不支持。\n请使用普通函数写法。\n\n原始错误：' + error;
+    }
+    return error.toString();
+  }
 
-        console.log = (...args) => {
-          originalConsoleLog(...args); // Keep original behavior in iframe's console
-          const message = args
-            .map((arg) => {
-              if (typeof arg === 'object' && arg !== null) {
-                return safeJsonStringify(arg);
-              }
-              if (typeof arg === 'function') {
-                return `[Function: ${arg.name || 'anonymous'}]`;
-              }
-              return String(arg);
-            })
-            .join(' ');
-          logs.push(message);
-        };
+  // ========== 劫持 console ==========
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+  const originalConsoleWarn = console.warn;
 
-        try {
-          const result = window.eval(code);
-          window.parent.postMessage(
-            { type: 'result', result: safeJsonStringify(result), logs },
-            '*',
-          );
-        } catch (error) {
-          window.parent.postMessage(
-            { type: 'error', error: error.toString(), logs },
-            '*',
-          );
-        } finally {
-          console.log = originalConsoleLog; // Restore console.log
-        }
-      });
+  function formatArg(a) {
+    if (typeof a === 'object' && a !== null) {
+      try { return JSON.stringify(a, null, 2); } 
+      catch { return String(a); }
+    }
+    if (typeof a === 'function') {
+      return `[Function: ${a.name || 'anonymous'}]`;
+    }
+    return String(a);
+  }
 
-      // Notify the parent window that the sandbox is ready to receive messages
-      window.parent.postMessage({ type: 'sandbox-ready' }, '*');
-    </script>
-  </body>
+  // 异步 console.log 会实时汇报
+  console.log = (...args) => {
+    originalConsoleLog.apply(console, args);
+    logs.push(args.map(formatArg).join(' '));
+    // 实时汇报异步 log
+    window.parent.postMessage({ type: 'log', logs: [...logs] }, '*');
+  };
+
+  console.error = (...args) => {
+    originalConsoleError.apply(console, args);
+    logs.push('❌ ' + args.map(formatArg).join(' '));
+    window.parent.postMessage({ type: 'log', logs: [...logs] }, '*');
+  };
+
+  console.warn = (...args) => {
+    originalConsoleWarn.apply(console, args);
+    logs.push('⚠️ ' + args.map(formatArg).join(' '));
+    window.parent.postMessage({ type: 'log', logs: [...logs] }, '*');
+  };
+
+  // ========== 监听消息 ==========
+  window.addEventListener('message', (event) => {
+    // 安全检查：只接受来自父窗口的消息
+    if (event.source !== window.parent) return;
+    
+    const { code } = event.data;
+    if (code === undefined) return;
+    
+    // 重置 logs
+    logs = [];
+    
+    // 过滤 import/export
+    const filteredCode = filterImports(code);
+    
+    try {
+      // 同步执行代码
+      const result = eval(filteredCode);
+      
+      // 同步代码执行完成，立即返回结果
+      const resultStr = result === undefined ? '' : 
+                        result === null ? 'null' : 
+                        typeof result === 'object' ? JSON.stringify(result, null, 2) : 
+                        String(result);
+      
+      window.parent.postMessage({ 
+        type: 'result', 
+        result: resultStr, 
+        logs: [...logs] 
+      }, '*');
+      
+    } catch (err) {
+      window.parent.postMessage({ 
+        type: 'error', 
+        error: formatError(err), 
+        logs: [...logs] 
+      }, '*');
+    }
+  });
+
+  // ========== 通知父页面就绪 ==========
+  window.parent.postMessage({ type: 'sandbox-ready' }, '*');
+</script>
+</body>
 </html>
