@@ -38,6 +38,13 @@ export const CategoryTagLabel: Record<CategoryTag, string> = {
   [CategoryTag.ALGORITHM]: '算法题',
 };
 
+// 测试用例接口
+export interface TestCase {
+  input: string;        // 输入描述或代码
+  expected: string;     // 预期输出
+  description?: string; // 用例说明（可选）
+}
+
 // 题目接口
 export interface Question {
   id: string;
@@ -45,4 +52,10 @@ export interface Question {
   difficulty: Difficulty;
   tags: CategoryTag[];
   description?: string;
+
+  // 扩展字段
+  testCases?: TestCase[];      // 建议用例
+  template?: string;           // 模板代码
+  solution?: string;           // 思路解析（支持 Markdown）
+  followUp?: string[];         // 进阶思考题
 }

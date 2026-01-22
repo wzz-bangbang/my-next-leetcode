@@ -40,14 +40,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { type, ids } = body;
+    const { type, ids } = body as { type: string; ids: string[] };
 
     if (!type || !Array.isArray(ids)) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 
     const data = await readFavorites();
-    
+
     if (type === 'bagu' || type === 'code') {
       data[type] = ids;
       await writeFavorites(data);

@@ -5,20 +5,13 @@ import { Button, Modal, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import Header from '@/components/Header';
+import MarkdownContent from '@/app/bagu/_components/MarkdownContent';
 import CodeEditorPanel from './_components/CodeEditorPanel';
 import ExecutionResultPanel from './_components/ExecutionResultPanel';
 import QuestionSidebar, { QuestionStatus, setQuestionStatus, getQuestionStatusMap } from './_components/QuestionSidebar';
-import { CategoryTag, Difficulty, DifficultyLabel, DifficultyColor, CategoryTagLabel } from '@/types/question';
+import { CategoryTag, Difficulty, DifficultyLabel, DifficultyColor, CategoryTagLabel, Question } from '@/types/question';
 import { useQuestionRoute, scrollToSelected } from '@/hooks/useQuestionRoute';
 import { getFavorites, toggleFavorite, loadFavoritesFromServer } from '@/lib/favorites';
-
-interface Question {
-  id: string;
-  title: string;
-  difficulty: number;
-  tags: number[];
-  description?: string;
-}
 
 function CodeEditorPage() {
   const [isClient, setIsClient] = useState(false);
@@ -48,7 +41,10 @@ function CodeEditorPage() {
   // 展开的分类
   const [expandedCategories, setExpandedCategories] = useState<Set<CategoryTag>>(new Set());
   const sidebarRef = useRef<HTMLDivElement>(null);
-  
+
+  // 侧边栏折叠状态
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   // 收藏状态
   const [favoriteQuestions, setFavoriteQuestions] = useState<Set<string>>(new Set());
   
@@ -278,8 +274,8 @@ function CodeEditorPage() {
     }
   }, [isClient, syncQuestionStatus]);
 
-  // 切换题目时自动加载历史代码
-  const loadSavedCode = useCallback(async (questionId: string) => {
+  // 切换题目时自动加载历史代码，如果没有则加载模板代码
+  const loadSavedCode = useCallback(async (questionId: string, template?: string) => {
     try {
       const res = await fetch(`/api/answers?questionId=${questionId}`);
       if (res.ok) {
@@ -287,20 +283,25 @@ function CodeEditorPage() {
         if (data.code) {
           setCode(data.code);
         } else {
-          setCode('');
+          // 没有保存的代码，使用模板代码
+          setCode(template || '');
         }
+      } else {
+        setCode(template || '');
       }
     } catch (error) {
       console.error('Auto load failed:', error);
+      setCode(template || '');
     }
   }, []);
 
   useEffect(() => {
     if (selectedQuestionId && isClient) {
       resetExecutionResult();
-      loadSavedCode(selectedQuestionId);
+      const question = questions.find(q => q.id === selectedQuestionId);
+      loadSavedCode(selectedQuestionId, question?.template);
     }
-  }, [selectedQuestionId, isClient, loadSavedCode]);
+  }, [selectedQuestionId, isClient, loadSavedCode, questions]);
 
   const handleSelectChange = async (value: string | null, categoryTag?: CategoryTag) => {
     if (value && (value !== selectedQuestionId || categoryTag !== selectedCategoryTag)) {
@@ -528,10 +529,10 @@ function CodeEditorPage() {
     const offsetX = e.clientX - rect.left;
     const containerWidth = rect.width;
     
-    // 计算百分比，限制在20%-40%之间，最小300px
+    // 计算百分比，限制在20%-60%之间（代码区最小40%），最小300px
     let percent = (offsetX / containerWidth) * 100;
     const minPercent = Math.max(20, (300 / containerWidth) * 100);
-    percent = Math.max(minPercent, Math.min(40, percent));
+    percent = Math.max(minPercent, Math.min(60, percent));
     
     setDescWidthPercent(percent);
   }, [isDraggingH]);
@@ -549,9 +550,9 @@ function CodeEditorPage() {
     const offsetY = e.clientY - rect.top;
     const containerHeight = rect.height;
     
-    // 计算百分比，限制在50%-90%之间
+    // 计算百分比，限制在50%-80%之间
     let percent = (offsetY / containerHeight) * 100;
-    percent = Math.max(50, Math.min(90, percent));
+    percent = Math.max(50, Math.min(80, percent));
     
     setCodeHeightPercent(percent);
   }, [isDraggingV]);
@@ -673,6 +674,8 @@ function CodeEditorPage() {
           expandedCategories={expandedCategories}
           onSelectQuestion={handleSelectChange}
           onToggleCategory={toggleCategory}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
         />
 
         {/* 右侧主区域 */}
@@ -718,6 +721,17 @@ function CodeEditorPage() {
                 <Button onClick={handleLoad} variant="light" radius="xl" size="sm" color="indigo">
                   📂 载入
                 </Button>
+                {selectedQuestion?.template && (
+                  <Button
+                    onClick={() => setCode(selectedQuestion.template || '')}
+                    variant="light"
+                    radius="xl"
+                    size="sm"
+                    color="cyan"
+                  >
+                    📋 模板
+                  </Button>
+                )}
                 <Button onClick={handleReset} variant="light" radius="xl" size="sm" color="pink">
                   ↩️ 还原
                 </Button>
@@ -736,12 +750,74 @@ function CodeEditorPage() {
               </div>
             </div>
 
-            {/* 题目描述 */}
+            {/* 题目描述及扩展信息 */}
             <div className="flex-1 min-h-0 overflow-y-auto p-5">
-              {selectedQuestion?.description ? (
-                <div className="text-gray-600 text-lg leading-relaxed">
-                  <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">📝 题目描述</h4>
-                  <pre className="whitespace-pre-wrap font-sans text-gray-600 text-lg">{selectedQuestion.description}</pre>
+              {selectedQuestion ? (
+                <div className="space-y-6">
+                  {/* 题目描述 */}
+                  {selectedQuestion.description && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">📝 题目描述</h4>
+                      <pre className="whitespace-pre-wrap font-sans text-gray-600 text-base leading-relaxed">{selectedQuestion.description}</pre>
+                    </div>
+                  )}
+
+                  {/* 建议用例 */}
+                  {selectedQuestion.testCases && selectedQuestion.testCases.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">🧪 建议用例</h4>
+                      <div className="space-y-3">
+                        {selectedQuestion.testCases.map((testCase, index) => (
+                          <div key={index} className="bg-gray-50/80 rounded-lg p-3 border border-gray-200/50">
+                            {testCase.description && (
+                              <div className="text-sm text-purple-600 font-medium mb-2">{testCase.description}</div>
+                            )}
+                            <div className="space-y-1.5">
+                              <div className="flex items-start gap-2">
+                                <span className="text-xs text-gray-400 font-mono w-12 shrink-0">输入:</span>
+                                <pre className="text-sm text-gray-700 font-mono whitespace-pre-wrap flex-1">{testCase.input}</pre>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-xs text-gray-400 font-mono w-12 shrink-0">预期:</span>
+                                <pre className="text-sm text-green-600 font-mono whitespace-pre-wrap flex-1">{testCase.expected}</pre>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 思路解析 - 默认折叠 */}
+                  {selectedQuestion.solution && (
+                    <div>
+                      <details className="group">
+                        <summary className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider cursor-pointer list-none flex items-center gap-2 select-none">
+                          <span className="transition-transform group-open:rotate-90">▶</span>
+                          💡 思路解析
+                          <span className="text-xs font-normal text-gray-400 normal-case">(点击展开)</span>
+                        </summary>
+                        <div className="mt-3 bg-white/80 rounded-lg p-4 border border-gray-200/50 solution-markdown">
+                          <MarkdownContent content={selectedQuestion.solution} />
+                        </div>
+                      </details>
+                    </div>
+                  )}
+
+                  {/* 进阶思考题 */}
+                  {selectedQuestion.followUp && selectedQuestion.followUp.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">🚀 进阶思考</h4>
+                      <ul className="space-y-2">
+                        {selectedQuestion.followUp.map((item, index) => (
+                          <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                            <span className="text-orange-500 font-bold shrink-0">{index + 1}.</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-gray-400 text-base">

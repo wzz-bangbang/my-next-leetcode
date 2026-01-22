@@ -264,3 +264,53 @@ button:where(:not(.mantine-Button-root):not([class*='mantine'])) {
   color: #9ca3af;
   text-decoration: line-through;
 }
+
+/* 代码编辑器页面的思路解析样式 - 更紧凑的字号 */
+.solution-markdown .markdown-content {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.6;
+}
+
+.solution-markdown .markdown-content h1,
+.solution-markdown .markdown-content h2,
+.solution-markdown .markdown-content h3,
+.solution-markdown .markdown-content h4 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.solution-markdown .markdown-content h1 {
+  font-size: 1.125rem;
+}
+.solution-markdown .markdown-content h2 {
+  font-size: 1rem;
+}
+.solution-markdown .markdown-content h3 {
+  font-size: 0.9375rem;
+}
+.solution-markdown .markdown-content h4 {
+  font-size: 0.875rem;
+}
+
+.solution-markdown .markdown-content p {
+  margin-bottom: 0.625em;
+}
+
+.solution-markdown .markdown-content ul,
+.solution-markdown .markdown-content ol {
+  margin-left: 1em;
+  margin-bottom: 0.625em;
+}
+
+.solution-markdown .markdown-content li {
+  margin-bottom: 0.15em;
+}
+
+.solution-markdown .markdown-content table {
+  font-size: 0.8125rem;
+}
+
+.solution-markdown .markdown-content th,
+.solution-markdown .markdown-content td {
+  padding: 0.375rem 0.5rem;
+}
