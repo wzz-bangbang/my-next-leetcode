@@ -10,37 +10,38 @@ const FAVORITES_CODE_KEY = 'favorites-code';
 export type FavoriteType = 'bagu' | 'code';
 
 // 获取收藏列表
-export function getFavorites(type: FavoriteType): Set<string> {
+export function getFavorites(type: FavoriteType): Set<number> {
   if (typeof window === 'undefined') return new Set();
   const key = type === 'bagu' ? FAVORITES_BAGU_KEY : FAVORITES_CODE_KEY;
   try {
     const data = localStorage.getItem(key);
-    return new Set(data ? JSON.parse(data) : []);
+    const arr = data ? JSON.parse(data) : [];
+    return new Set(arr.map((id: number | string) => Number(id)));
   } catch {
     return new Set();
   }
 }
 
 // 设置收藏状态
-export function setFavorite(type: FavoriteType, questionId: string, isFavorite: boolean): void {
+export function setFavorite(type: FavoriteType, questionId: number, isFavorite: boolean): void {
   if (typeof window === 'undefined') return;
   const key = type === 'bagu' ? FAVORITES_BAGU_KEY : FAVORITES_CODE_KEY;
   const set = getFavorites(type);
-  
+
   if (isFavorite) {
     set.add(questionId);
   } else {
     set.delete(questionId);
   }
-  
+
   localStorage.setItem(key, JSON.stringify([...set]));
-  
-  // 同时保存到 JSON 文件（通过 API）
+
+  // 同时保存到服务器
   saveFavoritesToServer(type, [...set]);
 }
 
 // 切换收藏状态
-export function toggleFavorite(type: FavoriteType, questionId: string): boolean {
+export function toggleFavorite(type: FavoriteType, questionId: number): boolean {
   const favorites = getFavorites(type);
   const newStatus = !favorites.has(questionId);
   setFavorite(type, questionId, newStatus);
@@ -48,12 +49,12 @@ export function toggleFavorite(type: FavoriteType, questionId: string): boolean 
 }
 
 // 检查是否已收藏
-export function isFavorited(type: FavoriteType, questionId: string): boolean {
+export function isFavorited(type: FavoriteType, questionId: number): boolean {
   return getFavorites(type).has(questionId);
 }
 
 // 保存到服务器
-async function saveFavoritesToServer(type: FavoriteType, ids: string[]): Promise<void> {
+async function saveFavoritesToServer(type: FavoriteType, ids: number[]): Promise<void> {
   try {
     await fetch('/api/favorites', {
       method: 'POST',
@@ -66,12 +67,12 @@ async function saveFavoritesToServer(type: FavoriteType, ids: string[]): Promise
 }
 
 // 从服务器加载收藏（初始化时调用）
-export async function loadFavoritesFromServer(type: FavoriteType): Promise<Set<string>> {
+export async function loadFavoritesFromServer(type: FavoriteType): Promise<Set<number>> {
   try {
     const res = await fetch(`/api/favorites?type=${type}`);
     if (res.ok) {
       const data = await res.json();
-      const ids: string[] = data.ids || [];
+      const ids: number[] = (data.ids || []).map((id: number | string) => Number(id));
       // 同步到 localStorage
       const key = type === 'bagu' ? FAVORITES_BAGU_KEY : FAVORITES_CODE_KEY;
       localStorage.setItem(key, JSON.stringify(ids));
@@ -82,4 +83,3 @@ export async function loadFavoritesFromServer(type: FavoriteType): Promise<Set<s
   }
   return getFavorites(type);
 }
-

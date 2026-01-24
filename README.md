@@ -37,12 +37,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## 后续优化方向
 
-代码题优化，完善题目描述，增加用例、模板，思路解析，进阶思考题
+建用户体系和登录
 部署上线
 ssr
 项目性能&错误监控
 
-用户 登录 数据表等
 web worker 缓存离线数据
 
 爬虫取最新各大平台的数据并解析题目

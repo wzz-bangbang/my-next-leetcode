@@ -2,45 +2,38 @@
 
 import { useEffect } from 'react';
 import { Collapse } from '@mantine/core';
-import type { BaguCategory, BaguQuestion } from '@/types/bagu';
+import type { BaguCategory, BaguQuestionListItem } from '@/types/bagu';
 
 interface QuestionListProps {
   categories: BaguCategory[];
-  selectedQuestion: BaguQuestion | null;
-  expandedCategories: Set<string>;
-  completedQuestions: Set<string>;
-  onSelectQuestion: (question: BaguQuestion, categoryId: string) => void;
-  onToggleCategory: (categoryId: string) => void;
+  selectedQuestionId: number | null;
+  expandedCategories: Set<number>;
+  completedQuestions: Set<number>;
+  onSelectQuestion: (question: BaguQuestionListItem, categoryId: number) => void;
+  onToggleCategory: (categoryId: number) => void;
 }
 
-// 分类图标映射
-const CategoryIcon: Record<string, string> = {
-  'js-basic': '🟨',
-  typescript: '🔷',
-  'css-html': '🎨',
-  react: '⚛️',
-  vue: '🇻',
-  browser: '🌐',
-  network: '🔗',
-  node: '🇳',
-  nextjs: '▲',
-  engineering: '⚙️',
-  cicd: '🔄',
-  'code-explain': '🔍',
-  'open-questions': '💡',
-  miniprogram: '📱',
-  ai: '🤖',
-  'tech-selection': '🎯',
-  projects: '📁',
-  teamwork: '👥',
-  'interview-tips': '💼',
-  'career-plan': '🚀',
-  history: '📜',
+// 分类图标映射（按数字ID）
+const CategoryIcon: Record<number, string> = {
+  1: '🟨',  // JS基础
+  2: '🔷',  // TypeScript
+  3: '🎨',  // CSS & HTML
+  4: '⚛️',  // React
+  5: '🇻',   // Vue
+  6: '🌐',  // 浏览器
+  7: '▲',   // Next.js
+  8: '⚙️',  // 工程化
+  9: '🔄',  // CI&CD
+  10: '💡', // 开放题&场景题
+  11: '📱', // 小程序
+  12: '🤖', // AI
+  13: '🎯', // 技术选型
+  14: '👥', // 工作协作
 };
 
 export default function QuestionList({
   categories,
-  selectedQuestion,
+  selectedQuestionId,
   expandedCategories,
   completedQuestions,
   onSelectQuestion,
@@ -51,7 +44,7 @@ export default function QuestionList({
   useEffect(() => {
       // 获取所有题目的扁平列表（用于键盘导航）
     const getAllQuestions = () => {
-      const result: { question: BaguQuestion; categoryId: string }[] = [];
+      const result: { question: BaguQuestionListItem; categoryId: number }[] = [];
       for (const category of categories) {
         for (const question of category.questions) {
           result.push({ question, categoryId: category.id });
@@ -59,7 +52,7 @@ export default function QuestionList({
       }
       return result;
     };
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
       // 如果在输入框内，不处理
       if (
@@ -79,8 +72,8 @@ export default function QuestionList({
       if (allQuestions.length === 0) return;
 
       // 找到当前选中题目的索引
-      const currentIndex = selectedQuestion
-        ? allQuestions.findIndex((q) => q.question.id === selectedQuestion.id)
+      const currentIndex = selectedQuestionId
+        ? allQuestions.findIndex((q) => q.question.id === selectedQuestionId)
         : -1;
 
       let newIndex: number;
@@ -106,7 +99,7 @@ export default function QuestionList({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedQuestion, expandedCategories, onSelectQuestion, onToggleCategory]);
+  }, [selectedQuestionId, expandedCategories, onSelectQuestion, onToggleCategory, categories]);
 
   return (
     <div className="py-1">
@@ -150,7 +143,7 @@ export default function QuestionList({
             <Collapse in={isExpanded}>
               <div className="bg-white/20">
                 {category.questions.map((question) => {
-                  const isSelected = selectedQuestion?.id === question.id;
+                  const isSelected = selectedQuestionId === question.id;
                   // const isCompleted = completedQuestions.has(question.id);
 
                   return (

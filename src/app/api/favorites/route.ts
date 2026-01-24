@@ -1,25 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { query } from '@/lib/db';
 
-const FAVORITES_FILE = path.join(process.cwd(), 'public', 'favorites.json');
+// 题目类型: 1=code, 2=bagu
+const TYPE_MAP: Record<string, number> = {
+  code: 1,
+  bagu: 2,
+};
 
-interface FavoritesData {
-  bagu: string[];
-  code: string[];
-}
-
-async function readFavorites(): Promise<FavoritesData> {
-  try {
-    const content = await fs.readFile(FAVORITES_FILE, 'utf-8');
-    return JSON.parse(content);
-  } catch {
-    return { bagu: [], code: [] };
-  }
-}
-
-async function writeFavorites(data: FavoritesData): Promise<void> {
-  await fs.writeFile(FAVORITES_FILE, JSON.stringify(data, null, 2), 'utf-8');
+interface FavoriteRow {
+  question_id: number;
 }
 
 // GET: 获取收藏列表
@@ -27,37 +16,69 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type') as 'bagu' | 'code' | null;
 
-  const data = await readFavorites();
+  try {
+    if (type && TYPE_MAP[type]) {
+      const rows = await query<FavoriteRow[]>(
+        'SELECT question_id FROM user_favorites WHERE user_id = 1 AND question_type = ?',
+        [TYPE_MAP[type]]
+      );
+      const ids = rows.map(row => row.question_id);
+      return NextResponse.json({ ids });
+    }
 
-  if (type === 'bagu' || type === 'code') {
-    return NextResponse.json({ ids: data[type] });
+    // 返回全部
+    const baguRows = await query<FavoriteRow[]>(
+      'SELECT question_id FROM user_favorites WHERE user_id = 1 AND question_type = ?',
+      [TYPE_MAP.bagu]
+    );
+    const codeRows = await query<FavoriteRow[]>(
+      'SELECT question_id FROM user_favorites WHERE user_id = 1 AND question_type = ?',
+      [TYPE_MAP.code]
+    );
+
+    return NextResponse.json({
+      bagu: baguRows.map(row => row.question_id),
+      code: codeRows.map(row => row.question_id),
+    });
+  } catch (error) {
+    console.error('Database error:', error);
+    return NextResponse.json(
+      { error: 'Database error' },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(data);
 }
 
 // POST: 保存收藏列表
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { type, ids } = body as { type: string; ids: string[] };
+    const { type, ids } = body as { type: string; ids: number[] };
 
-    if (!type || !Array.isArray(ids)) {
+    if (!type || !Array.isArray(ids) || !TYPE_MAP[type]) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 
-    const data = await readFavorites();
+    const typeValue = TYPE_MAP[type];
 
-    if (type === 'bagu' || type === 'code') {
-      data[type] = ids;
-      await writeFavorites(data);
-      return NextResponse.json({ success: true });
+    // 先删除该类型的所有旧收藏
+    await query('DELETE FROM user_favorites WHERE user_id = 1 AND question_type = ?', [typeValue]);
+
+    // 批量插入新收藏
+    if (ids.length > 0) {
+      const values = ids.map(id => [1, id, typeValue]);
+      const placeholders = values.map(() => '(?, ?, ?)').join(', ');
+      const flatValues = values.flat();
+
+      await query(
+        `INSERT INTO user_favorites (user_id, question_id, question_type) VALUES ${placeholders}`,
+        flatValues
+      );
     }
 
-    return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Save favorites failed:', error);
+    console.error('Database error:', error);
     return NextResponse.json({ error: 'Save failed' }, { status: 500 });
   }
 }
-

@@ -10,7 +10,8 @@ import { CategoryTag, CategoryTagLabel } from '@/types/question';
 import type { BaguData, BaguQuestion } from '@/types/bagu';
 
 interface CodeQuestion {
-  id: string;
+  id: number;
+  slug: string;
   title: string;
   difficulty: number;
   tags: number[];
@@ -18,8 +19,8 @@ interface CodeQuestion {
 }
 
 export default function FavoritesPage() {
-  const [baguFavorites, setBaguFavorites] = useState<Set<string>>(new Set());
-  const [codeFavorites, setCodeFavorites] = useState<Set<string>>(new Set());
+  const [baguFavorites, setBaguFavorites] = useState<Set<number>>(new Set());
+  const [codeFavorites, setCodeFavorites] = useState<Set<number>>(new Set());
   const [baguData, setBaguData] = useState<BaguData | null>(null);
   const [codeQuestions, setCodeQuestions] = useState<CodeQuestion[]>([]);
   const [activeTab, setActiveTab] = useState<'bagu' | 'code'>('bagu');
@@ -41,24 +42,24 @@ export default function FavoritesPage() {
     }
 
     // 加载刷题数据
-    fetch('/questions.json')
+    fetch('/api/code')
       .then((res) => res.json())
       .then(setCodeQuestions);
   }, []);
 
   // 八股文收藏按分类分组
   const baguFavoritesByCategory = useMemo(() => {
-    if (!baguData) return new Map<string, { name: string; questions: BaguQuestion[] }>();
-    
-    const map = new Map<string, { name: string; questions: BaguQuestion[] }>();
-    
+    if (!baguData) return new Map<number, { name: string; questions: BaguQuestion[] }>();
+
+    const map = new Map<number, { name: string; questions: BaguQuestion[] }>();
+
     for (const category of baguData.categories) {
       const favQuestions = category.questions.filter((q) => baguFavorites.has(q.id));
       if (favQuestions.length > 0) {
         map.set(category.id, { name: category.name, questions: favQuestions });
       }
     }
-    
+
     return map;
   }, [baguData, baguFavorites]);
 
@@ -133,7 +134,7 @@ export default function FavoritesPage() {
   }, [baguFavoritesByCategory, baguCount]);
 
   // 取消收藏八股文
-  const removeBaguFavorite = useCallback((questionId: string) => {
+  const removeBaguFavorite = useCallback((questionId: number) => {
     setFavorite('bagu', questionId, false);
     setBaguFavorites((prev) => {
       const next = new Set(prev);
@@ -149,7 +150,7 @@ export default function FavoritesPage() {
   }, []);
 
   // 取消收藏刷题
-  const removeCodeFavorite = useCallback((questionId: string) => {
+  const removeCodeFavorite = useCallback((questionId: number) => {
     setFavorite('code', questionId, false);
     setCodeFavorites((prev) => {
       const next = new Set(prev);
@@ -283,7 +284,7 @@ export default function FavoritesPage() {
                         className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-white/70 hover:bg-white hover:shadow-sm transition-all group"
                       >
                         <Link
-                          href={`/code-editor?q=${tag}-${q.id}`}
+                          href={`/code-editor?q=${tag}-${q.slug}`}
                           className="flex-1 text-[11px] sm:text-sm text-gray-700 hover:text-violet-600 truncate"
                         >
                           {q.title}

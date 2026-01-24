@@ -1,21 +1,37 @@
-// 八股文题目
-export interface BaguQuestion {
-  id: string; // 唯一ID
-  title: string; // 题目标题
-  content: string; // Markdown 内容
-  hasAnswer: boolean; // 是否有答案
+// 八股文题目列表项（不含内容）
+export interface BaguQuestionListItem {
+  id: number;
+  slug: string;
+  title: string;
+  hasAnswer: boolean;
 }
 
-// 八股文分类
+// 八股文题目详情（含内容和状态）
+export interface BaguQuestionDetail extends BaguQuestionListItem {
+  categoryId: number;
+  content: string | null;
+  isFavorited: boolean;
+}
+
+// 八股文分类（列表用）
 export interface BaguCategory {
-  id: string; // 唯一ID，不会变
-  name: string; // 显示名称
-  isFolder?: boolean; // 是否是文件夹类型（每个文件=一道题）
-  questions: BaguQuestion[];
+  id: number;
+  slug: string;
+  name: string;
+  icon?: string | null;
+  questions: BaguQuestionListItem[];
 }
 
-// 八股文数据
+// 八股文列表数据
+export interface BaguListData {
+  categories: BaguCategory[];
+}
+
+// 兼容旧类型
+export interface BaguQuestion extends BaguQuestionListItem {
+  content?: string | null;
+}
+
 export interface BaguData {
   categories: BaguCategory[];
-  generatedAt: string; // 生成时间
 }

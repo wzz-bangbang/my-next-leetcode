@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: leetcode-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: wzz888888
+      MYSQL_DATABASE: leetcode
+      MYSQL_USER: wzz
+      MYSQL_PASSWORD: wzz888888
+      TZ: Asia/Shanghai
+    volumes:
+      # 数据持久化
+      - ./docker/mysql/data:/var/lib/mysql
+      # 初始化脚本（首次启动时执行）
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pwzz888888"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Adminer - 数据库管理工具（可选，方便查看数据）
+  adminer:
+    image: adminer:latest
+    container_name: leetcode-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql

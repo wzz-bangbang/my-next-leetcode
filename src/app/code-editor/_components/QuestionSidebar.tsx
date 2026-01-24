@@ -2,21 +2,18 @@
 
 import React, { useEffect, useState, forwardRef } from 'react';
 import { Collapse, Tooltip } from '@mantine/core';
-import { CategoryTag, CategoryTagLabel, Difficulty, DifficultyLabel, DifficultyColor, Question } from '@/types/question';
+import { CategoryTag, CategoryTagLabel, Difficulty, DifficultyLabel, DifficultyColor, QuestionListItem } from '@/types/question';
+import {
+  QuestionStatus,
+  getQuestionStatusMap,
+  setQuestionStatus as setStatusToServer,
+  loadQuestionStatusFromServer,
+  isStatusCacheLoaded,
+} from '@/lib/questionStatus';
 
-// 题目状态枚举
-export enum QuestionStatus {
-  NOT_DONE = 0,    // 没做过
-  ATTEMPTED = 1,   // 做过
-  SOLVED = 2,      // 已解决
-}
-
-// 状态图标
-const StatusIcon: Record<QuestionStatus, { icon: string; color: string; label: string }> = {
-  [QuestionStatus.NOT_DONE]: { icon: '○', color: '#9ca3af', label: '未开始' },
-  [QuestionStatus.ATTEMPTED]: { icon: '◐', color: '#f59e0b', label: '尝试中' },
-  [QuestionStatus.SOLVED]: { icon: '●', color: '#22c55e', label: '已完成' },
-};
+// 重新导出给外部使用
+export { QuestionStatus, getQuestionStatusMap };
+export const setQuestionStatus = setStatusToServer;
 
 // 分类图标
 const CategoryIcon: Partial<Record<CategoryTag, string>> = {
@@ -28,42 +25,20 @@ const CategoryIcon: Partial<Record<CategoryTag, string>> = {
   [CategoryTag.ALGORITHM]: '🧮',
 };
 
-// localStorage key
-const QUESTION_STATUS_KEY = 'question-status-map';
-
-// 获取所有题目状态
-export function getQuestionStatusMap(): Record<string, QuestionStatus> {
-  if (typeof window === 'undefined') return {};
-  try {
-    const data = localStorage.getItem(QUESTION_STATUS_KEY);
-    return data ? JSON.parse(data) : {};
-  } catch {
-    return {};
-  }
-}
-
-// 设置单个题目状态
-export function setQuestionStatus(questionId: string, status: QuestionStatus) {
-  if (typeof window === 'undefined') return;
-  const map = getQuestionStatusMap();
-  map[questionId] = status;
-  localStorage.setItem(QUESTION_STATUS_KEY, JSON.stringify(map));
-}
-
 interface QuestionSidebarProps {
-  questions: Question[];
-  questionsByCategory: Map<CategoryTag, Question[]>;
-  selectedQuestionId: string | null;
+  questions: QuestionListItem[];
+  questionsByCategory: Map<CategoryTag, QuestionListItem[]>;
+  selectedQuestionId: number | null;
   selectedCategoryTag: CategoryTag | null;
   expandedCategories: Set<CategoryTag>;
-  onSelectQuestion: (id: string, categoryTag: CategoryTag) => void;
+  onSelectQuestion: (id: number, categoryTag: CategoryTag) => void;
   onToggleCategory: (tag: CategoryTag) => void;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 }
 
 const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
-  questions,
+  questions: _questions,
   questionsByCategory,
   selectedQuestionId,
   selectedCategoryTag,
@@ -73,33 +48,30 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
   collapsed = false,
   onToggleCollapse,
 }, ref) => {
-  const [statusMap, setStatusMap] = useState<Record<string, QuestionStatus>>({});
+  const [statusMap, setStatusMap] = useState<Record<number, QuestionStatus>>({});
 
-  // 加载状态数据
+  // 加载状态数据（从服务器）
   useEffect(() => {
-    setStatusMap(getQuestionStatusMap());
-  }, []);
-
-  // 监听localStorage变化（其他标签页或组件更新时）
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setStatusMap(getQuestionStatusMap());
+    const loadStatus = async () => {
+      if (!isStatusCacheLoaded('code')) {
+        await loadQuestionStatusFromServer('code');
+      }
+      setStatusMap(getQuestionStatusMap('code'));
     };
-    
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    loadStatus();
   }, []);
 
-  // 更新状态并刷新UI
-  const updateStatus = (questionId: string, status: QuestionStatus) => {
-    setQuestionStatus(questionId, status);
-    setStatusMap(prev => ({ ...prev, [questionId]: status }));
-  };
+  // 定时刷新状态（可选，用于多标签页同步）
+  useEffect(() => {
+    const refreshStatus = () => {
+      setStatusMap(getQuestionStatusMap('code'));
+    };
 
-  // 暴露给外部的更新方法（通过ref或context，这里简化处理）
-  // 当有代码保存时，外部可以调用 setQuestionStatus 来更新状态
+    // 每次组件重新渲染时刷新
+    refreshStatus();
+  });
 
-  const getStatus = (questionId: string): QuestionStatus => {
+  const getStatus = (questionId: number): QuestionStatus => {
     return statusMap[questionId] ?? QuestionStatus.NOT_DONE;
   };
 
@@ -197,8 +169,6 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
                       {categoryQuestions.map((q) => {
                         const categoryTag = tag as CategoryTag;
                         const isSelected = selectedQuestionId === q.id && selectedCategoryTag === categoryTag;
-                        const status = getStatus(q.id);
-                        const statusInfo = StatusIcon[status];
                         const questionKey = `${categoryTag}-${q.id}`;
 
                         return (

@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Docker MySQL data (不提交数据库数据)
+/docker/mysql/data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

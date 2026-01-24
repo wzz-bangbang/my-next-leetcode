@@ -45,17 +45,30 @@ export interface TestCase {
   description?: string; // 用例说明（可选）
 }
 
-// 题目接口
-export interface Question {
-  id: string;
+// 题目列表项（不含详情）
+export interface QuestionListItem {
+  id: number;
+  slug: string;
   title: string;
   difficulty: Difficulty;
   tags: CategoryTag[];
-  description?: string;
+}
 
-  // 扩展字段
-  testCases?: TestCase[];      // 建议用例
-  template?: string;           // 模板代码
-  solution?: string;           // 思路解析（支持 Markdown）
-  followUp?: string[];         // 进阶思考题
+// 题目详情（含详情和状态）
+export interface QuestionDetail extends QuestionListItem {
+  description?: string;
+  testCases?: TestCase[];
+  template?: string;
+  solution?: string;
+  followUp?: string[];
+  isFavorited: boolean;
+}
+
+// 兼容旧类型
+export interface Question extends QuestionListItem {
+  description?: string;
+  testCases?: TestCase[];
+  template?: string;
+  solution?: string;
+  followUp?: string[];
 }

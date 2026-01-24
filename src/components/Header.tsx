@@ -3,17 +3,42 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { preloadBaguData } from '@/lib/bagu-data';
+
+// 预加载页面组件的函数
+const preloadCodeEditor = () => import('@/app/code-editor/_components/CodeEditorClient');
+const preloadBagu = () => import('@/app/bagu/_components/BaguClient');
+const preloadMarkdown = () => import('@/app/bagu/_components/MarkdownContent');
 
 export default function Header() {
   const pathname = usePathname();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // 预加载八股数据（不在八股页时）
+  // 空闲时预加载其他页面的组件
   useEffect(() => {
-    if (pathname !== '/bagu') {
-      preloadBaguData();
+    const preload = () => {
+      if (pathname === '/bagu') {
+        // 在八股页时，预加载代码编辑器
+        preloadCodeEditor();
+      } else if (pathname === '/code-editor') {
+        // 在代码页时，预加载八股组件
+        preloadBagu();
+      } else {
+        // 在其他页面，预加载两个主要页面
+        preloadBagu();
+        preloadCodeEditor();
+      }
+      // 总是预加载 Markdown 组件
+      preloadMarkdown();
+    };
+
+    // 使用 requestIdleCallback 在空闲时预加载
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(preload, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    } else {
+      const timer = setTimeout(preload, 1000);
+      return () => clearTimeout(timer);
     }
   }, [pathname]);
 

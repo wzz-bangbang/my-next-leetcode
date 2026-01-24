@@ -3,20 +3,20 @@
 import { useState, useCallback } from 'react';
 import { Modal, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import type { BaguData, BaguQuestion, BaguCategory } from '@/types/bagu';
+import type { BaguListData, BaguQuestionListItem, BaguCategory } from '@/types/bagu';
 
 interface SimulationGroup {
   category: string;
-  questions: BaguQuestion[];
+  questions: BaguQuestionListItem[];
 }
 
 interface SimulationModalProps {
-  data: BaguData | null;
+  data: BaguListData | null;
   filteredCategories: BaguCategory[];
   filterMode: 'all' | 'incomplete' | 'favorited';
-  onSelectQuestion: (question: BaguQuestion, categoryId: string) => void;
-  onExpandCategory: (categoryId: string) => void;
-  expandedCategories: Set<string>;
+  onSelectQuestion: (question: BaguQuestionListItem, categoryId: number) => void;
+  onExpandCategory: (categoryId: number) => void;
+  expandedCategories: Set<number>;
 }
 
 export default function SimulationModal({
@@ -150,7 +150,7 @@ export default function SimulationModal({
 
   // 点击题目跳转
   const handleSelectQuestion = useCallback(
-    (question: BaguQuestion) => {
+    (question: BaguQuestionListItem) => {
       // 找到题目所属的分类
       const category = data?.categories.find((c) =>
         c.questions.some((cq) => cq.id === question.id)

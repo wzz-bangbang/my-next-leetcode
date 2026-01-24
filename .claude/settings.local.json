@@ -4,7 +4,25 @@
       "Bash(npm run build)",
       "Bash(pkill:*)",
       "Bash(lsof:*)",
-      "Bash(xargs kill:*)"
+      "Bash(xargs kill:*)",
+      "Bash(python3:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"const data = require\\(''./public/questions.json''\\); const ids = [''handwrite-bind'',''handwrite-new'',''array-unique'',''array-flatten'',''deep-equal'',''handwrite-object-assign'',''proxy'',''prototype-inheritance'',''compose-middleware'',''object-create'',''handwrite-instanceof'']; ids.forEach\\(id => { const q = data.find\\(x => x.id === id\\); console.log\\(id + '':'', q && q.testCases && q.testCases[0] && typeof q.testCases[0] === ''object'' ? ''OK'' : ''WRONG''\\); }\\);\")",
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose --version:*)",
+      "Bash(npx eslint:*)",
+      "Bash(curl:*)",
+      "Bash(for i in 1 2 3 4 5)",
+      "Bash(do curl -w \"Request $i: %{time_total}s\\\\n\" -o /dev/null -s \"http://localhost:3000/api/question-status?type=2\")",
+      "Bash(done)",
+      "Bash(ping:*)",
+      "Bash(echo:*)",
+      "Bash(export no_proxy=localhost,127.0.0.1)",
+      "Bash(__NEW_LINE_849eba1ee24187be__ echo \"=== Docker MySQL 连接测试 ===\")",
+      "Bash(__NEW_LINE_849eba1ee24187be__ echo \"\")",
+      "Bash(time nc:*)"
     ]
   }
 }

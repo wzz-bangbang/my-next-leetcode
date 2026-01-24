@@ -4,7 +4,7 @@ import type { BaguData } from '@/types/bagu';
 let cachedData: BaguData | null = null;
 let fetchPromise: Promise<BaguData> | null = null;
 
-// 获取数据（带缓存）
+// 获取数据（带缓存）- 从 API 获取
 export async function getBaguData(): Promise<BaguData> {
   // 如果已缓存，直接返回
   if (cachedData) {
@@ -16,8 +16,8 @@ export async function getBaguData(): Promise<BaguData> {
     return fetchPromise;
   }
 
-  // 发起请求
-  fetchPromise = fetch('/bagu-data.json')
+  // 发起请求 - 从数据库 API 获取
+  fetchPromise = fetch('/api/bagu')
     .then((res) => res.json())
     .then((data: BaguData) => {
       cachedData = data;
@@ -58,6 +58,3 @@ export function isBaguDataCached(): boolean {
 export function getCachedBaguData(): BaguData | null {
   return cachedData;
 }
-
-
-
