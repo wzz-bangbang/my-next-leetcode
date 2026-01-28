@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import LoginButton from './LoginButton';
 
 // 预加载页面组件的函数
 const preloadCodeEditor = () => import('@/app/code-editor/_components/CodeEditorClient');
@@ -11,28 +12,21 @@ const preloadMarkdown = () => import('@/app/bagu/_components/MarkdownContent');
 
 export default function Header() {
   const pathname = usePathname();
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   // 空闲时预加载其他页面的组件
   useEffect(() => {
     const preload = () => {
       if (pathname === '/bagu') {
-        // 在八股页时，预加载代码编辑器
         preloadCodeEditor();
       } else if (pathname === '/code-editor') {
-        // 在代码页时，预加载八股组件
         preloadBagu();
       } else {
-        // 在其他页面，预加载两个主要页面
         preloadBagu();
         preloadCodeEditor();
       }
-      // 总是预加载 Markdown 组件
       preloadMarkdown();
     };
 
-    // 使用 requestIdleCallback 在空闲时预加载
     if ('requestIdleCallback' in window) {
       const id = window.requestIdleCallback(preload, { timeout: 3000 });
       return () => window.cancelIdleCallback(id);
@@ -42,27 +36,9 @@ export default function Header() {
     }
   }, [pathname]);
 
-  // 点击外部关闭菜单
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsUserMenuOpen(false);
-      }
-    };
-
-    if (isUserMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isUserMenuOpen]);
-
   const navItems = [
     { href: '/bagu', label: '📚 八股文', mobileLabel: '📚 八股' },
     { href: '/code-editor', label: '🚀 刷题', mobileLabel: '🚀 刷题' },
-  ];
-
-  const userMenuItems = [
-    { icon: '⭐', label: '收藏清单', href: '/favorites' },
   ];
 
   return (
@@ -79,7 +55,7 @@ export default function Header() {
             backgroundClip: 'text',
           }}
         >
-          求职指北
+          前端求职指北
         </Link>
 
         {/* 分隔线 */}
@@ -117,35 +93,8 @@ export default function Header() {
         </nav>
       </div>
 
-      {/* 用户按钮 */}
-      <div ref={menuRef} className="relative">
-        <button
-          onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-          className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full bg-gradient-to-br from-sky-100 to-teal-100 flex items-center justify-center text-sky-600 text-xs sm:text-sm shadow-sm hover:shadow-md hover:from-sky-200 hover:to-teal-200 transition-all duration-200 border border-sky-200/50"
-        >
-          👤
-        </button>
-
-        {/* 用户菜单浮窗 */}
-        {isUserMenuOpen && (
-          <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="py-1">
-              {userMenuItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsUserMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors"
-                >
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      {/* 登录按钮 */}
+      <LoginButton redirectUrl={pathname} />
     </header>
   );
 }
-

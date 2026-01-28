@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Preloader from "@/components/Preloader";
+import HomeLoginButton from "./_components/HomeLoginButton";
 
 export default function Home() {
   return (
@@ -17,6 +18,8 @@ export default function Home() {
         `,
       }}
     >
+      {/* 右上角登录按钮（使用公共组件的包装） */}
+      <HomeLoginButton />
       {/* 装饰性渐变圆形 */}
       <div
         className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-60 blur-3xl"
