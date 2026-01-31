@@ -73,7 +73,7 @@ export default function Header() {
                 className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
                   isActive
                     ? 'text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/30'
+                    : 'text-gray-600 hover:text-gray-900 bg-white/30 hover:bg-white/50 '
                 }`}
                 style={
                   isActive

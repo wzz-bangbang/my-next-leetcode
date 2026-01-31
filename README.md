@@ -38,6 +38,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## 后续优化方向
 
 建用户体系和登录
+忘记密码 修改邮箱
+邮箱验证码注册
+google账号关联注册
+
 部署上线
 ssr
 项目性能&错误监控
@@ -48,3 +52,5 @@ web worker 缓存离线数据
 增加题目遇到次数
 增加 ai 解题和 ai 练习入口
 增加用户维护入口
+自动生成头像昵称
+换昵称 换头像

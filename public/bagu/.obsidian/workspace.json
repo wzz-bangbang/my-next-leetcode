@@ -34,9 +34,21 @@
               "icon": "lucide-file",
               "title": "大文件&长列表&大数据等优化场景"
             }
+          },
+          {
+            "id": "e58efd93d08e007e",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.11.5"
+              },
+              "icon": "lucide-book-up",
+              "title": "Release Notes 1.11.5"
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -198,7 +210,7 @@
       "bases:Create new base": false
     }
   },
-  "active": "1475efd1569d4c45",
+  "active": "e58efd93d08e007e",
   "lastOpenFiles": [
     "Ai及应用.md",
     "工作协作.md",
