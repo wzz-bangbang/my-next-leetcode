@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 interface BaguCategoryRow {
   id: number;
   slug: string;
   name: string;
-  icon: string | null;
   sort_order: number;
 }
 
@@ -19,8 +19,9 @@ interface BaguQuestionRow {
   sort_order: number;
 }
 
-interface FavoriteRow {
-  question_id: number;
+interface ProgressRow {
+  is_favorite: number;
+  status: number;
 }
 
 // GET: 获取八股文数据
@@ -42,12 +43,22 @@ export async function GET(request: NextRequest) {
 
       const row = rows[0];
 
-      // 查询收藏状态
-      const favorites = await query<FavoriteRow[]>(
-        'SELECT question_id FROM user_favorites WHERE user_id = 1 AND question_id = ? AND question_type = 2',
-        [row.id]
-      );
-      const isFavorited = favorites.length > 0;
+      // 查询用户进度（收藏状态 + 完成状态）
+      let isFavorited = false;
+      let userStatus = 0;
+
+      const session = await auth();
+      if (session?.user?.id) {
+        const userId = Number(session.user.id);
+        const progress = await query<ProgressRow[]>(
+          'SELECT is_favorite, status FROM user_bagu_progress WHERE user_id = ? AND question_id = ?',
+          [userId, row.id]
+        );
+        if (progress.length > 0) {
+          isFavorited = progress[0].is_favorite === 1;
+          userStatus = progress[0].status;
+        }
+      }
 
       return NextResponse.json({
         id: row.id,
@@ -57,25 +68,25 @@ export async function GET(request: NextRequest) {
         content: row.content,
         hasAnswer: row.has_answer === 1,
         isFavorited,
+        userStatus,
       });
     }
 
     // 获取列表（只返回基础信息，不含 content）
     const categories = await query<BaguCategoryRow[]>(
-      'SELECT id, slug, name, icon, sort_order FROM bagu_categories ORDER BY sort_order'
+      'SELECT id, slug, name, sort_order FROM bagu_categories ORDER BY sort_order'
     );
 
     const questions = await query<(Pick<BaguQuestionRow, 'id' | 'slug' | 'category_id' | 'title' | 'has_answer'>)[]>(
       'SELECT id, slug, category_id, title, has_answer FROM bagu_questions ORDER BY sort_order'
     );
 
-    // 按分类组织数据
+    // 按分类组织数据（icon 从前端枚举获取）
     const result = {
       categories: categories.map(cat => ({
         id: cat.id,
         slug: cat.slug,
         name: cat.name,
-        icon: cat.icon,
         questions: questions
           .filter(q => q.category_id === cat.id)
           .map(q => ({

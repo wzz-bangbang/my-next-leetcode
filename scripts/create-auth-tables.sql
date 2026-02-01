@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS accounts (
   scope VARCHAR(255),
   id_token TEXT,
   session_state VARCHAR(255),
+  deactivated_user_ids JSON DEFAULT NULL COMMENT '历史失效的user_id数组',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY unique_provider_account (provider, provider_account_id),

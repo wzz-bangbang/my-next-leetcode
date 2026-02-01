@@ -62,6 +62,8 @@ export interface QuestionDetail extends QuestionListItem {
   solution?: string;
   followUp?: string[];
   isFavorited: boolean;
+  userStatus?: number;       // 用户完成状态: 0=未做, 1=尝试中, 2=已完成
+  savedCode?: string | null; // 用户保存的代码
 }
 
 // 兼容旧类型

@@ -6,7 +6,7 @@ import { useSession, signOut, signIn } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { TextInput, PasswordInput, Button, Divider, Alert } from '@mantine/core';
-import { validateLoginForm, validateRegisterForm } from '@/lib/validation';
+import { validateLoginForm, validateRegisterForm, validateUsername } from '@/lib/validation';
 import ProfileModal from './ProfileModal';
 
 interface LoginButtonProps {
@@ -23,17 +23,23 @@ export default function LoginButton({ redirectUrl = '/' }: LoginButtonProps) {
   const isFavoritesActive = pathname === '/favorites';
   
   // 表单状态
+  const [loginType, setLoginType] = useState<'password' | 'code'>('password');
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [verifyCode, setVerifyCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   
   // 字段错误状态
+  const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [codeError, setCodeError] = useState('');
   const [generalError, setGeneralError] = useState('');
 
   const isLoggedIn = status === 'authenticated' && session?.user;
@@ -49,18 +55,24 @@ export default function LoginButton({ redirectUrl = '/' }: LoginButtonProps) {
     setPassword('');
     setConfirmPassword('');
     setName('');
+    setVerifyCode('');
+    setNameError('');
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
+    setCodeError('');
     setGeneralError('');
     setIsRegisterMode(false);
+    setLoginType('password');
   };
   
   // 清除所有错误
   const clearErrors = () => {
+    setNameError('');
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
+    setCodeError('');
     setGeneralError('');
   };
 
@@ -118,11 +130,14 @@ export default function LoginButton({ redirectUrl = '/' }: LoginButtonProps) {
     clearErrors();
 
     // 前端校验
+    const nameValidation = validateUsername(name);
+    setNameError(nameValidation.message);
+    
     const validation = validateRegisterForm(email, password, confirmPassword);
     setEmailError(validation.emailError);
     setPasswordError(validation.passwordError);
     setConfirmPasswordError(validation.confirmPasswordError);
-    if (!validation.isValid) return;
+    if (!nameValidation.valid || !validation.isValid) return;
 
     setIsLoading(true);
 
@@ -268,9 +283,14 @@ export default function LoginButton({ redirectUrl = '/' }: LoginButtonProps) {
                 {/* 注册时显示昵称 */}
                 {isRegisterMode && (
                   <TextInput
-                    placeholder="昵称（选填）"
+                    placeholder="昵称"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      setNameError('');
+                    }}
+                    error={nameError}
+                    maxLength={20}
                     radius="md"
                     size="md"
                   />
@@ -288,47 +308,107 @@ export default function LoginButton({ redirectUrl = '/' }: LoginButtonProps) {
                   size="md"
                 />
                 
-                <PasswordInput
-                  placeholder={isRegisterMode ? '密码（8-14位，含大小写+数字+符号三种）' : '密码（8-14位）'}
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setPasswordError('');
-                  }}
-                  error={passwordError}
-                  radius="md"
-                  size="md"
-                />
+                {/* 密码模式 */}
+                {loginType === 'password' && (
+                  <>
+                    <PasswordInput
+                      placeholder={isRegisterMode ? '密码（8-14位，含大小写+数字+符号三种）' : '密码（8-14位）'}
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setPasswordError('');
+                      }}
+                      error={passwordError}
+                      radius="md"
+                      size="md"
+                    />
 
-                {/* 注册时显示确认密码 */}
-                {isRegisterMode && (
-                  <PasswordInput
-                    placeholder="确认密码"
-                    value={confirmPassword}
-                    onChange={(e) => {
-                      setConfirmPassword(e.target.value);
-                      setConfirmPasswordError('');
-                    }}
-                    error={confirmPasswordError}
-                    radius="md"
-                    size="md"
-                  />
+                    {/* 注册时显示确认密码 */}
+                    {isRegisterMode && (
+                      <PasswordInput
+                        placeholder="确认密码"
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setConfirmPassword(e.target.value);
+                          setConfirmPasswordError('');
+                        }}
+                        error={confirmPasswordError}
+                        radius="md"
+                        size="md"
+                      />
+                    )}
+                  </>
                 )}
 
-                {/* 登录按钮 */}
-                <Button
-                  type="submit"
-                  loading={isLoading}
-                  fullWidth
-                  radius="md"
-                  size="md"
-                  variant="light"
-                  color="cyan"
-                  className="!bg-gradient-to-r !from-sky-100 !to-teal-100 !text-sky-700 hover:!from-sky-200 hover:!to-teal-200 !border !border-sky-200/50"
-                >
-                  {isRegisterMode ? '注册' : '登录'}
-                </Button>
+                {/* 验证码模式 */}
+                {loginType === 'code' && (
+                  <div className="flex gap-2">
+                    <TextInput
+                      placeholder="验证码"
+                      value={verifyCode}
+                      onChange={(e) => {
+                        setVerifyCode(e.target.value);
+                        setCodeError('');
+                      }}
+                      error={codeError}
+                      radius="md"
+                      size="md"
+                      className="flex-1"
+                      maxLength={6}
+                    />
+                    <Button
+                      type="button"
+                      variant="light"
+                      color="gray"
+                      radius="md"
+                      size="md"
+                      loading={isSendingCode}
+                      disabled={countdown > 0}
+                      onClick={() => {
+                        // TODO: 发送验证码
+                      }}
+                      className="whitespace-nowrap"
+                    >
+                      {countdown > 0 ? `${countdown}s` : '获取验证码'}
+                    </Button>
+                  </div>
+                )}
+                {/* 忘记密码+ 切换登录方式 */}
+                <div className="flex items-center gap-2 justify-between">
+                <button
+                    type="button"
+                    onClick={() => {
+                      setLoginType(loginType === 'password' ? 'code' : 'password');
+                      clearErrors();
+                    }}
+                    className="text-xs text-gray-500 hover:text-purple-600 whitespace-nowrap transition-colors"
+                  >
+                    {loginType === 'password' ? '验证码登录' : '密码登录'}
+                  </button>
+                  {loginType === 'password' && <button
+                    type="button"
+                    onClick={() => {
+                      // todo
+                    }}
+                    className="text-xs text-gray-500 hover:text-purple-600 whitespace-nowrap transition-colors"
+                  >
+                    忘记密码
+                  </button>}
 
+                </div>
+                {/* 登录按钮 + 切换登录方式 */}
+                <Button
+                  fullWidth
+                    type="submit"
+                    loading={isLoading}
+                    radius="md"
+                    size="md"
+                    variant="light"
+                    color="cyan"
+                    className="!bg-gradient-to-r !from-sky-100 !to-teal-100 !text-sky-700 hover:!from-sky-200 hover:!to-teal-200 !border !border-sky-200/50"
+                >
+                    {isRegisterMode ? '注册' : '登录'}
+                </Button>
                 {/* 切换登录/注册 */}
                 <Button
                   type="button"

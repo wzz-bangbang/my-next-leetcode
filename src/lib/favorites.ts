@@ -9,7 +9,7 @@ const FAVORITES_CODE_KEY = 'favorites-code';
 
 export type FavoriteType = 'bagu' | 'code';
 
-// 获取收藏列表
+// 获取收藏列表（从本地缓存）
 export function getFavorites(type: FavoriteType): Set<number> {
   if (typeof window === 'undefined') return new Set();
   const key = type === 'bagu' ? FAVORITES_BAGU_KEY : FAVORITES_CODE_KEY;
@@ -22,7 +22,7 @@ export function getFavorites(type: FavoriteType): Set<number> {
   }
 }
 
-// 设置收藏状态
+// 设置收藏状态（同时更新本地缓存和服务器）
 export function setFavorite(type: FavoriteType, questionId: number, isFavorite: boolean): void {
   if (typeof window === 'undefined') return;
   const key = type === 'bagu' ? FAVORITES_BAGU_KEY : FAVORITES_CODE_KEY;
@@ -36,8 +36,8 @@ export function setFavorite(type: FavoriteType, questionId: number, isFavorite: 
 
   localStorage.setItem(key, JSON.stringify([...set]));
 
-  // 同时保存到服务器
-  saveFavoritesToServer(type, [...set]);
+  // 同步到服务器（使用 PATCH 更新单个）
+  toggleFavoriteOnServer(type, questionId, isFavorite);
 }
 
 // 切换收藏状态
@@ -53,16 +53,16 @@ export function isFavorited(type: FavoriteType, questionId: number): boolean {
   return getFavorites(type).has(questionId);
 }
 
-// 保存到服务器
-async function saveFavoritesToServer(type: FavoriteType, ids: number[]): Promise<void> {
+// 切换单个收藏状态到服务器
+async function toggleFavoriteOnServer(type: FavoriteType, questionId: number, isFavorite: boolean): Promise<void> {
   try {
     await fetch('/api/favorites', {
-      method: 'POST',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, ids }),
+      body: JSON.stringify({ type, questionId, isFavorite }),
     });
   } catch (error) {
-    console.error('Save favorites to server failed:', error);
+    console.error('Toggle favorite on server failed:', error);
   }
 }
 

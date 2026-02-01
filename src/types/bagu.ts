@@ -11,6 +11,7 @@ export interface BaguQuestionDetail extends BaguQuestionListItem {
   categoryId: number;
   content: string | null;
   isFavorited: boolean;
+  userStatus?: number; // 用户完成状态: 0=未做, 1=尝试中, 2=已完成
 }
 
 // 八股文分类（列表用）

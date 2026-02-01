@@ -24,6 +24,7 @@ import QuestionSidebar, { QuestionStatus, setQuestionStatus, getQuestionStatusMa
 import { CategoryTag, Difficulty, DifficultyLabel, DifficultyColor, CategoryTagLabel, QuestionListItem, QuestionDetail } from '@/types/question';
 import { useQuestionRoute, scrollToSelected } from '@/hooks/useQuestionRoute';
 import { toggleFavorite } from '@/lib/favorites';
+import { validateCode, CODE_MAX_LINES, CODE_MAX_CHARS } from '@/lib/validation';
 
 interface CodeEditorClientProps {
   initialQuestions: QuestionListItem[];
@@ -282,39 +283,23 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     };
   }, []);
 
-  // 切换题目时自动加载历史代码
-  const loadSavedCode = useCallback(async (questionId: number, template?: string) => {
-    try {
-      const res = await fetch(`/api/answers?questionId=${questionId}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.code) {
-          setCode(data.code);
-        } else {
-          setCode(template || '');
-        }
-      } else {
-        setCode(template || '');
-      }
-    } catch (error) {
-      console.error('Auto load failed:', error);
-      setCode(template || '');
-    }
-  }, []);
-
+  // 切换题目时加载代码（优先使用 API 返回的 savedCode，否则用模板）
   useEffect(() => {
     if (selectedQuestionId && isClient && selectedDetail) {
       resetExecutionResult();
-      loadSavedCode(selectedQuestionId, selectedDetail.template);
+      // 优先使用用户保存的代码，否则使用模板
+      const initialCode = selectedDetail.savedCode || selectedDetail.template || '';
+      setCode(initialCode);
     }
-  }, [selectedQuestionId, isClient, loadSavedCode, selectedDetail, resetExecutionResult]);
+  }, [selectedQuestionId, isClient, selectedDetail, resetExecutionResult]);
 
   const handleSelectChange = useCallback(async (value: number | null, categoryTag?: CategoryTag) => {
     if (value && (value !== selectedQuestionId || categoryTag !== selectedCategoryTag)) {
-      // 自动保存当前代码
+      // 自动保存当前代码（需通过长度校验）
       if (code.trim() && selectedQuestionId && selectedDetail) {
         const template = selectedDetail.template || '';
-        if (code.trim() !== template.trim()) {
+        const codeValidation = validateCode(code);
+        if (code.trim() !== template.trim() && codeValidation.valid) {
           try {
             const res = await fetch('/api/answers', {
               method: 'POST',
@@ -389,6 +374,12 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     }
     if (!code.trim()) {
       notifications.show({ autoClose: 1500, title: '提示', message: '代码内容不能为空', color: 'yellow' });
+      return;
+    }
+    // 校验代码长度
+    const codeValidation = validateCode(code);
+    if (!codeValidation.valid) {
+      notifications.show({ autoClose: 3000, title: '代码过长', message: codeValidation.message, color: 'red' });
       return;
     }
     try {
@@ -842,12 +833,23 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
           {/* 右侧：代码和结果区 */}
           <div ref={codeContainerRef} className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
             {/* 代码编辑器 */}
-            <div style={{ height: `${codeHeightPercent}%`, minHeight: 0 }}>
-              <CodeEditorPanel
-                code={code}
-                onChange={onCodeChange}
-                height="100%"
-              />
+            <div style={{ height: `${codeHeightPercent}%`, minHeight: 0 }} className="flex flex-col">
+              <div className="flex-1 min-h-0">
+                <CodeEditorPanel
+                  code={code}
+                  onChange={onCodeChange}
+                  height="100%"
+                />
+              </div>
+              {/* 代码统计状态栏 */}
+              <div className="flex-shrink-0 px-3 py-1.5 bg-gray-100/80 border-t border-gray-200/50 text-xs text-gray-500 flex items-center justify-end gap-4">
+                <span className={code.split('\n').length > CODE_MAX_LINES ? 'text-red-500 font-medium' : ''}>
+                  行数: {code.split('\n').length} / {CODE_MAX_LINES}
+                </span>
+                <span className={code.length > CODE_MAX_CHARS ? 'text-red-500 font-medium' : ''}>
+                  字符: {code.length.toLocaleString()} / {CODE_MAX_CHARS.toLocaleString()}
+                </span>
+              </div>
             </div>
 
             {/* 隐藏的 sandbox iframe */}

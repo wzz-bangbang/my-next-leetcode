@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 import { query } from '@/lib/db';
 import type { BaguListData } from '@/types/bagu';
+import { BaguCategories, BaguCategoryId } from '@/lib/baguCategories';
 import BaguClient from './_components/BaguClient';
 
 interface BaguCategoryRow {
   id: number;
   slug: string;
   name: string;
-  icon: string | null;
   sort_order: number;
 }
 
@@ -22,7 +22,7 @@ interface BaguQuestionRow {
 // 服务端获取列表数据（不含 content）
 async function getBaguListData(): Promise<BaguListData> {
   const categories = await query<BaguCategoryRow[]>(
-    'SELECT id, slug, name, icon, sort_order FROM bagu_categories ORDER BY sort_order'
+    'SELECT id, slug, name, sort_order FROM bagu_categories ORDER BY sort_order'
   );
 
   const questions = await query<BaguQuestionRow[]>(
@@ -34,7 +34,7 @@ async function getBaguListData(): Promise<BaguListData> {
       id: cat.id,
       slug: cat.slug,
       name: cat.name,
-      icon: cat.icon,
+      icon: BaguCategories[cat.id as BaguCategoryId]?.icon || null,
       questions: questions
         .filter(q => q.category_id === cat.id)
         .map(q => ({

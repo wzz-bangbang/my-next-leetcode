@@ -4,6 +4,39 @@ export interface ValidationResult {
   message: string;
 }
 
+// 用户名校验：最大20字符
+export function validateUsername(username: string): ValidationResult {
+  if (username && username.length > 20) {
+    return { valid: false, message: '昵称最多20个字符' };
+  }
+  
+  return { valid: true, message: '' };
+}
+
+// 代码长度限制常量
+export const CODE_MAX_LINES = 400;
+export const CODE_MAX_CHARS = 50000;
+
+// 代码长度校验：最大400行，50000字符
+export function validateCode(code: string): ValidationResult {
+  if (!code) {
+    return { valid: true, message: '' };
+  }
+
+  const lines = code.split('\n').length;
+  const chars = code.length;
+
+  if (lines > CODE_MAX_LINES) {
+    return { valid: false, message: `代码最多 ${CODE_MAX_LINES} 行，当前 ${lines} 行` };
+  }
+
+  if (chars > CODE_MAX_CHARS) {
+    return { valid: false, message: `代码最多 ${CODE_MAX_CHARS.toLocaleString()} 字符，当前 ${chars.toLocaleString()} 字符` };
+  }
+
+  return { valid: true, message: '' };
+}
+
 // 邮箱格式校验
 export function validateEmail(email: string): ValidationResult {
   if (!email.trim()) {

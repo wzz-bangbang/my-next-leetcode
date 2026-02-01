@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Preloader from "@/components/Preloader";
-import HomeLoginButton from "./_components/HomeLoginButton";
+import HomeLoginButton from "../components/HomeLoginButton";
 
 export default function Home() {
   return (

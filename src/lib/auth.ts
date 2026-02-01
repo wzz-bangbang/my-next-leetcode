@@ -95,17 +95,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return true;
       }
 
-      // 如果没有邮箱，生成一个临时邮箱
-      if (!user.email) {
-        if (account.provider === 'github') {
-          const githubProfile = profile as { login?: string };
-          user.email = githubProfile?.login ? `${githubProfile.login}@github.local` : `${account.providerAccountId}@github.local`;
-        } else {
-          user.email = `${account.providerAccountId}@${account.provider}.local`;
-        }
-        console.log('[Auth] No email, using generated:', user.email);
-      }
-
       try {
         // 查找是否已有此 OAuth 账号
         const existingAccounts = await query<{ user_id: number }[]>(
@@ -114,29 +103,66 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
 
         if (existingAccounts.length > 0) {
+          const oldUserId = existingAccounts[0].user_id;
+          
           // 检查用户是否已注销
           const userStatus = await query<{ status: number | null }[]>(
             'SELECT status FROM users WHERE id = ?',
-            [existingAccounts[0].user_id]
+            [oldUserId]
           );
           
           if (userStatus.length > 0 && userStatus[0].status === 1) {
-            console.log('[Auth] User is deactivated, rejecting OAuth login');
-            return false;
+            // 用户已注销：创建新用户，保留旧 user_id 到历史记录
+            console.log('[Auth] User deactivated, creating new user. Old user_id:', oldUserId);
+            
+            // 1. 创建新用户
+            const newUserResult = await query<{ insertId: number }>(
+              `INSERT INTO users (username, email, avatar) VALUES (?, ?, ?)`,
+              [user.name ?? 'Unknown', user.email ?? null, user.image ?? null]
+            );
+            const newUserId = (newUserResult as unknown as { insertId: number }).insertId;
+            
+            // 2. 获取当前的 deactivated_user_ids
+            const accountData = await query<{ deactivated_user_ids: number[] | null }[]>(
+              'SELECT deactivated_user_ids FROM accounts WHERE provider = ? AND provider_account_id = ?',
+              [account.provider, account.providerAccountId]
+            );
+            const existingIds = accountData[0]?.deactivated_user_ids ?? [];
+            const updatedIds = [...existingIds, oldUserId];
+            
+            // 3. 更新 accounts：新 user_id + 历史记录 + token
+            await query(
+              `UPDATE accounts SET 
+                user_id = ?, 
+                deactivated_user_ids = ?,
+                access_token = ?, 
+                refresh_token = ?, 
+                expires_at = ?
+               WHERE provider = ? AND provider_account_id = ?`,
+              [
+                newUserId,
+                JSON.stringify(updatedIds),
+                account.access_token ?? null,
+                account.refresh_token ?? null,
+                account.expires_at ?? null,
+                account.provider,
+                account.providerAccountId,
+              ]
+            );
+          } else {
+            // 用户正常：只更新 OAuth token
+            await query(
+              `UPDATE accounts SET access_token = ?, refresh_token = ?, expires_at = ? 
+               WHERE provider = ? AND provider_account_id = ?`,
+              [
+                account.access_token ?? null,
+                account.refresh_token ?? null,
+                account.expires_at ?? null,
+                account.provider,
+                account.providerAccountId,
+              ]
+            );
           }
-
-          // 已存在，更新 token
-          await query(
-            `UPDATE accounts SET access_token = ?, refresh_token = ?, expires_at = ? 
-             WHERE provider = ? AND provider_account_id = ?`,
-            [
-              account.access_token ?? null,
-              account.refresh_token ?? null,
-              account.expires_at ?? null,
-              account.provider,
-              account.providerAccountId,
-            ]
-          );
         } else {
           // 新用户：先创建 user，再创建 account
           const result = await query<{ insertId: number }>(

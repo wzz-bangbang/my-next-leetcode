@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 interface CodeQuestionListRow {
   id: number;
@@ -17,8 +18,13 @@ interface CodeQuestionDetailRow extends CodeQuestionListRow {
   follow_up: string[] | null;
 }
 
-interface FavoriteRow {
-  question_id: number;
+interface ProgressRow {
+  is_favorite: number;
+  status: number;
+}
+
+interface UserAnswerRow {
+  code: string;
 }
 
 // GET: 获取代码题数据
@@ -40,12 +46,34 @@ export async function GET(request: NextRequest) {
 
       const row = rows[0];
 
-      // 查询收藏状态
-      const favorites = await query<FavoriteRow[]>(
-        'SELECT question_id FROM user_favorites WHERE user_id = 1 AND question_id = ? AND question_type = 1',
-        [row.id]
-      );
-      const isFavorited = favorites.length > 0;
+      // 查询用户进度和保存的代码（需要用户登录）
+      let isFavorited = false;
+      let userStatus = 0;
+      let savedCode: string | null = null;
+
+      const session = await auth();
+      if (session?.user?.id) {
+        const userId = Number(session.user.id);
+        
+        // 查询进度（收藏状态 + 完成状态）
+        const progress = await query<ProgressRow[]>(
+          'SELECT is_favorite, status FROM user_code_progress WHERE user_id = ? AND question_id = ?',
+          [userId, row.id]
+        );
+        if (progress.length > 0) {
+          isFavorited = progress[0].is_favorite === 1;
+          userStatus = progress[0].status;
+        }
+
+        // 查询用户保存的代码
+        const userAnswer = await query<UserAnswerRow[]>(
+          'SELECT code FROM user_answers WHERE user_id = ? AND question_id = ?',
+          [userId, row.id]
+        );
+        if (userAnswer.length > 0 && userAnswer[0].code) {
+          savedCode = userAnswer[0].code;
+        }
+      }
 
       return NextResponse.json({
         id: row.id,
@@ -59,6 +87,8 @@ export async function GET(request: NextRequest) {
         testCases: row.test_cases,
         followUp: row.follow_up,
         isFavorited,
+        userStatus,
+        savedCode,
       });
     }
 

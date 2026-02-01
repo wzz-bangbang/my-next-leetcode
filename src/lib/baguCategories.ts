@@ -16,23 +16,28 @@ export enum BaguCategoryId {
   TEAMWORK = 14,
 }
 
-// 分类信息映射
-export const BaguCategories: Record<BaguCategoryId, { slug: string; name: string }> = {
-  [BaguCategoryId.JS_BASIC]: { slug: 'js-basic', name: 'JS基础' },
-  [BaguCategoryId.TYPESCRIPT]: { slug: 'typescript', name: 'TypeScript' },
-  [BaguCategoryId.CSS_HTML]: { slug: 'css-html', name: 'CSS & HTML' },
-  [BaguCategoryId.REACT]: { slug: 'react', name: 'React' },
-  [BaguCategoryId.VUE]: { slug: 'vue', name: 'Vue' },
-  [BaguCategoryId.BROWSER]: { slug: 'browser', name: '浏览器' },
-  [BaguCategoryId.NEXTJS]: { slug: 'nextjs', name: 'Next.js' },
-  [BaguCategoryId.ENGINEERING]: { slug: 'engineering', name: '工程化' },
-  [BaguCategoryId.CICD]: { slug: 'cicd', name: 'CI&CD' },
-  [BaguCategoryId.OPEN_QUESTIONS]: { slug: 'open-questions', name: '开放题&场景题' },
-  [BaguCategoryId.MINIPROGRAM]: { slug: 'miniprogram', name: '小程序' },
-  [BaguCategoryId.AI]: { slug: 'ai', name: 'AI' },
-  [BaguCategoryId.TECH_SELECTION]: { slug: 'tech-selection', name: '技术选型' },
-  [BaguCategoryId.TEAMWORK]: { slug: 'teamwork', name: '工作协作' },
+// 分类信息映射（包含 icon）
+export const BaguCategories: Record<BaguCategoryId, { slug: string; name: string; icon: string }> = {
+  [BaguCategoryId.JS_BASIC]: { slug: 'js-basic', name: 'JS基础', icon: '📜' },
+  [BaguCategoryId.TYPESCRIPT]: { slug: 'typescript', name: 'TypeScript', icon: '📘' },
+  [BaguCategoryId.CSS_HTML]: { slug: 'css-html', name: 'CSS & HTML', icon: '🎨' },
+  [BaguCategoryId.REACT]: { slug: 'react', name: 'React', icon: '⚛️' },
+  [BaguCategoryId.VUE]: { slug: 'vue', name: 'Vue', icon: '💚' },
+  [BaguCategoryId.BROWSER]: { slug: 'browser', name: '浏览器', icon: '🌐' },
+  [BaguCategoryId.NEXTJS]: { slug: 'nextjs', name: 'Next.js', icon: '▲' },
+  [BaguCategoryId.ENGINEERING]: { slug: 'engineering', name: '工程化', icon: '🔧' },
+  [BaguCategoryId.CICD]: { slug: 'cicd', name: 'CI&CD', icon: '🚀' },
+  [BaguCategoryId.OPEN_QUESTIONS]: { slug: 'open-questions', name: '开放题&场景题', icon: '💡' },
+  [BaguCategoryId.MINIPROGRAM]: { slug: 'miniprogram', name: '小程序', icon: '📱' },
+  [BaguCategoryId.AI]: { slug: 'ai', name: 'AI', icon: '🤖' },
+  [BaguCategoryId.TECH_SELECTION]: { slug: 'tech-selection', name: '技术选型', icon: '⚖️' },
+  [BaguCategoryId.TEAMWORK]: { slug: 'teamwork', name: '工作协作', icon: '🤝' },
 };
+
+// 获取分类图标
+export function getCategoryIcon(id: BaguCategoryId): string {
+  return BaguCategories[id]?.icon || '';
+}
 
 // 根据 slug 获取分类 ID
 export function getCategoryIdBySlug(slug: string): BaguCategoryId | undefined {

@@ -21,23 +21,23 @@ ON DUPLICATE KEY UPDATE username = username;
 -- ========== 代码题相关表 ==========
 
 -- 代码题分类表
--- id: 1=JS分析, 2=JS手写, 3=TS类型, 4=React, 6=算法
+-- id: 1=JS分析, 2=JS手写, 3=TS类型, 4=React, 5=HTML和CSS, 6=算法
 CREATE TABLE IF NOT EXISTS code_categories (
     id TINYINT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
-    icon VARCHAR(10),
     sort_order TINYINT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 初始化代码题分类
-INSERT INTO code_categories (id, name, icon, sort_order) VALUES
-  (1, 'JS代码分析题', '🔍', 1),
-  (2, 'JS手写题', '✍️', 2),
-  (3, 'TS类型题', '📘', 3),
-  (4, 'React代码题', '⚛️', 4),
-  (6, '算法题', '🧮', 6)
-ON DUPLICATE KEY UPDATE name = VALUES(name), icon = VALUES(icon);
+INSERT INTO code_categories (id, name, sort_order) VALUES
+  (1, 'JS代码分析题', 1),
+  (2, 'JS手写题', 2),
+  (3, 'TS类型题', 3),
+  (4, 'React代码题', 4),
+  (5, 'HTML和CSS', 5),
+  (6, '算法题', 6)
+ON DUPLICATE KEY UPDATE name = VALUES(name);
 
 -- 代码题表
 CREATE TABLE IF NOT EXISTS code_questions (
@@ -49,12 +49,11 @@ CREATE TABLE IF NOT EXISTS code_questions (
     description TEXT,
     template TEXT,
     solution TEXT,
-    test_cases JSON,
-    follow_up JSON,
+    test_cases JSON COMMENT '测试用例数组',
+    follow_up JSON COMMENT '进阶问题数组',
     sort_order INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_difficulty (difficulty)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ========== 八股文相关表 ==========
@@ -65,7 +64,6 @@ CREATE TABLE IF NOT EXISTS bagu_categories (
     id TINYINT PRIMARY KEY,
     slug VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(50) NOT NULL,
-    icon VARCHAR(10),
     sort_order INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -100,34 +98,29 @@ CREATE TABLE IF NOT EXISTS user_answers (
     INDEX idx_question (question_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 收藏表
--- question_type: 1=code, 2=bagu
-CREATE TABLE IF NOT EXISTS user_favorites (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL DEFAULT 1,
-    question_id INT NOT NULL,
-    question_type TINYINT NOT NULL DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_favorite (user_id, question_id, question_type),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user (user_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 题目状态表
--- question_type: 1=code, 2=bagu
+-- 代码题进度表（合并了收藏和状态）
 -- status: 0=未开始, 1=尝试中, 2=已完成
-CREATE TABLE IF NOT EXISTS user_question_status (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL DEFAULT 1,
+CREATE TABLE IF NOT EXISTS user_code_progress (
+    user_id INT NOT NULL,
     question_id INT NOT NULL,
-    question_type TINYINT NOT NULL DEFAULT 1,
-    status TINYINT NOT NULL DEFAULT 0,
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '0=未开始, 1=尝试中, 2=已完成',
+    is_favorite TINYINT NOT NULL DEFAULT 0 COMMENT '0=未收藏, 1=已收藏',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_status (user_id, question_id, question_type),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_type (question_type),
-    INDEX idx_status (status)
+    PRIMARY KEY (user_id, question_id),
+    INDEX idx_favorite (user_id, is_favorite)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 八股文进度表（合并了收藏和状态）
+CREATE TABLE IF NOT EXISTS user_bagu_progress (
+    user_id INT NOT NULL,
+    question_id INT NOT NULL,
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '0=未开始, 1=尝试中, 2=已完成',
+    is_favorite TINYINT NOT NULL DEFAULT 0 COMMENT '0=未收藏, 1=已收藏',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, question_id),
+    INDEX idx_favorite (user_id, is_favorite)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 笔记表

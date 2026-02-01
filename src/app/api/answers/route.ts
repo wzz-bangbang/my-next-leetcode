@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 interface UserAnswer {
   id: number;
@@ -9,6 +10,12 @@ interface UserAnswer {
 
 // GET: 获取用户答案
 export async function GET(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const userId = Number(session.user.id);
+
   const { searchParams } = new URL(request.url);
   const questionId = searchParams.get('questionId');
 
@@ -16,7 +23,8 @@ export async function GET(request: Request) {
     // 如果没有 questionId，返回所有有答案的题目 ID 列表
     if (!questionId) {
       const rows = await query<UserAnswer[]>(
-        'SELECT question_id FROM user_answers WHERE user_id = 1 AND code IS NOT NULL AND code != ""'
+        'SELECT question_id FROM user_answers WHERE user_id = ? AND code IS NOT NULL AND code != ""',
+        [userId]
       );
 
       const answeredIds = rows.map(row => row.question_id);
@@ -25,8 +33,8 @@ export async function GET(request: Request) {
 
     // 获取特定题目的答案
     const rows = await query<UserAnswer[]>(
-      'SELECT code FROM user_answers WHERE user_id = 1 AND question_id = ?',
-      [questionId]
+      'SELECT code FROM user_answers WHERE user_id = ? AND question_id = ?',
+      [userId, questionId]
     );
 
     if (rows.length === 0) {
@@ -45,6 +53,12 @@ export async function GET(request: Request) {
 
 // POST: 保存用户答案
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const userId = Number(session.user.id);
+
   try {
     const { questionId, code } = await request.json();
 
@@ -58,9 +72,9 @@ export async function POST(request: Request) {
     // 使用 UPSERT（INSERT ... ON DUPLICATE KEY UPDATE）
     await query(
       `INSERT INTO user_answers (user_id, question_id, code)
-       VALUES (1, ?, ?)
+       VALUES (?, ?, ?)
        ON DUPLICATE KEY UPDATE code = VALUES(code), updated_at = CURRENT_TIMESTAMP`,
-      [questionId, code]
+      [userId, questionId, code]
     );
 
     return NextResponse.json({ success: true });

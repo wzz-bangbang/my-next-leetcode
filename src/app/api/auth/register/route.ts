@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
-import { validateEmail, validatePasswordStrength } from '@/lib/validation';
+import { validateEmail, validatePasswordStrength, validateUsername } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
@@ -9,6 +9,12 @@ export async function POST(request: Request) {
     // 参数验证
     if (!email || !password) {
       return Response.json({ error: '邮箱和密码不能为空' }, { status: 400 });
+    }
+
+    // 用户名校验
+    const usernameValidation = validateUsername(name || '');
+    if (!usernameValidation.valid) {
+      return Response.json({ error: usernameValidation.message }, { status: 400 });
     }
 
     // 邮箱格式校验

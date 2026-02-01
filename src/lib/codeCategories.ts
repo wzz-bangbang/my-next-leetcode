@@ -4,6 +4,7 @@ export enum CodeCategoryId {
   JS_HANDWRITE = 2,
   TS_TYPE = 3,
   REACT = 4,
+  // HTML_CSS = 5,
   ALGORITHM = 6,
 }
 
@@ -13,6 +14,7 @@ export const CodeCategories: Record<CodeCategoryId, { name: string; icon: string
   [CodeCategoryId.JS_HANDWRITE]: { name: 'JS手写题', icon: '✍️' },
   [CodeCategoryId.TS_TYPE]: { name: 'TS类型题', icon: '📘' },
   [CodeCategoryId.REACT]: { name: 'React代码题', icon: '⚛️' },
+  // [CodeCategoryId.HTML_CSS]: { name: 'HTML和CSS', icon: '🎨' },
   [CodeCategoryId.ALGORITHM]: { name: '算法题', icon: '🧮' },
 };
 
