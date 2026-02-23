@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { Button } from '@mantine/core';
+import { saveAnswer } from '@/services/answers';
+import { batchSetQuestionStatus } from '@/services/questionStatus';
+import { batchSetFavorites } from '@/services/favorites';
 
 export default function MigratePage() {
   const [log, setLog] = useState<string[]>([]);
@@ -27,12 +30,8 @@ export default function MigratePage() {
 
         for (const [questionId, code] of entries) {
           if (code && typeof code === 'string' && code.trim()) {
-            const res = await fetch('/api/answers', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ questionId, categoryTag: 0, code }),
-            });
-            if (res.ok) {
+            const { ok } = await saveAnswer(Number(questionId), code);
+            if (ok) {
               addLog(`✓ 代码答案已迁移: ${questionId}`);
             } else {
               addLog(`✗ 代码答案迁移失败: ${questionId}`);
@@ -49,18 +48,14 @@ export default function MigratePage() {
       if (statusRaw) {
         const statusMap = JSON.parse(statusRaw);
         const statusList = Object.entries(statusMap).map(([questionId, status]) => ({
-          questionId,
+          questionId: Number(questionId),
           status: status as number,
         }));
         addLog(`找到 ${statusList.length} 条题目状态`);
 
         if (statusList.length > 0) {
-          const res = await fetch('/api/question-status', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ statusList, questionType: 'code' }),
-          });
-          if (res.ok) {
+          const { ok } = await batchSetQuestionStatus(statusList, 'code');
+          if (ok) {
             addLog(`✓ 题目状态已批量迁移: ${statusList.length} 条`);
           } else {
             addLog('✗ 题目状态迁移失败');
@@ -77,12 +72,8 @@ export default function MigratePage() {
         const favorites = JSON.parse(favoritesRaw);
         if (Array.isArray(favorites) && favorites.length > 0) {
           addLog(`找到 ${favorites.length} 条收藏数据`);
-          const res = await fetch('/api/favorites', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: 'code', ids: favorites }),
-          });
-          if (res.ok) {
+          const { ok } = await batchSetFavorites('code', favorites);
+          if (ok) {
             addLog(`✓ 收藏数据已迁移: ${favorites.length} 条`);
           } else {
             addLog('✗ 收藏数据迁移失败');

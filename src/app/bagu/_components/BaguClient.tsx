@@ -11,6 +11,7 @@ import {
   setQuestionStatus,
   loadQuestionStatusFromServer,
 } from '@/lib/questionStatus';
+import { getBaguDetail } from '@/services/questions';
 import dynamic from 'next/dynamic';
 
 // 懒加载 MarkdownContent（包含大量依赖）
@@ -152,27 +153,21 @@ export default function BaguClient({ initialData }: BaguClientProps) {
     if (detailCache.has(questionId)) return;
 
     setIsLoadingDetail(true);
-    try {
-      const res = await fetch(`/api/bagu?id=${questionId}`);
-      if (res.ok) {
-        const detail: BaguQuestionDetail = await res.json();
-        setDetailCache(prev => new Map(prev).set(questionId, detail));
-        // 同步收藏状态
-        setFavoriteQuestions(prev => {
-          const next = new Set(prev);
-          if (detail.isFavorited) {
-            next.add(questionId);
-          } else {
-            next.delete(questionId);
-          }
-          return next;
-        });
-      }
-    } catch (error) {
-      console.error('Failed to fetch detail:', error);
-    } finally {
-      setIsLoadingDetail(false);
+    const { ok, data: detail } = await getBaguDetail(questionId);
+    if (ok && detail) {
+      setDetailCache(prev => new Map(prev).set(questionId, detail));
+      // 同步收藏状态
+      setFavoriteQuestions(prev => {
+        const next = new Set(prev);
+        if (detail.isFavorited) {
+          next.add(questionId);
+        } else {
+          next.delete(questionId);
+        }
+        return next;
+      });
     }
+    setIsLoadingDetail(false);
   }, [detailCache]);
 
   // 选择题目（带自动展开分类）

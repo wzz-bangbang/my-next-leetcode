@@ -1,3 +1,5 @@
+import * as questionStatusApi from '@/services/questionStatus';
+
 // 题目状态枚举
 export enum QuestionStatus {
   NOT_DONE = 0,    // 没做过
@@ -50,9 +52,8 @@ export async function loadQuestionStatusFromServer(type: QuestionTypeKey): Promi
   // 发起新请求
   loadingPromise[typeEnum] = (async () => {
     try {
-      const res = await fetch(`/api/question-status?type=${typeEnum}`);
-      if (res.ok) {
-        const data = await res.json();
+      const { ok, data } = await questionStatusApi.loadQuestionStatus(typeEnum);
+      if (ok && data) {
         const serverMap = data.statusMap || {};
         const numericMap: Record<number, QuestionStatus> = {};
         Object.entries(serverMap).forEach(([key, value]) => {
@@ -106,17 +107,8 @@ export async function setQuestionStatus(
   statusCache[typeEnum][questionId] = status;
 
   // 同步到服务器
-  try {
-    const res = await fetch('/api/question-status', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ questionId, questionType: typeEnum, status }),
-    });
-    return res.ok;
-  } catch (error) {
-    console.error('Set question status failed:', error);
-    return false;
-  }
+  const { ok } = await questionStatusApi.saveQuestionStatus(questionId, typeEnum, status);
+  return ok;
 }
 
 // 清除缓存（用于刷新数据）

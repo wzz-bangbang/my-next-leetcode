@@ -8,6 +8,7 @@ import { getFavorites, loadFavoritesFromServer, setFavorite } from '@/lib/favori
 import { getBaguData, getCachedBaguData } from '@/lib/bagu-data';
 import { CategoryTag, CategoryTagLabel } from '@/types/question';
 import type { BaguData, BaguQuestion } from '@/types/bagu';
+import { getCodeQuestionList } from '@/services/questions';
 
 interface CodeQuestion {
   id: number;
@@ -42,9 +43,9 @@ export default function FavoritesPage() {
     }
 
     // 加载刷题数据
-    fetch('/api/code')
-      .then((res) => res.json())
-      .then(setCodeQuestions);
+    getCodeQuestionList().then(({ data }) => {
+      if (data) setCodeQuestions(data);
+    });
   }, []);
 
   // 八股文收藏按分类分组

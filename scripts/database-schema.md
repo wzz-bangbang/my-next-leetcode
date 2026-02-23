@@ -16,6 +16,7 @@
 | `user_bagu_progress` | 用户八股文进度表 |
 | `user_answers` | 用户代码答案表 |
 | `user_notes` | 用户笔记表（暂未使用） |
+| `email_verification_codes` | 邮箱验证码表 |
 
 ---
 
@@ -176,6 +177,35 @@
 | `updated_at` | TIMESTAMP | ON UPDATE | 更新时间 |
 
 **唯一约束**：`UNIQUE (user_id, question_id, category_tag)`
+
+### email_verification_codes - 邮箱验证码表
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | INT | PK, AUTO_INCREMENT | 记录ID |
+| `email` | VARCHAR(100) | NOT NULL, INDEX | 邮箱地址 |
+| `code` | VARCHAR(6) | NOT NULL | 6位数字验证码 |
+| `type` | TINYINT | NOT NULL, DEFAULT 1 | 类型：1=登录/注册, 2=重置密码 |
+| `ip` | VARCHAR(45) | INDEX | 发送请求的IP地址 |
+| `expires_at` | TIMESTAMP | NOT NULL | 过期时间（5分钟后） |
+| `used` | TINYINT | DEFAULT 0 | 状态：0=未使用, 1=已使用 |
+| `verify_attempts` | TINYINT | DEFAULT 0 | 验证尝试次数 |
+| `locked_until` | TIMESTAMP | NULL | 锁定截止时间 |
+| `created_at` | TIMESTAMP | DEFAULT NOW, INDEX | 创建时间 |
+
+**索引**：
+- `INDEX idx_email_type (email, type)`
+- `INDEX idx_ip (ip)`
+- `INDEX idx_created (created_at)`
+
+**安全限制**：
+| 规则 | 说明 |
+|------|------|
+| 同邮箱60秒限制 | 同一邮箱60秒内只能发送1次 |
+| 同邮箱10分钟限制 | 同一邮箱10分钟内最多发送3次 |
+| 同IP小时限制 | 同一IP每小时最多发送10次 |
+| 验证错误锁定 | 连续错误5次，锁定30分钟 |
+| 验证码过期 | 5分钟有效期 |
 
 ---
 

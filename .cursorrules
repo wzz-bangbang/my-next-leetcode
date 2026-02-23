@@ -1,0 +1,8 @@
+# Cursor Rules
+
+## npm 配置
+- 所有 npm install 命令都使用淘宝镜像源：`--registry=https://registry.npmmirror.com`
+- 示例：`npm install xxx --registry=https://registry.npmmirror.com`
+
+## 语言
+- 回复使用中文

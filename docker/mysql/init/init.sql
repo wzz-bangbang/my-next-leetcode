@@ -136,3 +136,20 @@ CREATE TABLE IF NOT EXISTS user_notes (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 邮箱验证码表
+CREATE TABLE IF NOT EXISTS email_verification_codes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    code VARCHAR(6) NOT NULL,
+    type TINYINT NOT NULL DEFAULT 1 COMMENT '1=登录/注册, 2=重置密码',
+    ip VARCHAR(45) COMMENT '发送请求的IP地址',
+    expires_at TIMESTAMP NOT NULL,
+    used TINYINT DEFAULT 0 COMMENT '0=未使用, 1=已使用',
+    verify_attempts TINYINT DEFAULT 0 COMMENT '验证尝试次数',
+    locked_until TIMESTAMP NULL COMMENT '锁定截止时间',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email_type (email, type),
+    INDEX idx_ip (ip),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

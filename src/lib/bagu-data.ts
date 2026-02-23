@@ -1,4 +1,5 @@
 import type { BaguData } from '@/types/bagu';
+import { getBaguList } from '@/services/questions';
 
 // 缓存数据
 let cachedData: BaguData | null = null;
@@ -17,11 +18,13 @@ export async function getBaguData(): Promise<BaguData> {
   }
 
   // 发起请求 - 从数据库 API 获取
-  fetchPromise = fetch('/api/bagu')
-    .then((res) => res.json())
-    .then((data: BaguData) => {
-      cachedData = data;
-      return data;
+  fetchPromise = getBaguList()
+    .then(({ data }) => {
+      if (data) {
+        cachedData = data;
+        return data;
+      }
+      return { categories: [] } as BaguData;
     })
     .finally(() => {
       fetchPromise = null;

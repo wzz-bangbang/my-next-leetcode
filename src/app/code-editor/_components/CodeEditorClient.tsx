@@ -25,6 +25,8 @@ import { CategoryTag, Difficulty, DifficultyLabel, DifficultyColor, CategoryTagL
 import { useQuestionRoute, scrollToSelected } from '@/hooks/useQuestionRoute';
 import { toggleFavorite } from '@/lib/favorites';
 import { validateCode, CODE_MAX_LINES, CODE_MAX_CHARS } from '@/lib/validation';
+import { getCodeQuestionDetail } from '@/services/questions';
+import { saveAnswer } from '@/services/answers';
 
 interface CodeEditorClientProps {
   initialQuestions: QuestionListItem[];
@@ -148,27 +150,21 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     if (detailCache.has(questionId)) return;
 
     setIsLoadingDetail(true);
-    try {
-      const res = await fetch(`/api/code?id=${questionId}`);
-      if (res.ok) {
-        const detail: QuestionDetail = await res.json();
-        setDetailCache(prev => new Map(prev).set(questionId, detail));
-        // 同步收藏状态
-        setFavoriteQuestions(prev => {
-          const next = new Set(prev);
-          if (detail.isFavorited) {
-            next.add(questionId);
-          } else {
-            next.delete(questionId);
-          }
-          return next;
-        });
-      }
-    } catch (error) {
-      console.error('Failed to fetch detail:', error);
-    } finally {
-      setIsLoadingDetail(false);
+    const { ok, data: detail } = await getCodeQuestionDetail(questionId);
+    if (ok && detail) {
+      setDetailCache(prev => new Map(prev).set(questionId, detail));
+      // 同步收藏状态
+      setFavoriteQuestions(prev => {
+        const next = new Set(prev);
+        if (detail.isFavorited) {
+          next.add(questionId);
+        } else {
+          next.delete(questionId);
+        }
+        return next;
+      });
     }
+    setIsLoadingDetail(false);
   }, [detailCache]);
 
   // URL 路由同步 - 直接选择题目
@@ -300,17 +296,9 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
         const template = selectedDetail.template || '';
         const codeValidation = validateCode(code);
         if (code.trim() !== template.trim() && codeValidation.valid) {
-          try {
-            const res = await fetch('/api/answers', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ questionId: selectedQuestionId, code }),
-            });
-            if (res.ok) {
-              markQuestionAsAttempted(selectedQuestionId);
-            }
-          } catch (error) {
-            console.error('Auto save failed:', error);
+          const { ok } = await saveAnswer(selectedQuestionId, code);
+          if (ok) {
+            markQuestionAsAttempted(selectedQuestionId);
           }
         }
       }
@@ -382,21 +370,13 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       notifications.show({ autoClose: 3000, title: '代码过长', message: codeValidation.message, color: 'red' });
       return;
     }
-    try {
-      const res = await fetch('/api/answers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ questionId: selectedQuestionId, code }),
-      });
-      if (res.ok) {
-        markQuestionAsAttempted(selectedQuestionId);
-        notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存！', color: 'green' });
-      } else {
-        notifications.show({ autoClose: 1500, title: '保存失败', message: '请稍后再试', color: 'red' });
-      }
-    } catch (error) {
-      console.error('Save failed:', error);
-      notifications.show({ autoClose: 1500, title: '网络错误', message: '保存时发生错误', color: 'red' });
+    const { ok, status } = await saveAnswer(selectedQuestionId, code);
+    if (ok) {
+      markQuestionAsAttempted(selectedQuestionId);
+      notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存！', color: 'green' });
+    } else if (status !== 401) {
+      // 401 已由 api 统一处理弹出登录框
+      notifications.show({ autoClose: 1500, title: '保存失败', message: '请稍后再试', color: 'red' });
     }
   };
 
@@ -424,18 +404,10 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       closeTemplateModal();
       return;
     }
-    try {
-      const res = await fetch('/api/answers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ questionId: selectedQuestionId, code }),
-      });
-      if (res.ok) {
-        markQuestionAsAttempted(selectedQuestionId);
-        notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存', color: 'green' });
-      }
-    } catch (error) {
-      console.error('Save failed:', error);
+    const { ok } = await saveAnswer(selectedQuestionId, code);
+    if (ok) {
+      markQuestionAsAttempted(selectedQuestionId);
+      notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存', color: 'green' });
     }
     const template = selectedDetail?.template || '';
     setCode(template);

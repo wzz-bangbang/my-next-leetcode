@@ -2,6 +2,7 @@
  * 收藏管理工具
  * 支持两种类型：bagu（八股文）和 code（代码题）
  */
+import * as favoritesApi from '@/services/favorites';
 
 // localStorage keys
 const FAVORITES_BAGU_KEY = 'favorites-bagu';
@@ -36,8 +37,8 @@ export function setFavorite(type: FavoriteType, questionId: number, isFavorite: 
 
   localStorage.setItem(key, JSON.stringify([...set]));
 
-  // 同步到服务器（使用 PATCH 更新单个）
-  toggleFavoriteOnServer(type, questionId, isFavorite);
+  // 同步到服务器
+  favoritesApi.toggleFavorite(type, questionId, isFavorite);
 }
 
 // 切换收藏状态
@@ -53,33 +54,15 @@ export function isFavorited(type: FavoriteType, questionId: number): boolean {
   return getFavorites(type).has(questionId);
 }
 
-// 切换单个收藏状态到服务器
-async function toggleFavoriteOnServer(type: FavoriteType, questionId: number, isFavorite: boolean): Promise<void> {
-  try {
-    await fetch('/api/favorites', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, questionId, isFavorite }),
-    });
-  } catch (error) {
-    console.error('Toggle favorite on server failed:', error);
-  }
-}
-
 // 从服务器加载收藏（初始化时调用）
 export async function loadFavoritesFromServer(type: FavoriteType): Promise<Set<number>> {
-  try {
-    const res = await fetch(`/api/favorites?type=${type}`);
-    if (res.ok) {
-      const data = await res.json();
-      const ids: number[] = (data.ids || []).map((id: number | string) => Number(id));
-      // 同步到 localStorage
-      const key = type === 'bagu' ? FAVORITES_BAGU_KEY : FAVORITES_CODE_KEY;
-      localStorage.setItem(key, JSON.stringify(ids));
-      return new Set(ids);
-    }
-  } catch (error) {
-    console.error('Load favorites from server failed:', error);
+  const { ok, data } = await favoritesApi.loadFavorites(type);
+  if (ok && data) {
+    const ids: number[] = (data.ids || []).map((id: number | string) => Number(id));
+    // 同步到 localStorage
+    const key = type === 'bagu' ? FAVORITES_BAGU_KEY : FAVORITES_CODE_KEY;
+    localStorage.setItem(key, JSON.stringify(ids));
+    return new Set(ids);
   }
   return getFavorites(type);
 }

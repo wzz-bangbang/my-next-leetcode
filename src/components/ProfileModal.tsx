@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Modal, Text, Stack, Button } from '@mantine/core';
 import { Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
+import { deactivateAccount } from '@/services/auth';
 
 interface ProfileModalProps {
   opened: boolean;
@@ -23,29 +24,21 @@ export default function ProfileModal({ opened, onClose, session, onLogout }: Pro
     setIsDeactivating(true);
     setDeactivateError('');
 
-    try {
-      const res = await fetch('/api/auth/deactivate', {
-        method: 'POST',
-      });
+    const { ok, error } = await deactivateAccount();
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setDeactivateError(data.error || '注销失败');
-        return;
-      }
-
-      // 注销成功：先关闭弹窗，再登出并跳转首页
-      setShowDeactivateConfirm(false);
-      onClose();
-      await signOut({ redirect: false });
-      router.push('/');
-      router.refresh(); // 刷新页面状态
-    } catch {
-      setDeactivateError('注销失败，请稍后重试');
-    } finally {
+    if (!ok) {
+      setDeactivateError(error || '注销失败');
       setIsDeactivating(false);
+      return;
     }
+
+    // 注销成功：先关闭弹窗，再登出并跳转首页
+    setShowDeactivateConfirm(false);
+    onClose();
+    setIsDeactivating(false);
+    await signOut({ redirect: false });
+    router.push('/');
+    router.refresh(); // 刷新页面状态
   };
 
   // 关闭弹窗时重置状态
