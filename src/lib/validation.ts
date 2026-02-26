@@ -69,7 +69,7 @@ export function validatePasswordLength(password: string): ValidationResult {
 }
 
 // 密码强度校验：8-14位，大写、小写、数字、符号至少三种
-export function validatePasswordStrength(password: string): ValidationResult {
+export function validatePassword(password: string): ValidationResult {
   // 先校验长度
   const lengthCheck = validatePasswordLength(password);
   if (!lengthCheck.valid) {
@@ -131,7 +131,7 @@ export function validateRegisterForm(
   isValid: boolean;
 } {
   const emailResult = validateEmail(email);
-  const passwordResult = validatePasswordStrength(password);
+  const passwordResult = validatePassword(password);
   const confirmResult = validateConfirmPassword(password, confirmPassword);
   
   return {
@@ -141,3 +141,6 @@ export function validateRegisterForm(
     isValid: emailResult.valid && passwordResult.valid && confirmResult.valid,
   };
 }
+
+// 别名导出，保持后端兼容
+export { validatePassword as validatePasswordStrength };

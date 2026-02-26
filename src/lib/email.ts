@@ -6,8 +6,9 @@ const EMAIL_FROM = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
 // 验证码类型
 export const CODE_TYPE = {
-  LOGIN: 1,      // 登录/注册
-  RESET: 2,      // 重置密码
+  LOGIN: 1,         // 登录/注册
+  RESET: 2,         // 重置密码
+  CHANGE_EMAIL: 3,  // 换绑邮箱
 } as const;
 
 export type CodeType = typeof CODE_TYPE[keyof typeof CODE_TYPE];
@@ -23,11 +24,20 @@ export async function sendVerificationEmail(
   code: string,
   type: CodeType
 ): Promise<{ success: boolean; error?: string }> {
-  const subject = type === CODE_TYPE.LOGIN 
-    ? '【前端练习】登录验证码'
-    : '【前端练习】重置密码验证码';
+  const getSubjectAndAction = () => {
+    switch (type) {
+      case CODE_TYPE.LOGIN:
+        return { subject: '【前端练习】登录验证码', action: '登录' };
+      case CODE_TYPE.RESET:
+        return { subject: '【前端练习】重置密码验证码', action: '重置密码' };
+      case CODE_TYPE.CHANGE_EMAIL:
+        return { subject: '【前端练习】换绑邮箱验证码', action: '换绑邮箱' };
+      default:
+        return { subject: '【前端练习】验证码', action: '验证' };
+    }
+  };
 
-  const actionText = type === CODE_TYPE.LOGIN ? '登录' : '重置密码';
+  const { subject, action: actionText } = getSubjectAndAction();
 
   try {
     const { error } = await resend.emails.send({

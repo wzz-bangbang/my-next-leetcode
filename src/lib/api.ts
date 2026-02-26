@@ -7,23 +7,27 @@
  */
 // import { notifications } from '@mantine/notifications';
 
+// 登录弹窗模式
+export type LoginModalMode = 'password' | 'code' | 'resetPassword' | 'changeEmail' | 'changePassword';
+
 // 全局登录弹窗方法
-let _showLoginModal: (() => void) | null = null;
+let _showLoginModal: ((mode?: LoginModalMode) => void) | null = null;
 
 /**
  * 注册登录弹窗方法
  * 由 LoginModal 组件挂载时调用
  */
-export function registerLoginModal(fn: (() => void) | null) {
+export function registerLoginModal(fn: ((mode?: LoginModalMode) => void) | null) {
   _showLoginModal = fn;
 }
 
 /**
  * 打开登录弹窗
  * 全局可用，任何地方都可以调用
+ * @param mode 可选的初始模式
  */
-export function showLoginModal() {
-  _showLoginModal?.();
+export function showLoginModal(mode?: LoginModalMode) {
+  _showLoginModal?.(mode);
 }
 
 // 请求配置

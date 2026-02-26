@@ -1,4 +1,3 @@
-import '@/lib/proxy'; // 让 Node.js 使用代理
 import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
@@ -14,6 +13,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
     // 邮箱密码登录
     Credentials({
+      id: 'credentials',
       name: 'credentials',
       credentials: {
         email: { label: '邮箱', type: 'email' },
@@ -74,6 +74,106 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
       },
     }),
+    // 验证码登录
+    Credentials({
+      id: 'code',
+      name: 'code',
+      credentials: {
+        email: { label: '邮箱', type: 'email' },
+        code: { label: '验证码', type: 'text' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.code) {
+          return null;
+        }
+
+        try {
+          const email = credentials.email as string;
+          const code = credentials.code as string;
+
+          // 1. 检查验证码是否存在且有效
+          const codes = await query<{
+            id: number;
+            verify_attempts: number;
+            locked_until: Date | null;
+          }[]>(
+            `SELECT id, verify_attempts, locked_until FROM email_verification_codes 
+             WHERE email = ? AND code = ? AND used = 0 AND expires_at > NOW()`,
+            [email, code]
+          );
+
+          if (codes.length === 0) {
+            console.log('[Auth] Invalid or expired code for:', email);
+            // 记录失败次数
+            await query(
+              `UPDATE email_verification_codes SET verify_attempts = verify_attempts + 1 WHERE email = ? AND used = 0`,
+              [email]
+            );
+            return null;
+          }
+
+          const codeRecord = codes[0];
+
+          // 2. 检查是否被锁定
+          if (codeRecord.locked_until && new Date(codeRecord.locked_until) > new Date()) {
+            console.log('[Auth] Code login locked for:', email);
+            return null;
+          }
+
+          // 3. 检查尝试次数（超过5次锁定30分钟）
+          if (codeRecord.verify_attempts >= 5) {
+            await query(
+              `UPDATE email_verification_codes SET locked_until = DATE_ADD(NOW(), INTERVAL 30 MINUTE) WHERE id = ?`,
+              [codeRecord.id]
+            );
+            console.log('[Auth] Too many attempts, locking:', email);
+            return null;
+          }
+
+          // 4. 验证成功，标记验证码已使用
+          await query(
+            `UPDATE email_verification_codes SET used = 1 WHERE id = ?`,
+            [codeRecord.id]
+          );
+
+          // 5. 查找或创建用户
+          let users = await query<{
+            id: number;
+            username: string;
+            email: string;
+            avatar: string | null;
+          }[]>(
+            'SELECT id, username, email, avatar FROM users WHERE email = ? AND (status IS NULL OR status = 0)',
+            [email]
+          );
+
+          let user;
+          if (users.length === 0) {
+            // 新用户：自动注册
+            const result = await query<{ insertId: number }>(
+              `INSERT INTO users (username, email) VALUES (?, ?)`,
+              [email.split('@')[0], email]
+            );
+            const userId = (result as unknown as { insertId: number }).insertId;
+            user = { id: userId, username: email.split('@')[0], email, avatar: null };
+            console.log('[Auth] Code login - new user created:', email);
+          } else {
+            user = users[0];
+          }
+
+          console.log('[Auth] Code login success:', email);
+          return {
+            id: String(user.id),
+            email: user.email,
+            name: user.username,
+            image: user.avatar,
+          };
+        } catch (error) {
+          console.error('[Auth] Code authorize error:', error);
+          return null;
+        }
+      },
+    }),
     // Google 登录
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -90,8 +190,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return false;
       }
 
-      // Credentials 登录：已在 authorize 中验证，直接放行
-      if (account.provider === 'credentials') {
+      // Credentials / Code 登录：已在 authorize 中验证，直接放行
+      if (account.provider === 'credentials' || account.provider === 'code') {
         return true;
       }
 
@@ -200,8 +300,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // JWT 回调：把用户 ID 存到 token 里
     async jwt({ token, user, account }) {
       if (user) {
-        // Credentials 登录：user.id 已经是数据库 ID
-        if (account?.provider === 'credentials') {
+        // Credentials / Code 登录：user.id 已经是数据库 ID
+        if (account?.provider === 'credentials' || account?.provider === 'code') {
           token.userId = Number(user.id);
         }
         // OAuth 登录：需要查询数据库获取用户 ID

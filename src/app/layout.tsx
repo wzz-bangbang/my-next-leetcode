@@ -6,7 +6,7 @@ import '@mantine/notifications/styles.css';
 import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import Providers from '@/components/Providers';
-import LoginModal from '@/components/LoginModal';
+import LoginModal from '@/components/auth/LoginModal';
 
 export const metadata: Metadata = {
   title: "前端求职指北",

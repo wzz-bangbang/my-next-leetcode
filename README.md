@@ -37,12 +37,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## 后续优化方向
 
-忘记密码 修改邮箱
-邮箱验证码注册
 部署上线
 ssr
 项目性能&错误监控
 
+邮件服务增加多服务切换
 web worker 缓存离线数据
 
 爬虫取最新各大平台的数据并解析题目

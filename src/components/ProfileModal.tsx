@@ -6,6 +6,7 @@ import { Modal, Text, Stack, Button } from '@mantine/core';
 import { Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import { deactivateAccount } from '@/services/auth';
+import { showLoginModal } from '@/lib/api';
 
 interface ProfileModalProps {
   opened: boolean;
@@ -24,10 +25,10 @@ export default function ProfileModal({ opened, onClose, session, onLogout }: Pro
     setIsDeactivating(true);
     setDeactivateError('');
 
-    const { ok, error } = await deactivateAccount();
+    const { ok } = await deactivateAccount();
 
     if (!ok) {
-      setDeactivateError(error || '注销失败');
+      setDeactivateError('注销失败，请稍后重试');
       setIsDeactivating(false);
       return;
     }
@@ -102,7 +103,8 @@ export default function ProfileModal({ opened, onClose, session, onLogout }: Pro
               radius="md"
               size="sm"
               onClick={() => {
-                // TODO: 实现邮箱换绑功能
+                onClose();
+                showLoginModal('changeEmail');
               }}
             >
               邮箱换绑
@@ -114,7 +116,8 @@ export default function ProfileModal({ opened, onClose, session, onLogout }: Pro
               radius="md"
               size="sm"
               onClick={() => {
-                // TODO: 实现修改密码功能
+                onClose();
+                showLoginModal('changePassword');
               }}
             >
               修改密码
