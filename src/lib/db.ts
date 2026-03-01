@@ -1,11 +1,11 @@
 import mysql from 'mysql2/promise';
 
-// 数据库连接配置
+// 数据库连接配置（敏感信息必须通过环境变量配置）
 const dbConfig = {
   host: process.env.DATABASE_HOST || 'localhost',
   port: parseInt(process.env.DATABASE_PORT || '3306'),
-  user: process.env.DATABASE_USER || 'wzz',
-  password: process.env.DATABASE_PASSWORD || 'wzz888888',
+  user: process.env.DATABASE_USER || '',
+  password: process.env.DATABASE_PASSWORD || '',
   database: process.env.DATABASE_NAME || 'leetcode',
   waitForConnections: true,
   connectionLimit: 10,

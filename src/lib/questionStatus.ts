@@ -92,23 +92,32 @@ export function getQuestionStatus(questionId: number, type: QuestionTypeKey): Qu
   return statusCache[typeEnum]?.[questionId] ?? QuestionStatus.NOT_DONE;
 }
 
-// 设置单个题目状态（同时更新缓存和服务器）
+/**
+ * 设置单个题目状态（服务端优先）
+ * @returns { success: boolean, finalStatus: QuestionStatus } - 是否成功 + 最终状态
+ */
 export async function setQuestionStatus(
   questionId: number,
   status: QuestionStatus,
   type: QuestionTypeKey
-): Promise<boolean> {
+): Promise<{ success: boolean; finalStatus: QuestionStatus }> {
   const typeEnum = typeKeyToEnum[type];
+  const oldStatus = statusCache[typeEnum]?.[questionId] ?? QuestionStatus.NOT_DONE;
 
-  // 更新本地缓存
-  if (!statusCache[typeEnum]) {
-    statusCache[typeEnum] = {};
-  }
-  statusCache[typeEnum][questionId] = status;
-
-  // 同步到服务器
+  // 先请求服务器
   const { ok } = await questionStatusApi.saveQuestionStatus(questionId, typeEnum, status);
-  return ok;
+
+  if (ok) {
+    // 服务器成功后更新缓存
+    if (!statusCache[typeEnum]) {
+      statusCache[typeEnum] = {};
+    }
+    statusCache[typeEnum][questionId] = status;
+    return { success: true, finalStatus: status };
+  }
+
+  // 服务器失败，返回旧状态
+  return { success: false, finalStatus: oldStatus };
 }
 
 // 清除缓存（用于刷新数据）

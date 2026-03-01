@@ -12,6 +12,7 @@ import {
   loadQuestionStatusFromServer,
 } from '@/lib/questionStatus';
 import { getBaguDetail } from '@/services/questions';
+import { trackPageView, trackQuestionView } from '@/lib/analytics';
 import dynamic from 'next/dynamic';
 
 // 懒加载 MarkdownContent（包含大量依赖）
@@ -166,6 +167,8 @@ export default function BaguClient({ initialData }: BaguClientProps) {
         }
         return next;
       });
+      // 追踪题目浏览
+      trackQuestionView(questionId, detail.title, 'bagu');
     }
     setIsLoadingDetail(false);
   }, [detailCache]);
@@ -206,6 +209,8 @@ export default function BaguClient({ initialData }: BaguClientProps) {
 
   // 加载用户数据（状态）
   useEffect(() => {
+    // 追踪页面浏览
+    trackPageView('/bagu');
     // 加载完成状态（从数据库）
     loadQuestionStatusFromServer('bagu').then((map) => {
       setStatusMap(map);
@@ -250,19 +255,24 @@ export default function BaguClient({ initialData }: BaguClientProps) {
     if (!selectedQuestionId) return;
 
     const isCompleted = completedQuestions.has(selectedQuestionId);
-    const newStatus = isCompleted ? QuestionStatus.NOT_DONE : QuestionStatus.SOLVED;
+    const targetStatus = isCompleted ? QuestionStatus.NOT_DONE : QuestionStatus.SOLVED;
 
-    // 更新数据库
-    await setQuestionStatus(selectedQuestionId, newStatus, 'bagu');
+    // 更新数据库（服务端优先）
+    const { success, finalStatus } = await setQuestionStatus(selectedQuestionId, targetStatus, 'bagu');
+
+    if (!success) {
+      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      return;
+    }
 
     // 更新本地状态
     setStatusMap((prev) => ({
       ...prev,
-      [selectedQuestionId]: newStatus,
+      [selectedQuestionId]: finalStatus,
     }));
 
     // 显示提示
-    if (newStatus === QuestionStatus.SOLVED) {
+    if (finalStatus === QuestionStatus.SOLVED) {
       notifications.show({
         autoClose: 1500,
         title: '🎉 完成',
@@ -333,10 +343,15 @@ export default function BaguClient({ initialData }: BaguClientProps) {
     : false;
 
   // 切换收藏状态
-  const handleToggleFavorite = useCallback(() => {
+  const handleToggleFavorite = useCallback(async () => {
     if (!selectedQuestionId) return;
 
-    const newStatus = toggleFavorite('bagu', selectedQuestionId);
+    const { success, newStatus } = await toggleFavorite('bagu', selectedQuestionId);
+
+    if (!success) {
+      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      return;
+    }
 
     setFavoriteQuestions((prev) => {
       const next = new Set(prev);

@@ -90,24 +90,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           const email = credentials.email as string;
           const code = credentials.code as string;
+          const CODE_TYPE_LOGIN = 1; // 登录类型验证码
 
-          // 1. 检查验证码是否存在且有效
+          // 1. 检查验证码是否存在且有效（必须是登录类型 type=1）
           const codes = await query<{
             id: number;
             verify_attempts: number;
             locked_until: Date | null;
           }[]>(
             `SELECT id, verify_attempts, locked_until FROM email_verification_codes 
-             WHERE email = ? AND code = ? AND used = 0 AND expires_at > NOW()`,
-            [email, code]
+             WHERE email = ? AND code = ? AND type = ? AND used = 0 AND expires_at > NOW()`,
+            [email, code, CODE_TYPE_LOGIN]
           );
 
           if (codes.length === 0) {
             console.log('[Auth] Invalid or expired code for:', email);
-            // 记录失败次数
+            // 记录失败次数（只针对登录类型的验证码）
             await query(
-              `UPDATE email_verification_codes SET verify_attempts = verify_attempts + 1 WHERE email = ? AND used = 0`,
-              [email]
+              `UPDATE email_verification_codes SET verify_attempts = verify_attempts + 1 
+               WHERE email = ? AND type = ? AND used = 0`,
+              [email, CODE_TYPE_LOGIN]
             );
             return null;
           }

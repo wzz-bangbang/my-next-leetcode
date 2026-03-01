@@ -2,6 +2,7 @@
  * 收藏相关 API
  */
 import { apiGet, apiPost, apiPatch } from '@/lib/api';
+import * as Sentry from '@sentry/nextjs';
 
 export type FavoriteType = 'bagu' | 'code';
 
@@ -14,7 +15,18 @@ export async function loadFavorites(type: FavoriteType) {
 
 /** 切换单个收藏状态 */
 export async function toggleFavorite(type: FavoriteType, questionId: number, isFavorite: boolean) {
-  return apiPatch<{ message: string }>('/api/favorites', { type, questionId, isFavorite });
+  const result = await apiPatch<{ message: string }>('/api/favorites', { type, questionId, isFavorite });
+  
+  // 收藏操作失败时上报（排除未登录的情况）
+  if (!result.ok && result.status !== 401) {
+    Sentry.captureMessage('收藏操作失败', {
+      level: 'error',
+      tags: { feature: 'favorites', action: isFavorite ? 'add' : 'remove' },
+      extra: { type, questionId, isFavorite, error: result.error, status: result.status },
+    });
+  }
+  
+  return result;
 }
 
 /** 批量设置收藏（迁移用） */

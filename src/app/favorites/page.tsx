@@ -135,8 +135,12 @@ export default function FavoritesPage() {
   }, [baguFavoritesByCategory, baguCount]);
 
   // 取消收藏八股文
-  const removeBaguFavorite = useCallback((questionId: number) => {
-    setFavorite('bagu', questionId, false);
+  const removeBaguFavorite = useCallback(async (questionId: number) => {
+    const success = await setFavorite('bagu', questionId, false);
+    if (!success) {
+      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      return;
+    }
     setBaguFavorites((prev) => {
       const next = new Set(prev);
       next.delete(questionId);
@@ -151,8 +155,12 @@ export default function FavoritesPage() {
   }, []);
 
   // 取消收藏刷题
-  const removeCodeFavorite = useCallback((questionId: number) => {
-    setFavorite('code', questionId, false);
+  const removeCodeFavorite = useCallback(async (questionId: number) => {
+    const success = await setFavorite('code', questionId, false);
+    if (!success) {
+      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      return;
+    }
     setCodeFavorites((prev) => {
       const next = new Set(prev);
       next.delete(questionId);

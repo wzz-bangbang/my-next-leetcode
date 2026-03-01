@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
         const progress = await query<ProgressRow[]>(
           'SELECT is_favorite, status FROM user_bagu_progress WHERE user_id = ? AND question_id = ?',
           [userId, row.id]
-        );
+      );
         if (progress.length > 0) {
           isFavorited = progress[0].is_favorite === 1;
           userStatus = progress[0].status;

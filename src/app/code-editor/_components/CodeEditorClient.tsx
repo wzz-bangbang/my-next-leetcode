@@ -27,6 +27,7 @@ import { toggleFavorite } from '@/lib/favorites';
 import { validateCode, CODE_MAX_LINES, CODE_MAX_CHARS } from '@/lib/validation';
 import { getCodeQuestionDetail } from '@/services/questions';
 import { saveAnswer } from '@/services/answers';
+import { trackPageView, trackQuestionView } from '@/lib/analytics';
 
 interface CodeEditorClientProps {
   initialQuestions: QuestionListItem[];
@@ -152,19 +153,21 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     setIsLoadingDetail(true);
     const { ok, data: detail } = await getCodeQuestionDetail(questionId);
     if (ok && detail) {
-      setDetailCache(prev => new Map(prev).set(questionId, detail));
-      // 同步收藏状态
-      setFavoriteQuestions(prev => {
-        const next = new Set(prev);
-        if (detail.isFavorited) {
-          next.add(questionId);
-        } else {
-          next.delete(questionId);
-        }
-        return next;
-      });
-    }
-    setIsLoadingDetail(false);
+        setDetailCache(prev => new Map(prev).set(questionId, detail));
+        // 同步收藏状态
+        setFavoriteQuestions(prev => {
+          const next = new Set(prev);
+          if (detail.isFavorited) {
+            next.add(questionId);
+          } else {
+            next.delete(questionId);
+          }
+          return next;
+        });
+        // 追踪题目浏览
+        trackQuestionView(questionId, detail.title, 'code');
+      }
+      setIsLoadingDetail(false);
   }, [detailCache]);
 
   // URL 路由同步 - 直接选择题目
@@ -226,14 +229,18 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     const currentStatusMap = getQuestionStatusMap('code');
     const currentStatus = currentStatusMap[questionId];
     if (currentStatus === undefined || currentStatus === QuestionStatus.NOT_DONE) {
-      await setQuestionStatus(questionId, QuestionStatus.ATTEMPTED, 'code');
+      const { success } = await setQuestionStatus(questionId, QuestionStatus.ATTEMPTED, 'code');
+      if (success) {
       setSidebarKey(prev => prev + 1);
+      }
     }
   }, []);
 
   // Hydration fix
   useEffect(() => {
     setIsClient(true);
+    // 追踪页面浏览
+    trackPageView('/code-editor');
 
     const handleMessage = (event: MessageEvent) => {
       const isFromSandbox = event.source === sandboxRef.current?.contentWindow;
@@ -298,7 +305,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
         if (code.trim() !== template.trim() && codeValidation.valid) {
           const { ok } = await saveAnswer(selectedQuestionId, code);
           if (ok) {
-            markQuestionAsAttempted(selectedQuestionId);
+              markQuestionAsAttempted(selectedQuestionId);
           }
         }
       }
@@ -372,11 +379,11 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     }
     const { ok, status } = await saveAnswer(selectedQuestionId, code);
     if (ok) {
-      markQuestionAsAttempted(selectedQuestionId);
-      notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存！', color: 'green' });
+        markQuestionAsAttempted(selectedQuestionId);
+        notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存！', color: 'green' });
     } else if (status !== 401) {
       // 401 已由 api 统一处理弹出登录框
-      notifications.show({ autoClose: 1500, title: '保存失败', message: '请稍后再试', color: 'red' });
+        notifications.show({ autoClose: 1500, title: '保存失败', message: '请稍后再试', color: 'red' });
     }
   };
 
@@ -406,8 +413,8 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     }
     const { ok } = await saveAnswer(selectedQuestionId, code);
     if (ok) {
-      markQuestionAsAttempted(selectedQuestionId);
-      notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存', color: 'green' });
+        markQuestionAsAttempted(selectedQuestionId);
+        notifications.show({ autoClose: 1500, title: '保存成功', message: '代码已保存', color: 'green' });
     }
     const template = selectedDetail?.template || '';
     setCode(template);
@@ -434,12 +441,18 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     }
     const statusMap = getQuestionStatusMap('code');
     const currentStatus = statusMap[selectedQuestionId];
-    const newStatus = currentStatus === QuestionStatus.SOLVED ? QuestionStatus.NOT_DONE : QuestionStatus.SOLVED;
+    const targetStatus = currentStatus === QuestionStatus.SOLVED ? QuestionStatus.NOT_DONE : QuestionStatus.SOLVED;
 
-    await setQuestionStatus(selectedQuestionId, newStatus, 'code');
+    const { success, finalStatus } = await setQuestionStatus(selectedQuestionId, targetStatus, 'code');
+
+    if (!success) {
+      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      return;
+    }
+
     setSidebarKey(prev => prev + 1);
 
-    if (newStatus === QuestionStatus.SOLVED) {
+    if (finalStatus === QuestionStatus.SOLVED) {
       notifications.show({ autoClose: 1500, title: '🎉 恭喜', message: '已标记为完成！', color: 'green' });
     } else {
       notifications.show({ autoClose: 1500, title: '已取消', message: '已取消完成状态', color: 'gray' });
@@ -457,13 +470,18 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     ? favoriteQuestions.has(selectedQuestionId)
     : false;
 
-  const handleToggleFavorite = useCallback(() => {
+  const handleToggleFavorite = useCallback(async () => {
     if (!selectedQuestionId) {
       notifications.show({ autoClose: 1500, title: '提示', message: '请先选择一个题目', color: 'yellow' });
       return;
     }
 
-    const newStatus = toggleFavorite('code', selectedQuestionId);
+    const { success, newStatus } = await toggleFavorite('code', selectedQuestionId);
+
+    if (!success) {
+      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      return;
+    }
 
     setFavoriteQuestions((prev) => {
       const next = new Set(prev);
@@ -807,11 +825,11 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
             {/* 代码编辑器 */}
             <div style={{ height: `${codeHeightPercent}%`, minHeight: 0 }} className="flex flex-col">
               <div className="flex-1 min-h-0">
-                <CodeEditorPanel
-                  code={code}
-                  onChange={onCodeChange}
-                  height="100%"
-                />
+              <CodeEditorPanel
+                code={code}
+                onChange={onCodeChange}
+                height="100%"
+              />
               </div>
               {/* 代码统计状态栏 */}
               <div className="flex-shrink-0 px-3 py-1.5 bg-gray-100/80 border-t border-gray-200/50 text-xs text-gray-500 flex items-center justify-end gap-4">

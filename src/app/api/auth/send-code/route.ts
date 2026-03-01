@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { query } from '@/lib/db';
 import { validateEmail } from '@/lib/validation';
@@ -132,28 +133,28 @@ export async function POST(request: Request) {
     // 参数校验
     const emailValidation = validateEmail(email);
     if (!emailValidation.valid) {
-      return Response.json({ error: emailValidation.message }, { status: 400 });
+      return NextResponse.json({ error: emailValidation.message }, { status: 400 });
     }
     if (![CODE_TYPE.LOGIN, CODE_TYPE.RESET, CODE_TYPE.CHANGE_EMAIL].includes(type)) {
-      return Response.json({ error: '无效的验证码类型' }, { status: 400 });
+      return NextResponse.json({ error: '无效的验证码类型' }, { status: 400 });
     }
 
     // 频率限制检查
     const ip = await getClientIP();
     const rateCheck = await checkRateLimit(email, ip);
     if (!rateCheck.ok) {
-      return Response.json({ error: rateCheck.error }, { status: 429 });
+      return NextResponse.json({ error: rateCheck.error }, { status: 429 });
     }
 
     // 发送验证码
     const result = await sendCodeLogic(email, type, ip);
     if (!result.ok) {
-      return Response.json({ error: result.error }, { status: result.status });
+      return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
-    return Response.json({ success: true, message: '验证码已发送' });
+    return NextResponse.json({ success: true, message: '验证码已发送' });
   } catch (error) {
     console.error('[SendCode] Error:', error);
-    return Response.json({ error: '发送失败，请稍后重试' }, { status: 500 });
+    return NextResponse.json({ error: '发送失败，请稍后重试' }, { status: 500 });
   }
 }

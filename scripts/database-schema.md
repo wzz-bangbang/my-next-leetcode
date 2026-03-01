@@ -17,6 +17,7 @@
 | `user_answers` | 用户代码答案表 |
 | `user_notes` | 用户笔记表（暂未使用） |
 | `email_verification_codes` | 邮箱验证码表 |
+| `user_analytics` | 用户行为分析表 |
 
 ---
 
@@ -209,6 +210,31 @@
 
 ---
 
+## 分析相关
+
+### user_analytics - 用户行为分析表
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | BIGINT | PK, AUTO_INCREMENT | 记录ID |
+| `user_id` | INT | INDEX | 用户ID（未登录为NULL） |
+| `event` | VARCHAR(50) | NOT NULL, INDEX | 事件名称 |
+| `data` | JSON | - | 事件数据 |
+| `url` | VARCHAR(255) | - | 页面URL |
+| `created_at` | TIMESTAMP | DEFAULT NOW, INDEX | 创建时间 |
+
+**事件类型**：
+| 事件 | 说明 | data 字段 |
+|------|------|----------|
+| `page_view` | 页面浏览 | `{ page: string }` |
+| `question_view` | 查看题目 | `{ questionId, questionTitle, type }` |
+| `question_solved` | 完成题目 | `{ questionId, questionTitle, type }` |
+| `code_save` | 保存代码 | `{ questionId }` |
+| `favorite_add` | 添加收藏 | `{ questionId, type }` |
+| `favorite_remove` | 取消收藏 | `{ questionId, type }` |
+
+---
+
 ## ER 关系图
 
 ```
@@ -222,7 +248,9 @@ users (1) ──────< accounts (N)
   │
   ├──────< user_answers (N)
   │
-  └──────< user_notes (N)
+  ├──────< user_notes (N)
+  │
+  └──────< user_analytics (N)
 
 code_categories (1) ────── code_questions (N) [通过 JSON category_ids 关联]
 

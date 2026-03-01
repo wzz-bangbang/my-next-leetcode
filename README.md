@@ -35,18 +35,19 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+## 环境配置
+
+详见 [docs/env-config.md](./docs/env-config.md)
+
+
 ## 后续优化方向
-
-部署上线
-ssr
-项目性能&错误监控
-
-邮件服务增加多服务切换
-web worker 缓存离线数据
-
-爬虫取最新各大平台的数据并解析题目
-增加题目遇到次数
-增加 ai 解题和 ai 练习入口
-增加用户维护入口
-自动生成头像昵称
-换昵称 换头像
+- [ ] SSR 优化
+- [ ] 增加标签 & 进阶思考 & 关联题目（知识图谱）
+- [ ] 邮件服务增加多服务切换
+- [ ] Web Worker 缓存离线数据
+- [ ] 爬虫取最新各大平台的数据并解析题目
+- [ ] 增加 AI 解题和 AI 练习入口
+- [ ] 增加水平判断，15k 25k 类似这种标准
+- [ ] 增加用户维护入口
+- [ ] 自动生成头像昵称
+- [ ] 换昵称 换头像

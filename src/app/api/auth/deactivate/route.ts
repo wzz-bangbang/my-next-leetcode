@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { query } from '@/lib/db';
 
@@ -6,7 +7,7 @@ export async function POST() {
     const session = await auth();
     
     if (!session?.user?.id) {
-      return Response.json({ error: '未登录' }, { status: 401 });
+      return NextResponse.json({ error: '未登录' }, { status: 401 });
     }
 
     const userId = Number(session.user.id);
@@ -20,12 +21,12 @@ export async function POST() {
 
     // 检查是否更新成功
     if ((result as { affectedRows: number }).affectedRows === 0) {
-      return Response.json({ error: '用户不存在' }, { status: 404 });
+      return NextResponse.json({ error: '用户不存在' }, { status: 404 });
     }
 
-    return Response.json({ success: true, message: '账号已注销' });
+    return NextResponse.json({ success: true, message: '账号已注销' });
   } catch (error) {
     console.error('[Deactivate] Error:', error);
-    return Response.json({ error: '注销失败，请稍后重试' }, { status: 500 });
+    return NextResponse.json({ error: '注销失败，请稍后重试' }, { status: 500 });
   }
 }

@@ -153,3 +153,16 @@ CREATE TABLE IF NOT EXISTS email_verification_codes (
     INDEX idx_ip (ip),
     INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 用户行为分析表
+CREATE TABLE IF NOT EXISTS user_analytics (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT COMMENT '用户ID，未登录为NULL',
+    event VARCHAR(50) NOT NULL COMMENT '事件名称',
+    data JSON COMMENT '事件数据',
+    url VARCHAR(255) COMMENT '页面URL',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user (user_id),
+    INDEX idx_event (event),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

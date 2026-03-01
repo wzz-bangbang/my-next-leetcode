@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
 import { validateEmail, validatePasswordStrength, validateUsername } from '@/lib/validation';
@@ -46,30 +47,30 @@ export async function POST(request: Request) {
 
     // 参数校验
     if (!email || !password) {
-      return Response.json({ error: '邮箱和密码不能为空' }, { status: 400 });
+      return NextResponse.json({ error: '邮箱和密码不能为空' }, { status: 400 });
     }
     const usernameValidation = validateUsername(name || '');
     if (!usernameValidation.valid) {
-      return Response.json({ error: usernameValidation.message }, { status: 400 });
+      return NextResponse.json({ error: usernameValidation.message }, { status: 400 });
     }
     const emailValidation = validateEmail(email);
     if (!emailValidation.valid) {
-      return Response.json({ error: emailValidation.message }, { status: 400 });
+      return NextResponse.json({ error: emailValidation.message }, { status: 400 });
     }
     const passwordValidation = validatePasswordStrength(password);
     if (!passwordValidation.valid) {
-      return Response.json({ error: passwordValidation.message }, { status: 400 });
+      return NextResponse.json({ error: passwordValidation.message }, { status: 400 });
     }
 
     // 注册用户
     const result = await registerUser(email, password, name);
     if (!result.ok) {
-      return Response.json({ error: result.error }, { status: result.status });
+      return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
-    return Response.json({ success: true, message: '注册成功' });
+    return NextResponse.json({ success: true, message: '注册成功' });
   } catch (error) {
     console.error('[Register] Error:', error);
-    return Response.json({ error: '注册失败，请稍后重试' }, { status: 500 });
+    return NextResponse.json({ error: '注册失败，请稍后重试' }, { status: 500 });
   }
 }
