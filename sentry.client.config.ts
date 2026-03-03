@@ -61,7 +61,7 @@ Sentry.init({
   ],
 
   // 发送前处理
-  beforeSend(event, hint) {
+  beforeSend(event) {
     const errorMessage = event.exception?.values?.[0]?.value || '';
     
     // 只过滤已知的 Sentry 内部错误（精确匹配）

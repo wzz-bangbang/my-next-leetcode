@@ -5,14 +5,12 @@ import { Collapse, Tooltip } from '@mantine/core';
 import { CategoryTag, CategoryTagLabel, Difficulty, DifficultyLabel, DifficultyColor, QuestionListItem } from '@/types/question';
 import {
   QuestionStatus,
-  getQuestionStatusMap,
   setQuestionStatus as setStatusToServer,
   loadQuestionStatusFromServer,
-  isStatusCacheLoaded,
 } from '@/lib/questionStatus';
 
 // 重新导出给外部使用
-export { QuestionStatus, getQuestionStatusMap };
+export { QuestionStatus };
 export const setQuestionStatus = setStatusToServer;
 
 // 分类图标
@@ -35,6 +33,7 @@ interface QuestionSidebarProps {
   onToggleCategory: (tag: CategoryTag) => void;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
+  statusMap: Record<number, QuestionStatus>;
 }
 
 const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
@@ -47,29 +46,8 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
   onToggleCategory,
   collapsed = false,
   onToggleCollapse,
+  statusMap,
 }, ref) => {
-  const [statusMap, setStatusMap] = useState<Record<number, QuestionStatus>>({});
-
-  // 加载状态数据（从服务器）
-  useEffect(() => {
-    const loadStatus = async () => {
-      if (!isStatusCacheLoaded('code')) {
-        await loadQuestionStatusFromServer('code');
-      }
-      setStatusMap(getQuestionStatusMap('code'));
-    };
-    loadStatus();
-  }, []);
-
-  // 定时刷新状态（可选，用于多标签页同步）
-  useEffect(() => {
-    const refreshStatus = () => {
-      setStatusMap(getQuestionStatusMap('code'));
-    };
-
-    // 每次组件重新渲染时刷新
-    refreshStatus();
-  });
 
   const getStatus = (questionId: number): QuestionStatus => {
     return statusMap[questionId] ?? QuestionStatus.NOT_DONE;
@@ -224,4 +202,3 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
 QuestionSidebar.displayName = 'QuestionSidebar';
 
 export default QuestionSidebar;
-

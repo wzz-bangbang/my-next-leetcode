@@ -13,7 +13,8 @@ interface SimulationGroup {
 interface SimulationModalProps {
   data: BaguListData | null;
   filteredCategories: BaguCategory[];
-  filterMode: 'all' | 'incomplete' | 'favorited';
+  showIncomplete: boolean;
+  showFavorited: boolean;
   onSelectQuestion: (question: BaguQuestionListItem, categoryId: number) => void;
   onExpandCategory: (categoryId: number) => void;
   expandedCategories: Set<number>;
@@ -22,7 +23,8 @@ interface SimulationModalProps {
 export default function SimulationModal({
   data,
   filteredCategories,
-  filterMode,
+  showIncomplete,
+  showFavorited,
   onSelectQuestion,
   onExpandCategory,
   expandedCategories,
@@ -38,10 +40,18 @@ export default function SimulationModal({
     const categories = filteredCategories.filter((c) => c.questions.length > 0);
     
     if (categories.length === 0) {
+      let message = '没有可用题目';
+      if (showIncomplete && showFavorited) {
+        message = '没有符合条件的题目（未完成+已收藏）';
+      } else if (showIncomplete) {
+        message = '没有未完成的题目';
+      } else if (showFavorited) {
+        message = '没有已收藏的题目';
+      }
       notifications.show({
         autoClose: 2000,
         title: '⚠️ 无可用题目',
-        message: filterMode === 'incomplete' ? '没有未完成的题目' : filterMode === 'favorited' ? '没有已收藏的题目' : '没有可用题目',
+        message,
         color: 'orange',
       });
       return;
@@ -121,7 +131,7 @@ export default function SimulationModal({
 
     setSimulationQuestions(result);
     setIsOpen(true);
-  }, [data, filteredCategories, filterMode]);
+  }, [data, filteredCategories, showIncomplete, showFavorited]);
 
   // 复制题目列表
   const copyQuestionList = useCallback(async () => {
@@ -190,15 +200,6 @@ export default function SimulationModal({
             <span className="text-xs text-gray-400 font-normal">
               ({totalCount} 题)
             </span>
-            {filterMode !== 'all' && (
-              <span className={`text-xs px-1.5 py-0.5 rounded ${
-                filterMode === 'incomplete' 
-                  ? 'bg-amber-100 text-amber-600' 
-                  : 'bg-yellow-100 text-yellow-600'
-              }`}>
-                {filterMode === 'incomplete' ? '未完成' : '已收藏'}
-              </span>
-            )}
           </div>
         }
         size="lg"

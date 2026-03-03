@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 import { Button, Modal, Group, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -20,10 +21,11 @@ const MarkdownContent = dynamic(() => import('@/app/bagu/_components/MarkdownCon
 });
 import CodeEditorPanel from './CodeEditorPanel';
 import ExecutionResultPanel from './ExecutionResultPanel';
-import QuestionSidebar, { QuestionStatus, setQuestionStatus, getQuestionStatusMap } from './QuestionSidebar';
+import QuestionSidebar, { QuestionStatus, setQuestionStatus } from './QuestionSidebar';
+import { loadQuestionStatusFromServer } from '@/lib/questionStatus';
 import { CategoryTag, Difficulty, DifficultyLabel, DifficultyColor, CategoryTagLabel, QuestionListItem, QuestionDetail } from '@/types/question';
 import { useQuestionRoute, scrollToSelected } from '@/hooks/useQuestionRoute';
-import { toggleFavorite } from '@/lib/favorites';
+import { toggleFavorite, loadFavoritesFromServer } from '@/lib/favorites';
 import { validateCode, CODE_MAX_LINES, CODE_MAX_CHARS } from '@/lib/validation';
 import { getCodeQuestionDetail } from '@/services/questions';
 import { saveAnswer } from '@/services/answers';
@@ -34,22 +36,26 @@ interface CodeEditorClientProps {
 }
 
 function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
+  // 监听登录状态
+  const { status: sessionStatus } = useSession();
+  const prevSessionStatus = useRef(sessionStatus);
+
   const [isClient, setIsClient] = useState(false);
   const [code, setCode] = useState('');
   const [questions] = useState<QuestionListItem[]>(initialQuestions);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
   const [selectedCategoryTag, setSelectedCategoryTag] = useState<CategoryTag | null>(null);
+
+  // 题目状态
+  const [statusMap, setStatusMap] = useState<Record<number, QuestionStatus>>({});
   const [templateModalOpened, { open: openTemplateModal, close: closeTemplateModal }] = useDisclosure(false);
   const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
   const [returnValue, setReturnValue] = useState<string>('');
   const [executionError, setExecutionError] = useState<string>('');
 
-  // 题目详情缓存
-  const [detailCache, setDetailCache] = useState<Map<number, QuestionDetail>>(new Map());
+  // 当前题目详情
+  const [selectedDetail, setSelectedDetail] = useState<QuestionDetail | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
-
-  // 获取当前选中题目的详情
-  const selectedDetail = selectedQuestionId ? detailCache.get(selectedQuestionId) : null;
 
   // 重置执行结果
   const resetExecutionResult = useCallback(() => {
@@ -106,8 +112,6 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     return questions.find(q => q.id === selectedQuestionId);
   }, [questions, selectedQuestionId]);
 
-  // 侧边栏更新触发器
-  const [sidebarKey, setSidebarKey] = useState(0);
 
   // 切换分类展开状态
   const toggleCategory = useCallback((tag: CategoryTag) => {
@@ -146,14 +150,13 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     return selectedQ ? `${selectedCategoryTag}-${selectedQ.slug}` : null;
   }, [selectedQuestionId, selectedCategoryTag, questions]);
 
-  // 请求题目详情
+  // 请求题目详情（每次都从后端获取，保证数据一致性）
   const fetchDetail = useCallback(async (questionId: number) => {
-    if (detailCache.has(questionId)) return;
-
     setIsLoadingDetail(true);
+    setSelectedDetail(null); // 清空旧数据
     const { ok, data: detail } = await getCodeQuestionDetail(questionId);
     if (ok && detail) {
-        setDetailCache(prev => new Map(prev).set(questionId, detail));
+        setSelectedDetail(detail);
         // 同步收藏状态
         setFavoriteQuestions(prev => {
           const next = new Set(prev);
@@ -168,7 +171,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
         trackQuestionView(questionId, detail.title, 'code');
       }
       setIsLoadingDetail(false);
-  }, [detailCache]);
+  }, []);
 
   // URL 路由同步 - 直接选择题目
   const selectQuestionDirect = useCallback((item: { question: QuestionListItem; categoryTag: CategoryTag }) => {
@@ -224,17 +227,16 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     }
   }, [selectedQuestionId]);
 
-  // 更新题目状态并刷新侧边栏
+  // 更新题目状态
   const markQuestionAsAttempted = useCallback(async (questionId: number) => {
-    const currentStatusMap = getQuestionStatusMap('code');
-    const currentStatus = currentStatusMap[questionId];
+    const currentStatus = statusMap[questionId];
     if (currentStatus === undefined || currentStatus === QuestionStatus.NOT_DONE) {
-      const { success } = await setQuestionStatus(questionId, QuestionStatus.ATTEMPTED, 'code');
+      const { success } = await setQuestionStatus(questionId, QuestionStatus.ATTEMPTED, 'code', currentStatus ?? QuestionStatus.NOT_DONE);
       if (success) {
-      setSidebarKey(prev => prev + 1);
+        setStatusMap(prev => ({ ...prev, [questionId]: QuestionStatus.ATTEMPTED }));
       }
     }
-  }, []);
+  }, [statusMap]);
 
   // Hydration fix
   useEffect(() => {
@@ -285,6 +287,33 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       window.removeEventListener('message', handleMessage);
     };
   }, []);
+
+  // 加载题目状态 + 收藏
+  useEffect(() => {
+    loadQuestionStatusFromServer('code').then((map) => {
+      setStatusMap(map);
+    });
+    loadFavoritesFromServer('code').then((ids) => {
+      setFavoriteQuestions(ids);
+    });
+  }, []);
+
+  // 监听登录状态变化，登录后刷新数据
+  useEffect(() => {
+    if (prevSessionStatus.current === 'unauthenticated' && sessionStatus === 'authenticated') {
+      loadQuestionStatusFromServer('code').then((map) => {
+        setStatusMap(map);
+      });
+      loadFavoritesFromServer('code').then((ids) => {
+        setFavoriteQuestions(ids);
+      });
+      // 如果当前有选中的题目，重新获取详情
+      if (selectedQuestionId) {
+        fetchDetail(selectedQuestionId);
+      }
+    }
+    prevSessionStatus.current = sessionStatus;
+  }, [sessionStatus, selectedQuestionId, fetchDetail]);
 
   // 切换题目时加载代码（优先使用 API 返回的 savedCode，否则用模板）
   useEffect(() => {
@@ -439,18 +468,20 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       notifications.show({ autoClose: 1500, title: '提示', message: '请先选择一个题目', color: 'yellow' });
       return;
     }
-    const statusMap = getQuestionStatusMap('code');
-    const currentStatus = statusMap[selectedQuestionId];
+    const currentStatus = statusMap[selectedQuestionId] ?? QuestionStatus.NOT_DONE;
     const targetStatus = currentStatus === QuestionStatus.SOLVED ? QuestionStatus.NOT_DONE : QuestionStatus.SOLVED;
 
-    const { success, finalStatus } = await setQuestionStatus(selectedQuestionId, targetStatus, 'code');
+    const { success, finalStatus, httpStatus } = await setQuestionStatus(selectedQuestionId, targetStatus, 'code', currentStatus);
 
     if (!success) {
-      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      if (httpStatus !== 401) {
+        notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      }
       return;
     }
 
-    setSidebarKey(prev => prev + 1);
+    // 更新本地状态
+    setStatusMap(prev => ({ ...prev, [selectedQuestionId]: finalStatus }));
 
     if (finalStatus === QuestionStatus.SOLVED) {
       notifications.show({ autoClose: 1500, title: '🎉 恭喜', message: '已标记为完成！', color: 'green' });
@@ -461,10 +492,8 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
 
   const isCurrentSolved = useMemo(() => {
     if (!selectedQuestionId) return false;
-    const statusMap = getQuestionStatusMap('code');
     return statusMap[selectedQuestionId] === QuestionStatus.SOLVED;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedQuestionId, sidebarKey]);
+  }, [selectedQuestionId, statusMap]);
 
   const isCurrentFavorited = selectedQuestionId
     ? favoriteQuestions.has(selectedQuestionId)
@@ -476,10 +505,13 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       return;
     }
 
-    const { success, newStatus } = await toggleFavorite('code', selectedQuestionId);
+    const currentStatus = favoriteQuestions.has(selectedQuestionId);
+    const { success, newStatus, status } = await toggleFavorite('code', selectedQuestionId, currentStatus);
 
     if (!success) {
-      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      if (status !== 401) {
+        notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      }
       return;
     }
 
@@ -493,16 +525,8 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       return next;
     });
 
-    // 更新缓存
-    setDetailCache(prev => {
-      const detail = prev.get(selectedQuestionId);
-      if (detail) {
-        const newMap = new Map(prev);
-        newMap.set(selectedQuestionId, { ...detail, isFavorited: newStatus });
-        return newMap;
-      }
-      return prev;
-    });
+    // 更新当前详情
+    setSelectedDetail(prev => prev ? { ...prev, isFavorited: newStatus } : null);
 
     notifications.show({
       autoClose: 1500,
@@ -510,7 +534,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       message: newStatus ? '题目已添加到收藏' : '题目已从收藏中移除',
       color: newStatus ? 'yellow' : 'gray',
     });
-  }, [selectedQuestionId]);
+  }, [selectedQuestionId, favoriteQuestions]);
 
   const onCodeChange = useCallback((value: string) => {
     setCode(value);
@@ -652,7 +676,6 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
         {/* 左侧分类菜单 */}
         <QuestionSidebar
           ref={sidebarRef}
-          key={sidebarKey}
           questions={questions}
           questionsByCategory={questionsByCategory}
           selectedQuestionId={selectedQuestionId}
@@ -662,6 +685,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
           onToggleCategory={toggleCategory}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
+          statusMap={statusMap}
         />
 
         {/* 右侧主区域 */}

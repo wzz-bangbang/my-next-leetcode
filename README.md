@@ -1,47 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 前端练习平台
 
-## Getting Started
+基于 Next.js 15 构建的前端面试题练习平台，支持代码题和八股文练习。
 
-First, run the development server:
+## 技术栈
+
+- **框架**: Next.js 15 (App Router, SSR)
+- **UI**: Mantine + TailwindCSS
+- **数据库**: MySQL 8.0
+- **认证**: NextAuth.js (GitHub/Google OAuth + 邮箱登录)
+- **邮件**: Resend
+- **监控**: Sentry
+
+## 功能特性
+
+- ✅ 代码题练习（JS/TS/React）
+- ✅ 八股文练习
+- ✅ 多种登录方式（GitHub/Google/邮箱验证码）
+- ✅ 用户进度追踪
+- ✅ 收藏功能
+- ✅ 代码编辑器（Monaco Editor）
+
+## 快速开始
+
+### 1. 安装依赖
+
+```bash
+npm install --registry=https://registry.npmmirror.com
+```
+
+### 2. 启动数据库
+
+```bash
+cd docker && docker-compose up -d
+```
+
+### 3. 配置环境变量
+
+```bash
+cp docs/env.production.example .env.local
+# 编辑 .env.local 填写配置
+```
+
+### 4. 启动开发服务器
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+访问 http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 部署
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+详见 [docs/deployment.md](./docs/deployment.md)
 
-## Learn More
+### 快速部署（Docker）
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# 配置环境变量
+cp docs/env.production.example .env.production
+vim .env.production
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 构建并启动
+docker-compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 文档
 
-## Deploy on Vercel
+| 文档 | 说明 |
+|-----|------|
+| [环境变量配置](./docs/env-config.md) | 开发/生产环境变量说明 |
+| [部署指南](./docs/deployment.md) | Docker 部署详细步骤 |
+| [数据库结构](./scripts/database-schema.md) | 表结构和字段说明 |
+| [测试用例](./tests/README.md) | 黑盒测试用例 |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 目录结构
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## 环境配置
-
-详见 [docs/env-config.md](./docs/env-config.md)
-
+```
+├── src/
+│   ├── app/              # Next.js App Router 页面
+│   ├── components/       # React 组件
+│   ├── lib/              # 工具函数
+│   ├── services/         # 前端 API 服务
+│   └── types/            # TypeScript 类型
+├── docker/               # Docker 配置
+├── docs/                 # 文档
+├── scripts/              # 脚本和 SQL
+└── tests/                # 测试用例
+```
 
 ## 后续优化方向
-- [ ] SSR 优化
+
+- [ ] SSR 性能优化
 - [ ] 增加标签 & 进阶思考 & 关联题目（知识图谱）
 - [ ] 邮件服务增加多服务切换
 - [ ] Web Worker 缓存离线数据
@@ -51,3 +100,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [ ] 增加用户维护入口
 - [ ] 自动生成头像昵称
 - [ ] 换昵称 换头像
+
+上线后cookie字段名可以改一下,  改成和域名相关的

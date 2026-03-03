@@ -1,0 +1,44 @@
+# 依赖目录
+node_modules
+
+# 构建输出
+.next
+out
+
+# 开发配置
+.env*.local
+.env.development
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# 日志
+*.log
+npm-debug.log*
+
+# 测试
+tests
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# 文档（不需要打包到镜像）
+docs
+*.md
+!README.md
+
+# Docker 配置（避免递归）
+docker-compose*.yml
+Dockerfile*
+
+# 其他
+.DS_Store
+Thumbs.db

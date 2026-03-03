@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { notifications } from '@mantine/notifications';
 import Header from '@/components/Header';
-import { getFavorites, loadFavoritesFromServer, setFavorite } from '@/lib/favorites';
+import { loadFavoritesFromServer, toggleFavorite } from '@/lib/favorites';
 import { getBaguData, getCachedBaguData } from '@/lib/bagu-data';
 import { CategoryTag, CategoryTagLabel } from '@/types/question';
 import type { BaguData, BaguQuestion } from '@/types/bagu';
@@ -29,8 +29,6 @@ export default function FavoritesPage() {
   // 加载数据
   useEffect(() => {
     // 加载收藏
-    setBaguFavorites(getFavorites('bagu'));
-    setCodeFavorites(getFavorites('code'));
     loadFavoritesFromServer('bagu').then(setBaguFavorites);
     loadFavoritesFromServer('code').then(setCodeFavorites);
 
@@ -136,9 +134,11 @@ export default function FavoritesPage() {
 
   // 取消收藏八股文
   const removeBaguFavorite = useCallback(async (questionId: number) => {
-    const success = await setFavorite('bagu', questionId, false);
+    const { success, status } = await toggleFavorite('bagu', questionId, true); // currentStatus=true means it's favorited
     if (!success) {
-      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      if (status !== 401) {
+        notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      }
       return;
     }
     setBaguFavorites((prev) => {
@@ -156,9 +156,11 @@ export default function FavoritesPage() {
 
   // 取消收藏刷题
   const removeCodeFavorite = useCallback(async (questionId: number) => {
-    const success = await setFavorite('code', questionId, false);
+    const { success, status } = await toggleFavorite('code', questionId, true); // currentStatus=true means it's favorited
     if (!success) {
-      notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      if (status !== 401) {
+        notifications.show({ autoClose: 2000, title: '操作失败', message: '请稍后重试', color: 'red' });
+      }
       return;
     }
     setCodeFavorites((prev) => {

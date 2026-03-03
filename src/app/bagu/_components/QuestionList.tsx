@@ -11,6 +11,8 @@ interface QuestionListProps {
   completedQuestions: Set<number>;
   onSelectQuestion: (question: BaguQuestionListItem, categoryId: number) => void;
   onToggleCategory: (categoryId: number) => void;
+  onGoToPrev?: () => void;
+  onGoToNext?: () => void;
 }
 
 // 分类图标映射（按数字ID）
@@ -38,21 +40,12 @@ export default function QuestionList({
   completedQuestions,
   onSelectQuestion,
   onToggleCategory,
+  onGoToPrev,
+  onGoToNext,
 }: QuestionListProps) {
 
   // 键盘导航
   useEffect(() => {
-      // 获取所有题目的扁平列表（用于键盘导航）
-    const getAllQuestions = () => {
-      const result: { question: BaguQuestionListItem; categoryId: number }[] = [];
-      for (const category of categories) {
-        for (const question of category.questions) {
-          result.push({ question, categoryId: category.id });
-        }
-      }
-      return result;
-    };
-
     const handleKeyDown = (e: KeyboardEvent) => {
       // 如果在输入框内，不处理
       if (
@@ -68,38 +61,16 @@ export default function QuestionList({
 
       e.preventDefault();
 
-      const allQuestions = getAllQuestions();
-      if (allQuestions.length === 0) return;
-
-      // 找到当前选中题目的索引
-      const currentIndex = selectedQuestionId
-        ? allQuestions.findIndex((q) => q.question.id === selectedQuestionId)
-        : -1;
-
-      let newIndex: number;
       if (e.key === 'ArrowUp') {
-        // 上一题（到头不循环）
-        if (currentIndex <= 0) return;
-        newIndex = currentIndex - 1;
+        onGoToPrev?.();
       } else {
-        // 下一题（到尾不循环）
-        if (currentIndex >= allQuestions.length - 1) return;
-        newIndex = currentIndex + 1;
+        onGoToNext?.();
       }
-
-      const { question, categoryId } = allQuestions[newIndex];
-      
-      // 自动展开目标分类
-      if (!expandedCategories.has(categoryId)) {
-        onToggleCategory(categoryId);
-      }
-      
-      onSelectQuestion(question, categoryId);
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedQuestionId, expandedCategories, onSelectQuestion, onToggleCategory, categories]);
+  }, [onGoToPrev, onGoToNext]);
 
   return (
     <div className="py-1">

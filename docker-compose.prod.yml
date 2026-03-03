@@ -1,0 +1,96 @@
+# 生产环境 Docker Compose 配置
+# 使用方式：docker-compose -f docker-compose.prod.yml up -d
+
+version: '3.8'
+
+services:
+  # Next.js 应用
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+        - SENTRY_ORG=${SENTRY_ORG}
+        - SENTRY_PROJECT=${SENTRY_PROJECT}
+    container_name: leetcode-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # 数据库
+      - DATABASE_HOST=db
+      - DATABASE_PORT=3306
+      - DATABASE_USER=${DATABASE_USER:-leetcode}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME:-leetcode}
+      # NextAuth
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      # OAuth
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      # 邮件
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM:-noreply@resend.dev}
+      # Sentry
+      - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - leetcode-network
+
+  # MySQL 数据库
+  db:
+    image: mysql:8.0
+    container_name: leetcode-mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD}
+      - MYSQL_DATABASE=${DATABASE_NAME:-leetcode}
+      - MYSQL_USER=${DATABASE_USER:-leetcode}
+      - MYSQL_PASSWORD=${DATABASE_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - leetcode-network
+    # 不暴露端口到外网（只允许内网访问）
+    # 如需外网调试，取消下面注释
+    # ports:
+    #   - "3306:3306"
+
+  # Nginx 反向代理（可选，用于 HTTPS）
+  nginx:
+    image: nginx:alpine
+    container_name: leetcode-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - certbot_data:/var/www/certbot:ro
+    depends_on:
+      - web
+    networks:
+      - leetcode-network
+
+volumes:
+  mysql_data:
+    driver: local
+  certbot_data:
+    driver: local
+
+networks:
+  leetcode-network:
+    driver: bridge
