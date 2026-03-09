@@ -23,6 +23,9 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --default-authentication-plugin=mysql_native_password
+      - --wait_timeout=300
+      - --interactive_timeout=300
+      - --max_connections=200
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pwzz888888"]
       interval: 10s

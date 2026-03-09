@@ -12,14 +12,18 @@ const dbConfig = {
   queueLimit: 0,
 };
 
-// 创建连接池（单例模式）
-let pool: mysql.Pool | null = null;
+// 扩展 globalThis 类型
+declare global {
+  // eslint-disable-next-line no-var
+  var mysqlPool: mysql.Pool | undefined;
+}
 
+// 创建连接池（使用 globalThis 防止开发模式热重载时重复创建）
 export function getPool(): mysql.Pool {
-  if (!pool) {
-    pool = mysql.createPool(dbConfig);
+  if (!globalThis.mysqlPool) {
+    globalThis.mysqlPool = mysql.createPool(dbConfig);
   }
-  return pool;
+  return globalThis.mysqlPool;
 }
 
 // 执行查询的便捷方法
@@ -31,8 +35,8 @@ export async function query<T>(sql: string, params?: unknown[]): Promise<T> {
 
 // 关闭连接池
 export async function closePool(): Promise<void> {
-  if (pool) {
-    await pool.end();
-    pool = null;
+  if (globalThis.mysqlPool) {
+    await globalThis.mysqlPool.end();
+    globalThis.mysqlPool = undefined;
   }
 }

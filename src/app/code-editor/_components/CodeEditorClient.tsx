@@ -67,6 +67,10 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
   const sandboxRef = useRef<HTMLIFrameElement | null>(null);
   const [isSandboxReady, setIsSandboxReady] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
+  const executionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // 执行超时时间（毫秒）
+  const EXECUTION_TIMEOUT = 5000;
 
   // 展开的分类
   const [expandedCategories, setExpandedCategories] = useState<Set<CategoryTag>>(new Set());
@@ -265,6 +269,11 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       }
 
       if (type === 'result') {
+        // 清除超时计时器
+        if (executionTimeoutRef.current) {
+          clearTimeout(executionTimeoutRef.current);
+          executionTimeoutRef.current = null;
+        }
         setConsoleLogs(logs || []);
         setReturnValue(result || '');
         setExecutionError('');
@@ -273,6 +282,11 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       }
 
       if (type === 'error') {
+        // 清除超时计时器
+        if (executionTimeoutRef.current) {
+          clearTimeout(executionTimeoutRef.current);
+          executionTimeoutRef.current = null;
+        }
         setConsoleLogs(logs || []);
         setReturnValue('');
         setExecutionError(error || '未知错误');
@@ -285,6 +299,10 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
 
     return () => {
       window.removeEventListener('message', handleMessage);
+      // 清理超时计时器
+      if (executionTimeoutRef.current) {
+        clearTimeout(executionTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -298,22 +316,28 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     });
   }, []);
 
-  // 监听登录状态变化，登录后刷新数据
+  // 监听登录状态变化
   useEffect(() => {
-    if (prevSessionStatus.current === 'unauthenticated' && sessionStatus === 'authenticated') {
+    const prev = prevSessionStatus.current;
+
+    // 登录：重新加载用户数据
+    if (prev === 'unauthenticated' && sessionStatus === 'authenticated') {
       loadQuestionStatusFromServer('code').then((map) => {
         setStatusMap(map);
       });
       loadFavoritesFromServer('code').then((ids) => {
         setFavoriteQuestions(ids);
       });
-      // 如果当前有选中的题目，重新获取详情
-      if (selectedQuestionId) {
-        fetchDetail(selectedQuestionId);
-      }
     }
+
+    // 退登：清空用户相关数据（保留题目内容缓存）
+    if (prev === 'authenticated' && sessionStatus === 'unauthenticated') {
+      setStatusMap({});
+      setFavoriteQuestions(new Set());
+    }
+
     prevSessionStatus.current = sessionStatus;
-  }, [sessionStatus, selectedQuestionId, fetchDetail]);
+  }, [sessionStatus]);
 
   // 切换题目时加载代码（优先使用 API 返回的 savedCode，否则用模板）
   useEffect(() => {
@@ -327,8 +351,8 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
 
   const handleSelectChange = useCallback(async (value: number | null, categoryTag?: CategoryTag) => {
     if (value && (value !== selectedQuestionId || categoryTag !== selectedCategoryTag)) {
-      // 自动保存当前代码（需通过长度校验）
-      if (code.trim() && selectedQuestionId && selectedDetail) {
+      // 自动保存当前代码（需登录且通过长度校验）
+      if (sessionStatus === 'authenticated' && code.trim() && selectedQuestionId && selectedDetail) {
         const template = selectedDetail.template || '';
         const codeValidation = validateCode(code);
         if (code.trim() !== template.trim() && codeValidation.valid) {
@@ -345,7 +369,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       resetExecutionResult();
       fetchDetail(value);
     }
-  }, [code, selectedQuestionId, selectedCategoryTag, selectedDetail, markQuestionAsAttempted, resetExecutionResult, fetchDetail]);
+  }, [sessionStatus, code, selectedQuestionId, selectedCategoryTag, selectedDetail, markQuestionAsAttempted, resetExecutionResult, fetchDetail]);
 
   // 键盘上下键切换题目
   useEffect(() => {
@@ -387,11 +411,29 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     if (sandboxRef.current && sandboxRef.current.contentWindow && !isExecuting) {
       setIsExecuting(true);
       resetExecutionResult();
+      
+      // 清除之前的超时计时器
+      if (executionTimeoutRef.current) {
+        clearTimeout(executionTimeoutRef.current);
+      }
+      
+      // 设置执行超时
+      executionTimeoutRef.current = setTimeout(() => {
+        // 超时处理：重新加载 sandbox iframe 以终止死循环
+        if (sandboxRef.current) {
+          const baseUrl = sandboxRef.current.src.split('?')[0];
+          sandboxRef.current.src = `${baseUrl}?t=${Date.now()}`;
+        }
+        setExecutionError(`⏱️ 执行超时（${EXECUTION_TIMEOUT / 1000}秒）\n可能存在死循环，请检查代码。`);
+        setIsExecuting(false);
+        executionTimeoutRef.current = null;
+      }, EXECUTION_TIMEOUT);
+      
       sandboxRef.current.contentWindow.postMessage({ code }, '*');
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!selectedQuestionId) {
       notifications.show({ autoClose: 1500, title: '操作失败', message: '请先选择一个题目', color: 'yellow' });
       return;
@@ -414,9 +456,84 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       // 401 已由 api 统一处理弹出登录框
         notifications.show({ autoClose: 1500, title: '保存失败', message: '请稍后再试', color: 'red' });
     }
+  }, [selectedQuestionId, code, markQuestionAsAttempted]);
+
+  // Ctrl+S / Cmd+S 保存代码
+  useEffect(() => {
+    const handleSaveShortcut = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+
+    window.addEventListener('keydown', handleSaveShortcut);
+    return () => window.removeEventListener('keydown', handleSaveShortcut);
+  }, [handleSave]);
+
+  // 页面关闭/隐藏时自动保存（静默保存，不显示通知）
+  useEffect(() => {
+    const silentSave = () => {
+      if (sessionStatus !== 'authenticated') return;
+      if (!selectedQuestionId || !code.trim()) return;
+      
+      const template = selectedDetail?.template || '';
+      const codeValidation = validateCode(code);
+      if (code.trim() === template.trim() || !codeValidation.valid) return;
+
+      // 使用 sendBeacon 确保页面关闭时请求能发出
+      const data = JSON.stringify({ questionId: selectedQuestionId, code });
+      navigator.sendBeacon('/api/answers', data);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        silentSave();
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      silentSave();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [sessionStatus, selectedQuestionId, code, selectedDetail]);
+
+  // 直接保存当前代码并载入模板（无弹窗确认）
+  const handleLoadTemplate = async () => {
+    if (!selectedQuestionId) {
+      notifications.show({ autoClose: 1500, title: '提示', message: '请先选择一个题目', color: 'blue' });
+      return;
+    }
+    const template = selectedDetail?.template || '';
+    
+    // 如果代码有修改且用户已登录，先保存
+    if (sessionStatus === 'authenticated' && code.trim() && code.trim() !== template.trim()) {
+      const codeValidation = validateCode(code);
+      if (codeValidation.valid) {
+        await saveAnswer(selectedQuestionId, code);
+        markQuestionAsAttempted(selectedQuestionId);
+      }
+    }
+    
+    // 载入模板
+    setCode(template);
+    resetExecutionResult();
+    if (template) {
+      notifications.show({ autoClose: 1500, title: '已载入', message: '模板代码已载入', color: 'cyan' });
+    } else {
+      notifications.show({ autoClose: 1500, title: '已清空', message: '本题无模板，代码区已清空', color: 'blue' });
+    }
   };
 
-  const handleLoadTemplate = () => {
+  /* [暂时注释] 原有弹窗确认逻辑
+  const handleLoadTemplateOld = () => {
     if (!selectedQuestionId) {
       notifications.show({ autoClose: 1500, title: '提示', message: '请先选择一个题目', color: 'blue' });
       return;
@@ -434,7 +551,9 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     }
     openTemplateModal();
   };
+  */
 
+  /* [暂时注释] 弹窗相关的保存/不保存处理函数
   const handleLoadTemplateWithSave = async () => {
     if (!selectedQuestionId) {
       closeTemplateModal();
@@ -462,6 +581,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
       notifications.show({ autoClose: 1500, title: '已清空', message: '本题无模板，代码区已清空', color: 'blue' });
     }
   };
+  */
 
   const handleMarkAsSolved = async () => {
     if (!selectedQuestionId) {
@@ -659,7 +779,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
         </a>
       </div>
 
-      {/* 载入模板确认弹窗 */}
+      {/* [暂时注释] 载入模板确认弹窗 - 现改为直接保存并载入
       {isClient && (
         <Modal opened={templateModalOpened} onClose={closeTemplateModal} title="载入模板" centered>
           <p>是否保存当前代码后再载入模板？</p>
@@ -670,6 +790,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
           </Group>
         </Modal>
       )}
+      */}
 
       {/* 主内容区域 - PC端显示 */}
       <div className="relative z-10 hidden md:flex min-h-0 flex-1 overflow-hidden">
@@ -728,6 +849,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
                 <Button onClick={handleSave} variant="light" radius="xl" size="sm" color="violet">
                   💾 保存
                 </Button>
+                {/* [已移至状态栏] 模板按钮
                 <Button
                   onClick={handleLoadTemplate}
                   variant="light"
@@ -737,6 +859,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
                 >
                   📋 模板
                 </Button>
+                */}
                 <Button
                   onClick={handleMarkAsSolved}
                   variant="light"
@@ -770,15 +893,32 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
                       </div>
                     )}
 
-                    {/* 建议用例 */}
+                    {/* 用例 */}
                     {selectedDetail?.testCases && selectedDetail.testCases.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">🧪 建议用例</h4>
+                        <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">🧪 用例</h4>
                         <div className="space-y-3">
                           {selectedDetail.testCases.map((testCase, index) => (
-                            <div key={index} className="bg-gray-50/80 rounded-lg p-3 border border-gray-200/50">
+                            <div key={index} className="bg-gray-50/80 rounded-lg p-3 border border-gray-200/50 relative group">
+                              <button
+                                onClick={() => {
+                                  const newCode = code.trimEnd() + '\n\n' + testCase.input;
+                                  setCode(newCode);
+                                  notifications.show({
+                                    title: '已添加用例',
+                                    message: '用例代码已添加到编辑器末尾',
+                                    color: 'green',
+                                  });
+                                }}
+                                className="absolute top-2 right-2 p-1.5 rounded-md bg-purple-100 hover:bg-purple-200 text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="应用到代码区"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                              </button>
                               {testCase.description && (
-                                <div className="text-sm text-purple-600 font-medium mb-2">{testCase.description}</div>
+                                <div className="text-sm text-purple-600 font-medium mb-2 pr-8">{testCase.description}</div>
                               )}
                               <div className="space-y-1.5">
                                 <div className="flex items-start gap-2">
@@ -856,13 +996,34 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
               />
               </div>
               {/* 代码统计状态栏 */}
-              <div className="flex-shrink-0 px-3 py-1.5 bg-gray-100/80 border-t border-gray-200/50 text-xs text-gray-500 flex items-center justify-end gap-4">
-                <span className={code.split('\n').length > CODE_MAX_LINES ? 'text-red-500 font-medium' : ''}>
-                  行数: {code.split('\n').length} / {CODE_MAX_LINES}
-                </span>
-                <span className={code.length > CODE_MAX_CHARS ? 'text-red-500 font-medium' : ''}>
-                  字符: {code.length.toLocaleString()} / {CODE_MAX_CHARS.toLocaleString()}
-                </span>
+              <div className="flex-shrink-0 px-3 py-1.5 bg-gray-100/80 border-t border-gray-200/50 text-xs text-gray-500 flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      setCode('');
+                      resetExecutionResult();
+                    }}
+                    className="px-2 py-0.5 rounded hover:bg-gray-200/80 text-gray-500 hover:text-gray-700 transition-colors"
+                    title="清空代码区"
+                  >
+                    🗑️ 清空
+                  </button>
+                  <button
+                    onClick={handleLoadTemplate}
+                    className="px-2 py-0.5 rounded hover:bg-gray-200/80 text-cyan-600 hover:text-cyan-700 transition-colors"
+                    title="保存当前代码并载入模板"
+                  >
+                    📋 载入模板
+                  </button>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className={code.split('\n').length > CODE_MAX_LINES ? 'text-red-500 font-medium' : ''}>
+                    行数: {code.split('\n').length} / {CODE_MAX_LINES}
+                  </span>
+                  <span className={code.length > CODE_MAX_CHARS ? 'text-red-500 font-medium' : ''}>
+                    字符: {code.length.toLocaleString()} / {CODE_MAX_CHARS.toLocaleString()}
+                  </span>
+                </div>
               </div>
             </div>
 

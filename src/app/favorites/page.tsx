@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { notifications } from '@mantine/notifications';
 import Header from '@/components/Header';
@@ -20,6 +21,10 @@ interface CodeQuestion {
 }
 
 export default function FavoritesPage() {
+  // 监听登录状态
+  const { status: sessionStatus } = useSession();
+  const prevSessionStatus = useRef(sessionStatus);
+
   const [baguFavorites, setBaguFavorites] = useState<Set<number>>(new Set());
   const [codeFavorites, setCodeFavorites] = useState<Set<number>>(new Set());
   const [baguData, setBaguData] = useState<BaguData | null>(null);
@@ -45,6 +50,25 @@ export default function FavoritesPage() {
       if (data) setCodeQuestions(data);
     });
   }, []);
+
+  // 监听登录状态变化
+  useEffect(() => {
+    const prev = prevSessionStatus.current;
+
+    // 登录：重新加载收藏数据
+    if (prev === 'unauthenticated' && sessionStatus === 'authenticated') {
+      loadFavoritesFromServer('bagu').then(setBaguFavorites);
+      loadFavoritesFromServer('code').then(setCodeFavorites);
+    }
+
+    // 退登：清空收藏数据
+    if (prev === 'authenticated' && sessionStatus === 'unauthenticated') {
+      setBaguFavorites(new Set());
+      setCodeFavorites(new Set());
+    }
+
+    prevSessionStatus.current = sessionStatus;
+  }, [sessionStatus]);
 
   // 八股文收藏按分类分组
   const baguFavoritesByCategory = useMemo(() => {

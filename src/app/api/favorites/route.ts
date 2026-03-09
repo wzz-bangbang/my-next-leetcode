@@ -72,23 +72,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 
+    // 校验所有 id 必须是正整数
+    const validIds = ids.filter(id => Number.isInteger(id) && id > 0);
+    if (validIds.length !== ids.length) {
+      return NextResponse.json({ error: 'Invalid question IDs' }, { status: 400 });
+    }
+
     const tableName = TABLE_MAP[type];
 
     // 先将该类型所有记录的 is_favorite 设为 0
     await query(`UPDATE ${tableName} SET is_favorite = 0 WHERE user_id = ?`, [userId]);
 
-    // 批量设置新收藏
-    if (ids.length > 0) {
-      const values = ids.map(id => [userId, id, 1]);
-      const placeholders = values.map(() => '(?, ?, ?)').join(', ');
-      const flatValues = values.flat();
-
-      await query(
-        `INSERT INTO ${tableName} (user_id, question_id, is_favorite)
-         VALUES ${placeholders}
-         ON DUPLICATE KEY UPDATE is_favorite = 1`,
-        flatValues
+    // 批量设置新收藏（只处理有效 ID）
+    if (validIds.length > 0) {
+      // 校验题目是否都存在
+      const questionTable = QUESTION_TABLE_MAP[type];
+      const placeholders = validIds.map(() => '?').join(',');
+      const existingQuestions = await query<{ id: number }[]>(
+        `SELECT id FROM ${questionTable} WHERE id IN (${placeholders})`,
+        validIds
       );
+      const existingIds = new Set(existingQuestions.map(q => q.id));
+      const validExistingIds = validIds.filter(id => existingIds.has(id));
+
+      if (validExistingIds.length > 0) {
+        const values = validExistingIds.map(id => [userId, id, 1]);
+        const insertPlaceholders = values.map(() => '(?, ?, ?)').join(', ');
+        const flatValues = values.flat();
+
+        await query(
+          `INSERT INTO ${tableName} (user_id, question_id, is_favorite)
+           VALUES ${insertPlaceholders}
+           ON DUPLICATE KEY UPDATE is_favorite = 1`,
+          flatValues
+        );
+      }
     }
 
     return NextResponse.json({ success: true });
@@ -97,6 +115,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Save failed' }, { status: 500 });
   }
 }
+
+// 题目类型到题目表名的映射
+const QUESTION_TABLE_MAP: Record<string, string> = {
+  code: 'code_questions',
+  bagu: 'bagu_questions',
+};
 
 // PATCH: 切换单个题目的收藏状态
 export async function PATCH(request: NextRequest) {
@@ -109,8 +133,24 @@ export async function PATCH(request: NextRequest) {
   try {
     const { type, questionId, isFavorite } = await request.json();
 
-    if (!type || !questionId || typeof isFavorite !== 'boolean' || !TABLE_MAP[type]) {
+    // 基础参数校验
+    if (!type || !TABLE_MAP[type] || typeof isFavorite !== 'boolean') {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
+
+    // 校验 questionId 必须是正整数
+    if (!Number.isInteger(questionId) || questionId <= 0) {
+      return NextResponse.json({ error: 'Invalid question ID' }, { status: 400 });
+    }
+
+    // 校验题目是否存在
+    const questionTable = QUESTION_TABLE_MAP[type];
+    const questionExists = await query<{ id: number }[]>(
+      `SELECT id FROM ${questionTable} WHERE id = ? LIMIT 1`,
+      [questionId]
+    );
+    if (questionExists.length === 0) {
+      return NextResponse.json({ error: 'Question not found' }, { status: 404 });
     }
 
     const tableName = TABLE_MAP[type];

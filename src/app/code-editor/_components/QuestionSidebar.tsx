@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, forwardRef } from 'react';
+import React, { useMemo, useState, forwardRef } from 'react';
 import { Collapse, Tooltip } from '@mantine/core';
 import { CategoryTag, CategoryTagLabel, Difficulty, DifficultyLabel, DifficultyColor, QuestionListItem } from '@/types/question';
 import {
   QuestionStatus,
   setQuestionStatus as setStatusToServer,
-  loadQuestionStatusFromServer,
 } from '@/lib/questionStatus';
 
 // 重新导出给外部使用
@@ -48,10 +47,60 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
   onToggleCollapse,
   statusMap,
 }, ref) => {
+  // 筛选状态
+  const [showIncomplete, setShowIncomplete] = useState(false);
+  const [difficultyFilters, setDifficultyFilters] = useState<Set<Difficulty>>(new Set());
 
   const getStatus = (questionId: number): QuestionStatus => {
     return statusMap[questionId] ?? QuestionStatus.NOT_DONE;
   };
+
+  // 切换难度筛选
+  const toggleDifficulty = (difficulty: Difficulty) => {
+    setDifficultyFilters(prev => {
+      const next = new Set(prev);
+      if (next.has(difficulty)) {
+        next.delete(difficulty);
+      } else {
+        next.add(difficulty);
+      }
+      return next;
+    });
+  };
+
+  // 筛选后的题目（按分类）
+  const filteredQuestionsByCategory = useMemo(() => {
+    const hasFilters = showIncomplete || difficultyFilters.size > 0;
+    if (!hasFilters) return questionsByCategory;
+
+    const filtered = new Map<CategoryTag, QuestionListItem[]>();
+    questionsByCategory.forEach((questions, tag) => {
+      const filteredQuestions = questions.filter(q => {
+        // 未完成筛选
+        const incompleteMatch = !showIncomplete || getStatus(q.id) !== QuestionStatus.SOLVED;
+        // 难度筛选
+        const difficultyMatch = difficultyFilters.size === 0 || difficultyFilters.has(q.difficulty as Difficulty);
+        return incompleteMatch && difficultyMatch;
+      });
+      if (filteredQuestions.length > 0) {
+        filtered.set(tag, filteredQuestions);
+      }
+    });
+    return filtered;
+  }, [questionsByCategory, showIncomplete, difficultyFilters, statusMap]);
+
+  // 统计信息（基于筛选后的数据）
+  const stats = useMemo(() => {
+    let total = 0;
+    let completed = 0;
+    filteredQuestionsByCategory.forEach(questions => {
+      total += questions.length;
+      completed += questions.filter(q => getStatus(q.id) === QuestionStatus.SOLVED).length;
+    });
+    return { total, completed };
+  }, [filteredQuestionsByCategory, statusMap]);
+
+  const hasFilters = showIncomplete || difficultyFilters.size > 0;
 
   return (
     <div
@@ -61,37 +110,109 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
       style={{ background: 'linear-gradient(180deg, rgba(139,92,246,0.15) 0%, rgba(167,139,250,0.1) 100%)' }}
     >
       {/* 头部 */}
-      <div className="px-3 py-3 border-b border-purple-200/50 bg-white/20 flex-shrink-0 flex items-center justify-between">
-        {!collapsed && <h2 className="text-sm font-semibold text-purple-700">📚 题目分类</h2>}
-        <button
-          onClick={onToggleCollapse}
-          className="p-1.5 rounded-md hover:bg-white/40 transition-colors text-purple-600"
-          title={collapsed ? '展开侧边栏' : '收起侧边栏'}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={`transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}
+      <div className="px-3 py-3 border-b border-purple-200/50 bg-white/20 shrink-0">
+        <div className="flex items-center justify-between">
+          {!collapsed && (
+            <div>
+              <h2 className="text-sm font-semibold text-purple-700">📚 代码题题库</h2>
+              <div className="text-[10px] text-gray-500">
+                共 {stats.total} 题 · 已完成 {stats.completed} 题
+              </div>
+            </div>
+          )}
+          <button
+            onClick={onToggleCollapse}
+            className="p-1.5 rounded-md hover:bg-white/40 transition-colors text-purple-600"
+            title={collapsed ? '展开侧边栏' : '收起侧边栏'}
           >
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="9" y1="3" x2="9" y2="21"></line>
-            <polyline points="14 9 17 12 14 15"></polyline>
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <polyline points="14 9 17 12 14 15"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        {/* 筛选按钮 */}
+        {!collapsed && (
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={() => setShowIncomplete(prev => !prev)}
+              className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all ${
+                showIncomplete
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-white/60 text-gray-600 hover:bg-white/80'
+              }`}
+            >
+              {showIncomplete ? '✓ ' : ''}未完成
+            </button>
+            <div className="flex-1 flex gap-1">
+              <button
+                onClick={() => toggleDifficulty(Difficulty.EASY)}
+                className={`flex-1 py-1.5 text-xs rounded-lg transition-all ${
+                  difficultyFilters.has(Difficulty.EASY)
+                    ? 'text-white'
+                    : 'bg-white/60 hover:bg-white/80'
+                }`}
+                style={{
+                  backgroundColor: difficultyFilters.has(Difficulty.EASY) ? DifficultyColor[Difficulty.EASY] : undefined,
+                  color: difficultyFilters.has(Difficulty.EASY) ? 'white' : DifficultyColor[Difficulty.EASY],
+                }}
+                title="简单"
+              >
+                简
+              </button>
+              <button
+                onClick={() => toggleDifficulty(Difficulty.MEDIUM)}
+                className={`flex-1 py-1.5 text-xs rounded-lg transition-all ${
+                  difficultyFilters.has(Difficulty.MEDIUM)
+                    ? 'text-white'
+                    : 'bg-white/60 hover:bg-white/80'
+                }`}
+                style={{
+                  backgroundColor: difficultyFilters.has(Difficulty.MEDIUM) ? DifficultyColor[Difficulty.MEDIUM] : undefined,
+                  color: difficultyFilters.has(Difficulty.MEDIUM) ? 'white' : DifficultyColor[Difficulty.MEDIUM],
+                }}
+                title="中等"
+              >
+                中
+              </button>
+              <button
+                onClick={() => toggleDifficulty(Difficulty.HARD)}
+                className={`flex-1 py-1.5 text-xs rounded-lg transition-all ${
+                  difficultyFilters.has(Difficulty.HARD)
+                    ? 'text-white'
+                    : 'bg-white/60 hover:bg-white/80'
+                }`}
+                style={{
+                  backgroundColor: difficultyFilters.has(Difficulty.HARD) ? DifficultyColor[Difficulty.HARD] : undefined,
+                  color: difficultyFilters.has(Difficulty.HARD) ? 'white' : DifficultyColor[Difficulty.HARD],
+                }}
+                title="困难"
+              >
+                难
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 折叠状态下显示简化图标列表 */}
       {collapsed ? (
         <div className="flex-1 min-h-0 overflow-y-auto py-2">
           {Object.values(CategoryTag).filter(v => typeof v === 'number').map((tag) => {
-            const categoryQuestions = questionsByCategory.get(tag as CategoryTag) || [];
+            const categoryQuestions = filteredQuestionsByCategory.get(tag as CategoryTag) || [];
             const hasQuestions = categoryQuestions.length > 0;
 
             return hasQuestions ? (
@@ -114,7 +235,7 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
         <div ref={ref} className="flex-1 min-h-0 overflow-y-auto">
           <div className="py-1">
             {Object.values(CategoryTag).filter(v => typeof v === 'number').map((tag) => {
-              const categoryQuestions = questionsByCategory.get(tag as CategoryTag) || [];
+              const categoryQuestions = filteredQuestionsByCategory.get(tag as CategoryTag) || [];
               const isExpanded = expandedCategories.has(tag as CategoryTag);
               const hasQuestions = categoryQuestions.length > 0;
 

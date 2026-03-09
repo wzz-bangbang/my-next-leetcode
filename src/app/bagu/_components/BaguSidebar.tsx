@@ -44,15 +44,15 @@ export default function BaguSidebar({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 统计信息（内部计算）
+  // 统计信息（基于筛选后的数据）
   const stats = useMemo(() => {
-    const total = data.categories.reduce((sum, cat) => sum + cat.questions.length, 0);
-    const completed = data.categories.reduce(
+    const total = filteredCategories.reduce((sum, cat) => sum + cat.questions.length, 0);
+    const completed = filteredCategories.reduce(
       (sum, cat) => sum + cat.questions.filter((q) => completedQuestions.has(q.id)).length,
       0
     );
     return { total, completed };
-  }, [data, completedQuestions]);
+  }, [filteredCategories, completedQuestions]);
 
   // 触摸滑动关闭侧边栏（内部处理）
   useEffect(() => {

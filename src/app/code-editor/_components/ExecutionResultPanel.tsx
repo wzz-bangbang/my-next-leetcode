@@ -63,25 +63,42 @@ export default function ExecutionResultPanel({
           </div>
         </div>
         
-        {/* 返回值 / 错误区域 */}
-        <div className="flex-1 min-h-0 flex flex-col">
-          <div className="flex-shrink-0 px-3 py-1.5 bg-gray-100/50 text-xs text-gray-500 font-medium">
-            {hasError ? '❌ Error' : '📤 Return Value'}
-          </div>
-          <div className="flex-1 min-h-0 overflow-y-auto p-3">
-            {hasError ? (
+        {/* 错误区域（仅在有错误时显示） */}
+        {hasError && (
+          <div className="flex-1 min-h-0 flex flex-col">
+            <div className="flex-shrink-0 px-3 py-1.5 bg-gray-100/50 text-xs text-gray-500 font-medium">
+              ❌ Error
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto p-3">
               <pre className="whitespace-pre-wrap break-all text-sm text-red-600 font-mono">
                 {error}
               </pre>
-            ) : hasReturn ? (
-              <pre className="whitespace-pre-wrap break-all text-sm text-emerald-600 font-mono">
-                {returnValue}
-              </pre>
-            ) : (
-              <span className="text-xs text-gray-400 italic">暂无返回值</span>
-            )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* 
+          [暂时隐藏] Return Value 区域
+          原因：最后一行表达式的值容易造成误导（如 setTimeout 返回 timer ID）
+          后续可考虑：智能过滤、添加说明提示、或用户手动开关
+          
+        {!hasError && (
+          <div className="flex-1 min-h-0 flex flex-col">
+            <div className="flex-shrink-0 px-3 py-1.5 bg-gray-100/50 text-xs text-gray-500 font-medium">
+              📤 Return Value
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto p-3">
+              {hasReturn ? (
+                <pre className="whitespace-pre-wrap break-all text-sm text-emerald-600 font-mono">
+                  {returnValue}
+                </pre>
+              ) : (
+                <span className="text-xs text-gray-400 italic">暂无返回值</span>
+              )}
+            </div>
+          </div>
+        )}
+        */}
       </div>
     </div>
   );

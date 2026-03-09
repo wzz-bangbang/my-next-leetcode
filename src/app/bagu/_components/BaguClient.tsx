@@ -154,25 +154,28 @@ export default function BaguClient({ initialData }: BaguClientProps) {
     });
   }, []);
 
-  // 监听登录状态变化，登录后刷新数据
+  // 监听登录状态变化
   useEffect(() => {
-    // 检测从未登录变为已登录
-    if (prevSessionStatus.current === 'unauthenticated' && sessionStatus === 'authenticated') {
-      // 重新加载数据
+    const prev = prevSessionStatus.current;
+
+    // 登录：重新加载用户数据
+    if (prev === 'unauthenticated' && sessionStatus === 'authenticated') {
       loadQuestionStatusFromServer('bagu').then((map) => {
         setStatusMap(map);
       });
       loadFavoritesFromServer('bagu').then((ids) => {
         setFavoriteQuestions(ids);
       });
-      // 如果当前有选中的题目，重新获取详情以刷新收藏状态
-      if (selectedQuestionId) {
-        setDetailCache(new Map()); // 清空详情缓存
-        fetchDetail(selectedQuestionId);
-      }
     }
+
+    // 退登：清空用户相关数据（保留题目内容缓存）
+    if (prev === 'authenticated' && sessionStatus === 'unauthenticated') {
+      setStatusMap({});
+      setFavoriteQuestions(new Set());
+    }
+
     prevSessionStatus.current = sessionStatus;
-  }, [sessionStatus, selectedQuestionId, fetchDetail]);
+  }, [sessionStatus]);
 
   // 切换分类展开状态
   const toggleCategory = useCallback((categoryId: number) => {

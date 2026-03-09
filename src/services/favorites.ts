@@ -1,7 +1,7 @@
 /**
  * 收藏相关 API
  */
-import { apiGet, apiPost, apiPatch } from '@/lib/api';
+import { apiGet, apiPatch } from '@/lib/api';
 import * as Sentry from '@sentry/nextjs';
 
 export type FavoriteType = 'bagu' | 'code';
@@ -27,11 +27,4 @@ export async function toggleFavorite(type: FavoriteType, questionId: number, isF
   }
   
   return result;
-}
-
-/** 批量设置收藏（迁移用） */
-export async function batchSetFavorites(type: FavoriteType, ids: number[]) {
-  return apiPost<{ message: string }>('/api/favorites', { type, ids }, {
-    showLoginOnUnauthorized: false,
-  });
 }
