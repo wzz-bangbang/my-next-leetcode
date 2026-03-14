@@ -16,7 +16,7 @@ const CATEGORY_CONFIG = {
   'TypeScript.md': { id: 'typescript', name: 'TypeScript' },
   'CSS&HTML.md': { id: 'css-html', name: 'CSS & HTML' },
   '浏览器.md': { id: 'browser', name: '浏览器' },
-  '网络与安全.md': { id: 'network', name: '网络' },
+  '网络、安全与前端请求.md': { id: 'network', name: '网络' },
   '工程化.md': { id: 'engineering', name: '工程化' },
   // 'Node.md': { id: 'node', name: 'Node.js' },
   'Nextjs.md': { id: 'nextjs', name: 'Next.js' },

@@ -910,5 +910,71 @@
       "如何处理 URL 编码的特殊字符，如 %20、%2B 等？",
       "如何支持嵌套对象的解析，如 ?user[name]=Alice&user[age]=20？"
     ]
+  },
+  {
+    "id": "typewriter",
+    "title": "手写打字机效果函数",
+    "difficulty": 2,
+    "tags": [2],
+    "description": "实现一个打字机效果函数 typewriter，模拟 AI 逐字输出的过程。函数接收要输出的文本、每个字符的延迟时间、以及一个回调函数用于处理每次输出。支持中途取消输出。",
+    "template": "function typewriter(text, delay, onChar) {\n  // 在此实现打字机效果\n  // 返回一个取消函数\n}",
+    "testCases": [
+      {
+        "input": "typewriter('Hello', 100, (char, index, current) => console.log(current))",
+        "expected": "依次输出: 'H', 'He', 'Hel', 'Hell', 'Hello'",
+        "description": "基础打字机效果：逐字输出"
+      },
+      {
+        "input": "const cancel = typewriter('ABCDE', 100, () => {});\nsetTimeout(cancel, 250);",
+        "expected": "只输出 'A', 'B'，然后停止",
+        "description": "取消功能：中途停止输出"
+      },
+      {
+        "input": "typewriter('你好世界', 50, (char) => console.log(char))",
+        "expected": "依次输出: '你', '好', '世', '界'",
+        "description": "中文支持：正确处理多字节字符"
+      }
+    ],
+    "solution": "### 答案\n\n```javascript\nfunction typewriter(text, delay, onChar) {\n  let index = 0;\n  let timerId = null;\n  let isCancelled = false;\n  \n  function tick() {\n    if (isCancelled || index >= text.length) return;\n    \n    index++;\n    const currentText = text.slice(0, index);\n    const currentChar = text[index - 1];\n    \n    onChar(currentChar, index - 1, currentText);\n    \n    if (index < text.length) {\n      timerId = setTimeout(tick, delay);\n    }\n  }\n  \n  timerId = setTimeout(tick, delay);\n  \n  // 返回取消函数\n  return function cancel() {\n    isCancelled = true;\n    if (timerId) {\n      clearTimeout(timerId);\n      timerId = null;\n    }\n  };\n}\n```\n\n### 解析\n\n打字机效果的核心是**定时器递归调用**，每次输出一个字符。\n\n#### 实现要点\n\n1. **递归 setTimeout**：每输出一个字符后，设置下一个定时器\n2. **取消机制**：返回 cancel 函数，清除定时器并设置标志位\n3. **回调参数**：提供当前字符、索引、已输出文本三个参数\n\n#### 使用 async/await 的实现\n\n```javascript\nfunction typewriter(text, delay, onChar) {\n  let isCancelled = false;\n  \n  const run = async () => {\n    for (let i = 0; i < text.length; i++) {\n      if (isCancelled) break;\n      \n      await new Promise(resolve => setTimeout(resolve, delay));\n      \n      if (isCancelled) break;\n      \n      const currentText = text.slice(0, i + 1);\n      onChar(text[i], i, currentText);\n    }\n  };\n  \n  run();\n  \n  return () => { isCancelled = true; };\n}\n```\n\n#### 支持 Promise 的版本\n\n```javascript\nfunction typewriter(text, delay, onChar) {\n  let isCancelled = false;\n  \n  const promise = new Promise((resolve, reject) => {\n    let index = 0;\n    \n    function tick() {\n      if (isCancelled) {\n        reject(new Error('Cancelled'));\n        return;\n      }\n      \n      if (index >= text.length) {\n        resolve(text);\n        return;\n      }\n      \n      const currentText = text.slice(0, index + 1);\n      onChar(text[index], index, currentText);\n      index++;\n      \n      setTimeout(tick, delay);\n    }\n    \n    setTimeout(tick, delay);\n  });\n  \n  promise.cancel = () => { isCancelled = true; };\n  return promise;\n}\n```\n\n#### 使用示例\n\n```javascript\n// 基础用法\nconst cancel = typewriter('Hello, AI!', 100, (char, index, current) => {\n  console.log(current);\n});\n\n// 2秒后取消\nsetTimeout(cancel, 2000);\n\n// 在 DOM 中显示\nconst element = document.getElementById('output');\ntypewriter('正在思考中...', 50, (char, index, current) => {\n  element.textContent = current;\n});\n```\n\n### 关键点\n\n| 要点 | 说明 |\n|------|------|\n| 递归 setTimeout | 比 setInterval 更灵活，可变延迟 |\n| 取消机制 | 返回 cancel 函数，清除定时器 |\n| 标志位 | isCancelled 防止异步回调继续执行 |\n| 回调参数 | 提供足够的上下文信息 |",
+    "followUp": [
+      "如何实现可变速度的打字机效果，比如标点符号后停顿更长？",
+      "如何实现流式输出，配合 SSE 或 WebSocket 使用？"
+    ]
+  },
+  {
+    "id": "array-to-tree",
+    "title": "扁平数组转树形结构",
+    "difficulty": 2,
+    "tags": [2, 6],
+    "description": "给定一个扁平化的数组，每个元素包含 id 和 parentId 字段（parentId 为 null 表示根节点），请将其转换为树形结构。常见于菜单、组织架构、评论回复等场景。",
+    "template": "function arrayToTree(items) {\n  // 在此实现\n  // 返回树形结构的数组\n}",
+    "testCases": [
+      {
+        "input": "arrayToTree([\n  { id: 1, name: '部门A', parentId: null },\n  { id: 2, name: '部门B', parentId: 1 },\n  { id: 3, name: '部门C', parentId: 1 },\n  { id: 4, name: '部门D', parentId: 2 }\n])",
+        "expected": "[{ id: 1, name: '部门A', parentId: null, children: [{ id: 2, ..., children: [{ id: 4, ... }] }, { id: 3, ..., children: [] }] }]",
+        "description": "基础转换：多层级嵌套结构"
+      },
+      {
+        "input": "arrayToTree([\n  { id: 1, name: '根1', parentId: null },\n  { id: 2, name: '根2', parentId: null }\n])",
+        "expected": "[{ id: 1, ..., children: [] }, { id: 2, ..., children: [] }]",
+        "description": "多个根节点：返回多棵树组成的数组"
+      },
+      {
+        "input": "arrayToTree([\n  { id: 2, name: '子节点', parentId: 1 },\n  { id: 1, name: '父节点', parentId: null }\n])",
+        "expected": "[{ id: 1, name: '父节点', children: [{ id: 2, name: '子节点', children: [] }] }]",
+        "description": "乱序输入：子节点先于父节点出现"
+      },
+      {
+        "input": "arrayToTree([])",
+        "expected": "[]",
+        "description": "空数组：返回空数组"
+      }
+    ],
+    "solution": "### 答案\n\n```javascript\nfunction arrayToTree(items) {\n  const map = new Map();\n  const roots = [];\n  \n  // 第一遍：创建所有节点的映射，并添加 children 数组\n  for (const item of items) {\n    map.set(item.id, { ...item, children: [] });\n  }\n  \n  // 第二遍：建立父子关系\n  for (const item of items) {\n    const node = map.get(item.id);\n    \n    if (item.parentId === null) {\n      // 根节点\n      roots.push(node);\n    } else {\n      // 找到父节点并添加到其 children\n      const parent = map.get(item.parentId);\n      if (parent) {\n        parent.children.push(node);\n      }\n    }\n  }\n  \n  return roots;\n}\n```\n\n### 解析\n\n这是一道经典的**扁平数组转树形结构**问题，常见于菜单渲染、组织架构、评论系统等场景。\n\n#### 核心思路\n\n1. **两遍遍历法**：\n   - 第一遍：创建 id → node 的映射表\n   - 第二遍：根据 parentId 建立父子关系\n\n2. **时间复杂度**：O(n)，每个节点只遍历两次\n\n3. **空间复杂度**：O(n)，Map 存储所有节点\n\n#### 一遍遍历的优化版本（支持乱序）\n\n```javascript\nfunction arrayToTree(items) {\n  const map = new Map();\n  const roots = [];\n  \n  for (const item of items) {\n    // 获取或创建当前节点\n    const node = map.get(item.id) || { children: [] };\n    Object.assign(node, item);\n    map.set(item.id, node);\n    \n    if (item.parentId === null) {\n      roots.push(node);\n    } else {\n      // 获取或创建父节点（父节点可能还未遍历到）\n      const parent = map.get(item.parentId) || { children: [] };\n      map.set(item.parentId, parent);\n      parent.children.push(node);\n    }\n  }\n  \n  return roots;\n}\n```\n\n这个版本可以处理**乱序输入**（子节点先于父节点出现的情况）。\n\n#### 递归实现（简洁但效率低，O(n²)）\n\n```javascript\nfunction arrayToTree(items, parentId = null) {\n  return items\n    .filter(item => item.parentId === parentId)\n    .map(item => ({\n      ...item,\n      children: arrayToTree(items, item.id)\n    }));\n}\n```\n\n每层递归都要遍历整个数组，不推荐在大数据量时使用。\n\n#### 使用 Object 代替 Map\n\n```javascript\nfunction arrayToTree(items) {\n  const map = {};\n  const roots = [];\n  \n  items.forEach(item => {\n    map[item.id] = { ...item, children: [] };\n  });\n  \n  items.forEach(item => {\n    if (item.parentId === null) {\n      roots.push(map[item.id]);\n    } else if (map[item.parentId]) {\n      map[item.parentId].children.push(map[item.id]);\n    }\n  });\n  \n  return roots;\n}\n```\n\n### 关键点\n\n| 要点 | 说明 |\n|------|------|\n| Map/Object 映射 | O(1) 查找父节点 |\n| 两遍遍历 | 简单可靠，适合有序输入 |\n| 一遍遍历 | 支持乱序输入 |\n| 根节点判断 | parentId 为 null 或不存在 |",
+    "followUp": [
+      "如何实现反向操作：树形结构转扁平数组？",
+      "如何查找两个节点的最近公共祖先（LCA）？",
+      "如何支持自定义 id 和 parentId 的字段名？"
+    ]
   }
 ]

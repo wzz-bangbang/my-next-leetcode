@@ -11,9 +11,9 @@ import { validatePassword } from '@/lib/validation';
 // ============ 数据访问层 ============
 
 /** 查找用户（包含密码） */
-async function findUserWithPassword(userId: string): Promise<{ id: number; password: string | null } | null> {
-  const users = await query<{ id: number; password: string | null }[]>(
-    'SELECT id, password FROM users WHERE id = ? AND (status IS NULL OR status = 0)',
+async function findUserWithPassword(userId: string): Promise<{ id: number; password_hash: string | null } | null> {
+  const users = await query<{ id: number; password_hash: string | null }[]>(
+    'SELECT id, password_hash FROM users WHERE id = ? AND (status IS NULL OR status = 0)',
     [userId]
   );
   return users[0] || null;
@@ -21,7 +21,7 @@ async function findUserWithPassword(userId: string): Promise<{ id: number; passw
 
 /** 更新用户密码 */
 async function updateUserPassword(userId: string, hashedPassword: string) {
-  await query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId]);
+  await query('UPDATE users SET password_hash = ? WHERE id = ?', [hashedPassword, userId]);
 }
 
 // ============ 业务逻辑层 ============
@@ -35,14 +35,14 @@ async function verifyOldPassword(userId: string, oldPassword: string) {
   }
 
   // 第三方登录用户没有密码
-  if (!user.password) {
+  if (!user.password_hash) {
     return { ok: false, status: 400, error: '您使用第三方登录，请先设置密码' };
   }
 
   // 验证原密码
-  const isValid = await bcrypt.compare(oldPassword, user.password);
+  const isValid = await bcrypt.compare(oldPassword, user.password_hash);
   if (!isValid) {
-    return { ok: false, status: 401, error: '原密码错误' };
+    return { ok: false, status: 400, error: '原密码错误' };
   }
 
   return { ok: true };

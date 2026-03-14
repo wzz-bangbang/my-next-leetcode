@@ -92,47 +92,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const code = credentials.code as string;
           const CODE_TYPE_LOGIN = 1; // 登录类型验证码
 
-          // 1. 检查验证码是否存在且有效（必须是登录类型 type=1）
-          const codes = await query<{
+          // 1. 查询该邮箱最新的有效验证码
+          const latestCodes = await query<{
             id: number;
-            verify_attempts: number;
-            locked_until: Date | null;
+            code: string;
           }[]>(
-            `SELECT id, verify_attempts, locked_until FROM email_verification_codes 
-             WHERE email = ? AND code = ? AND type = ? AND used = 0 AND expires_at > NOW()`,
-            [email, code, CODE_TYPE_LOGIN]
+            `SELECT id, code FROM email_verification_codes 
+             WHERE email = ? AND type = ? AND used = 0 AND expires_at > NOW()
+             ORDER BY created_at DESC LIMIT 1`,
+            [email, CODE_TYPE_LOGIN]
           );
 
-          if (codes.length === 0) {
-            console.log('[Auth] Invalid or expired code for:', email);
-            // 记录失败次数（只针对登录类型的验证码）
-            await query(
-              `UPDATE email_verification_codes SET verify_attempts = verify_attempts + 1 
-               WHERE email = ? AND type = ? AND used = 0`,
-              [email, CODE_TYPE_LOGIN]
-            );
+          if (latestCodes.length === 0) {
+            console.log('[Auth] No valid code for:', email);
             return null;
           }
 
-          const codeRecord = codes[0];
+          const codeRecord = latestCodes[0];
 
-          // 2. 检查是否被锁定
-          if (codeRecord.locked_until && new Date(codeRecord.locked_until) > new Date()) {
-            console.log('[Auth] Code login locked for:', email);
+          // 2. 验证码是否匹配
+          if (codeRecord.code !== code) {
+            console.log('[Auth] Invalid code for:', email);
             return null;
           }
 
-          // 3. 检查尝试次数（超过5次锁定30分钟）
-          if (codeRecord.verify_attempts >= 5) {
-            await query(
-              `UPDATE email_verification_codes SET locked_until = DATE_ADD(NOW(), INTERVAL 30 MINUTE) WHERE id = ?`,
-              [codeRecord.id]
-            );
-            console.log('[Auth] Too many attempts, locking:', email);
-            return null;
-          }
-
-          // 4. 验证成功，标记验证码已使用
+          // 3. 验证成功，标记验证码已使用
           await query(
             `UPDATE email_verification_codes SET used = 1 WHERE id = ?`,
             [codeRecord.id]
@@ -299,15 +283,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     },
 
-    // JWT 回调：把用户 ID 存到 token 里
+    // JWT 回调：把用户 ID 和登录方式存到 token 里
     async jwt({ token, user, account }) {
-      if (user) {
+      if (user && account) {
+        token.loginType = account.provider;
+        
         // Credentials / Code 登录：user.id 已经是数据库 ID
-        if (account?.provider === 'credentials' || account?.provider === 'code') {
+        if (account.provider === 'credentials' || account.provider === 'code') {
           token.userId = Number(user.id);
         }
         // OAuth 登录：需要查询数据库获取用户 ID
-        else if (account) {
+        else {
           const users = await query<{ id: number }[]>(
             'SELECT u.id FROM users u JOIN accounts a ON u.id = a.user_id WHERE a.provider = ? AND a.provider_account_id = ?',
             [account.provider, account.providerAccountId]
@@ -324,6 +310,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (token.userId) {
         session.user.id = String(token.userId);
+      }
+      if (token.loginType) {
+        session.user.loginType = token.loginType;
       }
       return session;
     },

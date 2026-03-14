@@ -96,19 +96,22 @@ export default function ProfileModal({ opened, onClose, session, onLogout }: Pro
 
           {/* 操作按钮 */}
           <Stack gap="xs" w="100%">
-            <Button
-              variant="light"
-              color="gray"
-              fullWidth
-              radius="md"
-              size="sm"
-              onClick={() => {
-                onClose();
-                showLoginModal('changeEmail');
-              }}
-            >
-              邮箱换绑
-            </Button>
+            {/* OAuth 用户不显示邮箱换绑（邮箱由第三方平台管理） */}
+            {(session?.user?.loginType === 'credentials' || session?.user?.loginType === 'code') && (
+              <Button
+                variant="light"
+                color="gray"
+                fullWidth
+                radius="md"
+                size="sm"
+                onClick={() => {
+                  onClose();
+                  showLoginModal('changeEmail');
+                }}
+              >
+                邮箱换绑
+              </Button>
+            )}
             <Button
               variant="light"
               color="gray"

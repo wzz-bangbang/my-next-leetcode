@@ -222,7 +222,7 @@ export default function ChangeEmailForm({ onSuccess }: ChangeEmailFormProps) {
             <TextInput
               placeholder="新邮箱"
               value={newEmail}
-              onChange={(e) => { setNewEmail(e.target.value); setEmailError(''); }}
+              onChange={(e) => { setNewEmail(e.target.value.trim()); setEmailError(''); }}
               error={emailError}
               radius="md"
               size="md"

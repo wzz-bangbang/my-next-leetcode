@@ -122,7 +122,7 @@ export default function ResetPasswordForm({ onSuccess, onBack }: ResetPasswordFo
           <TextInput
             placeholder="邮箱"
             value={email}
-            onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
+            onChange={(e) => { setEmail(e.target.value.trim()); setEmailError(''); }}
             error={emailError}
             radius="md"
             size="md"
@@ -157,7 +157,7 @@ export default function ResetPasswordForm({ onSuccess, onBack }: ResetPasswordFo
           <PasswordInput
             placeholder="新密码（8-14位，含大小写+数字+符号三种）"
             value={password}
-            onChange={(e) => { setPassword(e.target.value); setPasswordError(''); }}
+            onChange={(e) => { setPassword(e.target.value.trim()); setPasswordError(''); }}
             error={passwordError}
             radius="md"
             size="md"
@@ -166,7 +166,7 @@ export default function ResetPasswordForm({ onSuccess, onBack }: ResetPasswordFo
           <PasswordInput
             placeholder="确认新密码"
             value={confirmPassword}
-            onChange={(e) => { setConfirmPassword(e.target.value); setConfirmPasswordError(''); }}
+            onChange={(e) => { setConfirmPassword(e.target.value.trim()); setConfirmPasswordError(''); }}
             error={confirmPasswordError}
             radius="md"
             size="md"

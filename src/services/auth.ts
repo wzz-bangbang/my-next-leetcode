@@ -103,8 +103,8 @@ export async function changeEmail(newEmail: string, code: string) {
 export async function changePassword(oldPassword: string, newPassword: string) {
   const result = await apiPost<{ message: string }>('/api/auth/change-password', { oldPassword, newPassword });
   
-  // 修改密码失败时上报（排除原密码错误 401）
-  if (!result.ok && result.status !== 401) {
+  // 修改密码失败时上报（排除原密码错误 400）
+  if (!result.ok && result.status !== 400) {
     Sentry.captureMessage('修改密码失败', {
       level: 'error',
       tags: { feature: 'auth', action: 'change-password' },
@@ -113,4 +113,31 @@ export async function changePassword(oldPassword: string, newPassword: string) {
   }
   
   return result;
+}
+
+/** 设置密码（第三方登录用户首次设置） */
+export async function setPassword(newPassword: string) {
+  const result = await apiPost<{ message: string }>('/api/auth/set-password', { newPassword });
+  
+  if (!result.ok) {
+    Sentry.captureMessage('设置密码失败', {
+      level: 'error',
+      tags: { feature: 'auth', action: 'set-password' },
+      extra: { error: result.error, status: result.status },
+    });
+  }
+  
+  return result;
+}
+
+/** 检查用户是否已设置密码 */
+export async function checkHasPassword(): Promise<boolean> {
+  try {
+    const res = await fetch('/api/auth/check-password');
+    if (!res.ok) return true; // 默认认为有密码，走修改流程
+    const data = await res.json();
+    return data.hasPassword ?? true;
+  } catch {
+    return true;
+  }
 }

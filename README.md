@@ -66,12 +66,12 @@ docker-compose -f docker-compose.prod.yml --env-file .env.production up -d --bui
 
 ## 文档
 
-| 文档 | 说明 |
-|-----|------|
-| [环境变量配置](./docs/env-config.md) | 开发/生产环境变量说明 |
-| [部署指南](./docs/deployment.md) | Docker 部署详细步骤 |
-| [数据库结构](./scripts/database-schema.md) | 表结构和字段说明 |
-| [测试用例](./tests/README.md) | 黑盒测试用例 |
+| 文档                                       | 说明                  |
+| ------------------------------------------ | --------------------- |
+| [环境变量配置](./docs/env-config.md)       | 开发/生产环境变量说明 |
+| [部署指南](./docs/deployment.md)           | Docker 部署详细步骤   |
+| [数据库结构](./scripts/database-schema.md) | 表结构和字段说明      |
+| [测试用例](./tests/README.md)              | 黑盒测试用例          |
 
 ## 目录结构
 
@@ -101,4 +101,5 @@ docker-compose -f docker-compose.prod.yml --env-file .env.production up -d --bui
 - [ ] 自动生成头像昵称
 - [ ] 换昵称 换头像
 
-上线后cookie字段名可以改一下,  改成和域名相关的
+上线后cookie字段名可以改一下, 改成和域名相关的
+发邮件的标题里网站名字也要改

@@ -6,20 +6,6 @@ import { generateCode, sendVerificationEmail, CODE_TYPE, CodeType } from '@/lib/
 
 // ============ 数据访问层 ============
 
-/** 检查邮箱是否被锁定 */
-async function checkEmailLocked(email: string): Promise<number | null> {
-  const rows = await query<{ locked_until: Date | null }[]>(
-    `SELECT locked_until FROM email_verification_codes 
-     WHERE email = ? AND locked_until > NOW() 
-     ORDER BY locked_until DESC LIMIT 1`,
-    [email]
-  );
-  if (rows.length > 0 && rows[0].locked_until) {
-    return Math.ceil((new Date(rows[0].locked_until).getTime() - Date.now()) / 60000);
-  }
-  return null;
-}
-
 /** 获取邮箱在指定时间内的发送次数 */
 async function getEmailSendCount(email: string, intervalSeconds: number): Promise<number> {
   const rows = await query<{ count: number }[]>(
@@ -71,12 +57,6 @@ async function getClientIP(): Promise<string> {
 
 /** 检查发送频率限制 */
 async function checkRateLimit(email: string, ip: string): Promise<{ ok: boolean; error?: string }> {
-  // 检查锁定状态
-  const lockedMinutes = await checkEmailLocked(email);
-  if (lockedMinutes) {
-    return { ok: false, error: `验证码错误次数过多，请 ${lockedMinutes} 分钟后再试` };
-  }
-
   // 60秒内只能发1次
   const recent = await getEmailSendCount(email, 60);
   if (recent > 0) {

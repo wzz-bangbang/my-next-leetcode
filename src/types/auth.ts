@@ -15,8 +15,6 @@ export interface VerificationCode {
   email: string;
   code: string;
   type: CodeType;
-  verify_attempts: number;
-  locked_until: Date | null;
   expires_at: Date;
   used: number;
 }
