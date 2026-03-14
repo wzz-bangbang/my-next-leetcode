@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import LoginButton from './LoginButton';
+import { BookOpenIcon, RocketIcon } from '@/components/icons';
 
 // 预加载页面组件的函数
 const preloadCodeEditor = () => import('@/app/code-editor/_components/CodeEditorClient');
@@ -37,8 +38,8 @@ export default function Header() {
   }, [pathname]);
 
   const navItems = [
-    { href: '/bagu', label: '📚 八股文', mobileLabel: '📚 八股' },
-    { href: '/code-editor', label: '🚀 刷题', mobileLabel: '🚀 刷题' },
+    { href: '/bagu', label: '八股文', mobileLabel: '八股', Icon: BookOpenIcon },
+    { href: '/code-editor', label: '刷题', mobileLabel: '刷题', Icon: RocketIcon },
   ];
 
   return (
@@ -85,8 +86,14 @@ export default function Header() {
                     : undefined
                 }
               >
-                <span className="hidden sm:inline">{item.label}</span>
-                <span className="sm:hidden">{item.mobileLabel}</span>
+                <span className="hidden sm:flex items-center gap-1.5">
+                  <item.Icon size={16} />
+                  {item.label}
+                </span>
+                <span className="flex sm:hidden items-center gap-1">
+                  <item.Icon size={14} />
+                  {item.mobileLabel}
+                </span>
               </Link>
             );
           })}
@@ -94,7 +101,7 @@ export default function Header() {
       </div>
 
       {/* 登录按钮 */}
-      <LoginButton redirectUrl={pathname} />
+      <LoginButton />
     </header>
   );
 }

@@ -123,7 +123,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
 
           // 5. 查找或创建用户
-          let users = await query<{
+          const users = await query<{
             id: number;
             username: string;
             email: string;
@@ -312,7 +312,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = String(token.userId);
       }
       if (token.loginType) {
-        session.user.loginType = token.loginType;
+        session.user.loginType = token.loginType as string;
       }
       return session;
     },

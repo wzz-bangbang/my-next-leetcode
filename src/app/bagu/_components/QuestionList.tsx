@@ -1,8 +1,30 @@
 'use client';
 
 import { useEffect } from 'react';
+import type { ComponentType } from 'react';
 import { Collapse } from '@mantine/core';
 import type { BaguCategory, BaguQuestionListItem } from '@/types/bagu';
+import {
+  JsBasicIcon,
+  TypeScriptIcon,
+  CssHtmlIcon,
+  ReactIcon,
+  VueIcon,
+  BrowserIcon,
+  NetworkIcon,
+  NextjsIcon,
+  EngineeringIcon,
+  CicdIcon,
+  OpenQuestionsIcon,
+  MiniprogramIcon,
+  AiToolsIcon,
+  AiFrontendIcon,
+  TechSelectionIcon,
+  TeamworkIcon,
+  FileIcon,
+  ChevronRightIcon,
+  type IconProps,
+} from '@/components/icons';
 
 interface QuestionListProps {
   categories: BaguCategory[];
@@ -15,22 +37,24 @@ interface QuestionListProps {
   onGoToNext?: () => void;
 }
 
-// 分类图标映射（按数字ID）
-const CategoryIcon: Record<number, string> = {
-  1: '🟨',  // JS基础
-  2: '🔷',  // TypeScript
-  3: '🎨',  // CSS & HTML
-  4: '⚛️',  // React
-  5: '🇻',   // Vue
-  6: '🌐',  // 浏览器
-  7: '▲',   // Next.js
-  8: '⚙️',  // 工程化
-  9: '🔄',  // CI&CD
-  10: '💡', // 开放题&场景题
-  11: '📱', // 小程序
-  12: '🤖', // AI
-  13: '🎯', // 技术选型
-  14: '👥', // 工作协作
+// 分类图标映射（按 slug）
+const CategoryIconMap: Record<string, ComponentType<IconProps>> = {
+  'js-basic': JsBasicIcon,
+  'typescript': TypeScriptIcon,
+  'css-html': CssHtmlIcon,
+  'react': ReactIcon,
+  'vue': VueIcon,
+  'browser': BrowserIcon,
+  'network': NetworkIcon,
+  'nextjs': NextjsIcon,
+  'engineering': EngineeringIcon,
+  'cicd': CicdIcon,
+  'open-questions': OpenQuestionsIcon,
+  'miniprogram': MiniprogramIcon,
+  'ai-tools': AiToolsIcon,
+  'ai-frontend': AiFrontendIcon,
+  'tech-selection': TechSelectionIcon,
+  'teamwork': TeamworkIcon,
 };
 
 export default function QuestionList({
@@ -93,7 +117,10 @@ export default function QuestionList({
               }`}
             >
               <span className="flex items-center gap-2">
-                <span>{CategoryIcon[category.id] || '📄'}</span>
+                {(() => {
+                  const IconComponent = CategoryIconMap[category.slug] || FileIcon;
+                  return <IconComponent size={16} />;
+                })()}
                 <span>{category.name}</span>
               </span>
               <span className="flex items-center gap-2">
@@ -102,9 +129,9 @@ export default function QuestionList({
                 </span>
                 {hasQuestions && (
                   <span
-                    className={`text-xs transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                    className={`transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                   >
-                    ▶
+                    <ChevronRightIcon size={12} />
                   </span>
                 )}
               </span>

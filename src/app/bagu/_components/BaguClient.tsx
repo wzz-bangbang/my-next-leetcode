@@ -228,7 +228,7 @@ export default function BaguClient({ initialData }: BaguClientProps) {
     if (finalStatus === QuestionStatus.SOLVED) {
       notifications.show({
         autoClose: 1500,
-        title: '🎉 完成',
+        title: '完成',
         message: '已标记为完成！',
         color: 'green',
       });
@@ -316,7 +316,7 @@ export default function BaguClient({ initialData }: BaguClientProps) {
 
     notifications.show({
       autoClose: 1500,
-      title: newStatus ? '⭐ 已收藏' : '已取消收藏',
+      title: newStatus ? '已收藏' : '已取消收藏',
       message: newStatus ? '题目已添加到收藏' : '题目已从收藏中移除',
       color: newStatus ? 'yellow' : 'gray',
     });

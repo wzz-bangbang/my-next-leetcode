@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import ProfileModal from './ProfileModal';
 import { showLoginModal } from '@/lib/api';
+import { StarFilledIcon } from '@/components/icons';
 
 export default function LoginButton() {
   const { data: session, status } = useSession();
@@ -40,7 +41,7 @@ export default function LoginButton() {
                   : undefined
               }
             >
-              <span className="hidden sm:inline">⭐</span>
+              <StarFilledIcon size={14} className="hidden sm:inline-block text-yellow-500" />
               <span>收藏</span>
             </Link>
 

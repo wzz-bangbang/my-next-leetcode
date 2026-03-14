@@ -4,6 +4,19 @@ import { Tooltip, Button, ActionIcon, Loader } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import dynamic from 'next/dynamic';
 import type { BaguQuestionListItem, BaguQuestionDetail as BaguQuestionDetailType, BaguCategory } from '@/types/bagu';
+import {
+  StarFilledIcon,
+  StarIcon,
+  CheckIcon,
+  ClockIcon,
+  CopyIcon,
+  BookOpenIcon,
+  NoteIcon,
+  MenuIcon,
+  ChevronDownIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+} from '@/components/icons';
 
 const MarkdownContent = dynamic(() => import('./MarkdownContent'), {
   loading: () => (
@@ -91,7 +104,7 @@ export default function QuestionDetail({
           onClick={onOpenSidebar}
           className="w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/60 border border-purple-200/50 text-left"
         >
-          <span className="text-purple-600 text-sm">☰</span>
+          <MenuIcon size={14} className="text-purple-600" />
           {question ? (
             <div className="flex-1 min-w-0 flex items-center gap-1.5">
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 shrink-0">
@@ -104,7 +117,7 @@ export default function QuestionDetail({
           ) : (
             <span className="text-xs text-gray-500">选择题目</span>
           )}
-          <span className="text-gray-400 text-[10px]">▼</span>
+          <ChevronDownIcon size={10} className="text-gray-400" />
         </button>
       </div>
 
@@ -123,8 +136,9 @@ export default function QuestionDetail({
                   radius="xl"
                   size="xs"
                   color={isFavorited ? 'yellow' : 'gray'}
+                  leftSection={isFavorited ? <StarFilledIcon size={14} /> : <StarIcon size={14} />}
                 >
-                  {isFavorited ? '⭐ 已收藏' : '☆ 收藏'}
+                  {isFavorited ? '已收藏' : '收藏'}
                 </Button>
                 <Button
                   onClick={onToggleComplete}
@@ -132,8 +146,9 @@ export default function QuestionDetail({
                   radius="xl"
                   size="xs"
                   color={isCompleted ? 'green' : 'gray'}
+                  leftSection={isCompleted ? <CheckIcon size={14} /> : <ClockIcon size={14} />}
                 >
-                  {isCompleted ? '✅ 已完成' : '⏳ 标为完成'}
+                  {isCompleted ? '已完成' : '标为完成'}
                 </Button>
               </div>
             </div>
@@ -146,7 +161,7 @@ export default function QuestionDetail({
                   size="sm"
                   onClick={() => copyToClipboard(question.title)}
                 >
-                  <span className="text-sm">📋</span>
+                  <CopyIcon size={14} />
                 </ActionIcon>
               </Tooltip>
             </div>
@@ -164,7 +179,7 @@ export default function QuestionDetail({
                 <MarkdownContent content={detail.content} />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                  <span className="text-3xl sm:text-4xl mb-3 sm:mb-4">📝</span>
+                  <NoteIcon size={48} className="mb-3 sm:mb-4" />
                   <p className="text-xs sm:text-base">暂无答案，等待补充...</p>
                 </div>
               )}
@@ -180,8 +195,9 @@ export default function QuestionDetail({
                   size="xs"
                   color="violet"
                   disabled={!hasPrev}
+                  leftSection={<ArrowLeftIcon size={12} />}
                 >
-                  <span className="text-xs">← 上一题</span>
+                  <span className="text-xs">上一题</span>
                 </Button>
 
                 <span className="text-xs text-gray-400">
@@ -195,8 +211,9 @@ export default function QuestionDetail({
                   size="xs"
                   color="violet"
                   disabled={!hasNext}
+                  rightSection={<ArrowRightIcon size={12} />}
                 >
-                  <span className="text-xs">下一题 →</span>
+                  <span className="text-xs">下一题</span>
                 </Button>
               </div>
             </div>
@@ -213,7 +230,7 @@ export default function QuestionDetail({
               disabled={!hasPrev}
               className="px-2! shrink-0"
             >
-              <span className="text-[10px]">←</span>
+              <ArrowLeftIcon size={12} />
             </Button>
 
             <Button
@@ -225,7 +242,7 @@ export default function QuestionDetail({
               className="px-2! shrink-0"
             >
               <span className="text-[10px] whitespace-nowrap flex items-center gap-0.5">
-                <span>{isFavorited ? '⭐' : '☆'}</span>
+                {isFavorited ? <StarFilledIcon size={12} /> : <StarIcon size={12} />}
                 <span>{isFavorited ? '已收藏' : '收藏'}</span>
               </span>
             </Button>
@@ -239,7 +256,7 @@ export default function QuestionDetail({
               className="px-2! shrink-0"
             >
               <span className="text-[10px] whitespace-nowrap flex items-center gap-0.5">
-                <span>{isCompleted ? '✅' : '⏳'}</span>
+                {isCompleted ? <CheckIcon size={12} /> : <ClockIcon size={12} />}
                 <span>{isCompleted ? '完成' : '待完成'}</span>
               </span>
             </Button>
@@ -253,13 +270,13 @@ export default function QuestionDetail({
               disabled={!hasNext}
               className="px-2! shrink-0"
             >
-              <span className="text-[10px]">→</span>
+              <ArrowRightIcon size={12} />
             </Button>
           </div>
         </>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-4 sm:p-6">
-          <span className="text-4xl sm:text-6xl mb-3 sm:mb-4">📚</span>
+          <BookOpenIcon size={64} className="mb-3 sm:mb-4" />
           <p className="text-sm sm:text-lg text-center">
             <span className="md:hidden">点击上方选择题目</span>
             <span className="hidden md:inline">请从左侧选择一道题目</span>

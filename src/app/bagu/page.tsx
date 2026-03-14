@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { query } from '@/lib/db';
 import type { BaguListData } from '@/types/bagu';
-import { BaguCategories, BaguCategoryId } from '@/lib/baguCategories';
 import BaguClient from './_components/BaguClient';
 
 interface BaguCategoryRow {
@@ -34,7 +33,6 @@ async function getBaguListData(): Promise<BaguListData> {
       id: cat.id,
       slug: cat.slug,
       name: cat.name,
-      icon: BaguCategories[cat.id as BaguCategoryId]?.icon || null,
       questions: questions
         .filter(q => q.category_id === cat.id)
         .map(q => ({

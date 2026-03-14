@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Preloader from "@/components/Preloader";
 import HomeLoginButton from "../components/HomeLoginButton";
+import { BookOpenIcon, RocketIcon, SparklesIcon, HeartIcon } from "@/components/icons";
 
 export default function Home() {
   return (
@@ -66,8 +67,9 @@ export default function Home() {
           前端工程师求职指北
         </h1>
         
-        <p className="text-gray-600 text-lg sm:text-xl mb-12 max-w-md">
-          系统练习前端面试常考题，助你斩获心仪 Offer ✨
+        <p className="text-gray-600 text-lg sm:text-xl mb-12 max-w-md flex items-center justify-center gap-1.5">
+          系统练习前端面试常考题，助你斩获心仪 Offer
+          <SparklesIcon size={20} className="text-yellow-500" />
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -79,7 +81,8 @@ export default function Home() {
             }}
           >
             <span className="relative z-10 flex items-center gap-2">
-              📚 八股文
+              <BookOpenIcon size={20} />
+              八股文
             </span>
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -97,7 +100,8 @@ export default function Home() {
             }}
           >
             <span className="relative z-10 flex items-center gap-2">
-              🚀 手写题
+              <RocketIcon size={20} />
+              手写题
             </span>
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -110,8 +114,8 @@ export default function Home() {
       </main>
 
       {/* 底部装饰 */}
-      <footer className="absolute bottom-6 text-gray-500 text-sm">
-        Made with 💖 for Frontend Engineers
+      <footer className="absolute bottom-6 text-gray-500 text-sm flex items-center gap-1.5">
+        Made with <HeartIcon size={14} className="text-pink-500" fill="currentColor" /> for Frontend Engineers
       </footer>
 
       {/* 预加载八股数据 */}

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { Modal, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import type { BaguListData, BaguQuestionListItem, BaguCategory } from '@/types/bagu';
+import { DiceIcon } from '@/components/icons';
 
 interface SimulationGroup {
   category: string;
@@ -50,7 +51,7 @@ export default function SimulationModal({
       }
       notifications.show({
         autoClose: 2000,
-        title: '⚠️ 无可用题目',
+        title: '无可用题目',
         message,
         color: 'orange',
       });
@@ -144,7 +145,7 @@ export default function SimulationModal({
       await navigator.clipboard.writeText(text);
       notifications.show({
         autoClose: 1500,
-        title: '📋 已复制',
+        title: '已复制',
         message: `已复制 ${lines.length} 道题目到剪贴板`,
         color: 'green',
       });
@@ -185,7 +186,7 @@ export default function SimulationModal({
         onClick={generateSimulation}
         className="mt-2 w-full py-1.5 md:py-2 rounded-lg bg-gradient-to-r from-pink-400 to-rose-400 text-white text-[10px] md:text-xs font-medium shadow-sm hover:shadow-md hover:from-pink-500 hover:to-rose-500 transition-all flex items-center justify-center gap-1"
       >
-        <span>🎲</span>
+        <DiceIcon size={14} />
         <span>随机模拟</span>
       </button>
 
@@ -195,7 +196,7 @@ export default function SimulationModal({
         onClose={() => setIsOpen(false)}
         title={
           <div className="flex items-center gap-2">
-            <span className="text-lg">🎲</span>
+            <DiceIcon size={20} className="text-pink-500" />
             <span className="font-semibold text-gray-800">随机模拟面试题</span>
             <span className="text-xs text-gray-400 font-normal">
               ({totalCount} 题)

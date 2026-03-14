@@ -7,6 +7,22 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
+import {
+  SaveIcon,
+  CheckIcon,
+  ClockIcon,
+  StarFilledIcon,
+  StarIcon,
+  NoteIcon,
+  TestIcon,
+  OpenQuestionsIcon,
+  RocketIcon,
+  TrashIcon,
+  TemplateIcon,
+  ComputerIcon,
+  BookOpenIcon,
+  ChevronRightIcon,
+} from '@/components/icons';
 
 // 懒加载 MarkdownContent（包含大量依赖）
 const MarkdownContent = dynamic(() => import('@/app/bagu/_components/MarkdownContent'), {
@@ -604,7 +620,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
     setStatusMap(prev => ({ ...prev, [selectedQuestionId]: finalStatus }));
 
     if (finalStatus === QuestionStatus.SOLVED) {
-      notifications.show({ autoClose: 1500, title: '🎉 恭喜', message: '已标记为完成！', color: 'green' });
+      notifications.show({ autoClose: 1500, title: '恭喜', message: '已标记为完成！', color: 'green' });
     } else {
       notifications.show({ autoClose: 1500, title: '已取消', message: '已取消完成状态', color: 'gray' });
     }
@@ -650,7 +666,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
 
     notifications.show({
       autoClose: 1500,
-      title: newStatus ? '⭐ 已收藏' : '已取消收藏',
+      title: newStatus ? '已收藏' : '已取消收藏',
       message: newStatus ? '题目已添加到收藏' : '题目已从收藏中移除',
       color: newStatus ? 'yellow' : 'gray',
     });
@@ -763,19 +779,20 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
 
       {/* 移动端提示 */}
       <div className="md:hidden flex-1 flex flex-col items-center justify-center px-6 text-center relative z-10">
-        <div className="text-6xl mb-6">💻</div>
+        <ComputerIcon size={64} className="mb-6 text-gray-400" />
         <h2 className="text-xl font-bold text-gray-800 mb-3">请使用电脑访问</h2>
         <p className="text-gray-500 text-sm max-w-xs">
           代码编辑器需要较大屏幕才能正常使用，请在电脑端打开本页面
         </p>
         <a
           href="/bagu"
-          className="mt-6 px-6 py-2.5 rounded-full text-sm font-medium text-white shadow-md"
+          className="mt-6 px-6 py-2.5 rounded-full text-sm font-medium text-white shadow-md flex items-center gap-1.5"
           style={{
             background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
           }}
         >
-          📚 去看八股文
+          <BookOpenIcon size={16} />
+          去看八股文
         </a>
       </div>
 
@@ -846,31 +863,29 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
             {/* 操作按钮 */}
             <div className="flex-shrink-0 px-5 py-3 border-b border-gray-200/50 bg-white/20">
               <div className="flex flex-wrap gap-2">
-                <Button onClick={handleSave} variant="light" radius="xl" size="sm" color="violet">
-                  💾 保存
+                <Button onClick={handleSave} variant="light" radius="xl" size="sm" color="violet" leftSection={<SaveIcon size={14} />}>
+                  保存
                 </Button>
-                {/* [已移至状态栏] 模板按钮
-                <Button
-                  onClick={handleLoadTemplate}
-                  variant="light"
-                  radius="xl"
-                  size="sm"
-                  color="cyan"
-                >
-                  📋 模板
-                </Button>
-                */}
+                {/* [已移至状态栏] 模板按钮 */}
                 <Button
                   onClick={handleMarkAsSolved}
                   variant="light"
                   radius="xl"
                   size="sm"
                   color={isCurrentSolved ? 'green' : 'gray'}
+                  leftSection={isCurrentSolved ? <CheckIcon size={14} /> : <ClockIcon size={14} />}
                 >
-                  {isCurrentSolved ? '✅ 已完成' : '⏳ 标为完成'}
+                  {isCurrentSolved ? '已完成' : '标为完成'}
                 </Button>
-                <Button onClick={handleToggleFavorite} variant="light" radius="xl" size="sm" color={isCurrentFavorited ? 'yellow' : 'gray'}>
-                  {isCurrentFavorited ? '⭐ 已收藏' : '☆ 收藏'}
+                <Button
+                  onClick={handleToggleFavorite}
+                  variant="light"
+                  radius="xl"
+                  size="sm"
+                  color={isCurrentFavorited ? 'yellow' : 'gray'}
+                  leftSection={isCurrentFavorited ? <StarFilledIcon size={14} /> : <StarIcon size={14} />}
+                >
+                  {isCurrentFavorited ? '已收藏' : '收藏'}
                 </Button>
               </div>
             </div>
@@ -888,7 +903,10 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
                     {/* 题目描述 */}
                     {selectedDetail?.description && (
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">📝 题目描述</h4>
+                        <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider flex items-center gap-1.5">
+                          <NoteIcon size={14} />
+                          题目描述
+                        </h4>
                         <pre className="whitespace-pre-wrap font-sans text-gray-600 text-base leading-relaxed">{selectedDetail.description}</pre>
                       </div>
                     )}
@@ -896,7 +914,10 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
                     {/* 用例 */}
                     {selectedDetail?.testCases && selectedDetail.testCases.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">🧪 用例</h4>
+                        <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider flex items-center gap-1.5">
+                          <TestIcon size={14} />
+                          用例
+                        </h4>
                         <div className="space-y-3">
                           {selectedDetail.testCases.map((testCase, index) => (
                             <div key={index} className="bg-gray-50/80 rounded-lg p-3 border border-gray-200/50 relative group">
@@ -941,8 +962,11 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
                       <div>
                         <details className="group">
                           <summary className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider cursor-pointer list-none flex items-center gap-2 select-none">
-                            <span className="transition-transform group-open:rotate-90">▶</span>
-                            💡 思路解析
+                            <span className="transition-transform group-open:rotate-90">
+                              <ChevronRightIcon size={12} />
+                            </span>
+                            <OpenQuestionsIcon size={14} />
+                            思路解析
                             <span className="text-xs font-normal text-gray-400 normal-case">(点击展开)</span>
                           </summary>
                           <div className="mt-3 bg-white/80 rounded-lg p-4 border border-gray-200/50 solution-markdown">
@@ -955,7 +979,10 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
                     {/* 进阶思考题 */}
                     {selectedDetail?.followUp && selectedDetail.followUp.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">🚀 进阶思考</h4>
+                        <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider flex items-center gap-1.5">
+                          <RocketIcon size={14} />
+                          进阶思考
+                        </h4>
                         <ul className="space-y-2">
                           {selectedDetail.followUp.map((item, index) => (
                             <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
@@ -1003,17 +1030,19 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
                       setCode('');
                       resetExecutionResult();
                     }}
-                    className="px-2 py-0.5 rounded hover:bg-gray-200/80 text-gray-500 hover:text-gray-700 transition-colors"
+                    className="px-2 py-0.5 rounded hover:bg-gray-200/80 text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1"
                     title="清空代码区"
                   >
-                    🗑️ 清空
+                    <TrashIcon size={12} />
+                    清空
                   </button>
                   <button
                     onClick={handleLoadTemplate}
-                    className="px-2 py-0.5 rounded hover:bg-gray-200/80 text-cyan-600 hover:text-cyan-700 transition-colors"
+                    className="px-2 py-0.5 rounded hover:bg-gray-200/80 text-cyan-600 hover:text-cyan-700 transition-colors flex items-center gap-1"
                     title="保存当前代码并载入模板"
                   >
-                    📋 载入模板
+                    <TemplateIcon size={12} />
+                    载入模板
                   </button>
                 </div>
                 <div className="flex items-center gap-4">

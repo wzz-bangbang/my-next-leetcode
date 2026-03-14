@@ -5,6 +5,7 @@ import { scrollToSelected } from '@/hooks/useQuestionRoute';
 import QuestionList from './QuestionList';
 import SimulationModal from './SimulationModal';
 import type { BaguListData, BaguCategory, BaguQuestionListItem } from '@/types/bagu';
+import { BookOpenIcon, CloseIcon, CheckIcon } from '@/components/icons';
 
 interface BaguSidebarProps {
   data: BaguListData;
@@ -129,8 +130,9 @@ export default function BaguSidebar({
       <div className="px-3 md:px-4 py-2 md:py-3 border-b border-purple-200/50 bg-white/20 shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xs md:text-sm font-semibold text-purple-700 mb-0.5 md:mb-1">
-              📚 八股文题库
+            <h2 className="text-xs md:text-sm font-semibold text-purple-700 mb-0.5 md:mb-1 flex items-center gap-1.5">
+              <BookOpenIcon size={16} />
+              八股文题库
             </h2>
             <div className="text-[10px] md:text-xs text-gray-500">
               共 {stats.total} 题 · 已完成 {stats.completed} 题
@@ -140,7 +142,7 @@ export default function BaguSidebar({
             className="md:hidden p-1.5 rounded-full hover:bg-purple-100 text-gray-600"
             onClick={onCloseSidebar}
           >
-            ✕
+            <CloseIcon size={16} />
           </button>
         </div>
 
@@ -159,23 +161,25 @@ export default function BaguSidebar({
         <div className="flex gap-2 mt-2">
           <button
             onClick={onToggleIncomplete}
-            className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all ${
+            className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 ${
               showIncomplete
                 ? 'bg-amber-500 text-white'
                 : 'bg-white/60 text-gray-600 hover:bg-white/80'
             }`}
           >
-            {showIncomplete ? '✓ ' : ''}未完成
+            {showIncomplete && <CheckIcon size={12} />}
+            未完成
           </button>
           <button
             onClick={onToggleFavorited}
-            className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all ${
+            className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 ${
               showFavorited
                 ? 'bg-yellow-500 text-white'
                 : 'bg-white/60 text-gray-600 hover:bg-white/80'
             }`}
           >
-            {showFavorited ? '✓ ' : ''}已收藏
+            {showFavorited && <CheckIcon size={12} />}
+            已收藏
           </button>
         </div>
       </div>

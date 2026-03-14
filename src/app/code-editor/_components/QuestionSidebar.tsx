@@ -1,25 +1,37 @@
 'use client';
 
 import React, { useMemo, useState, forwardRef } from 'react';
+import type { ComponentType } from 'react';
 import { Collapse, Tooltip } from '@mantine/core';
 import { CategoryTag, CategoryTagLabel, Difficulty, DifficultyLabel, DifficultyColor, QuestionListItem } from '@/types/question';
 import {
   QuestionStatus,
   setQuestionStatus as setStatusToServer,
 } from '@/lib/questionStatus';
+import {
+  JsAnalysisIcon,
+  JsHandwriteIcon,
+  TsTypeIcon,
+  ReactIcon,
+  AlgorithmIcon,
+  BookOpenIcon,
+  ChevronRightIcon,
+  CheckIcon,
+  type IconProps,
+} from '@/components/icons';
 
 // 重新导出给外部使用
 export { QuestionStatus };
 export const setQuestionStatus = setStatusToServer;
 
 // 分类图标
-const CategoryIcon: Partial<Record<CategoryTag, string>> = {
-  [CategoryTag.JS_ANALYSIS]: '🔍',
-  [CategoryTag.JS_HANDWRITE]: '✍️',
-  [CategoryTag.TS_TYPES]: '📘',
-  [CategoryTag.REACT]: '⚛️',
-  // [CategoryTag.HTML_CSS]: '🎨', // 暂未启用
-  [CategoryTag.ALGORITHM]: '🧮',
+const CategoryIconMap: Partial<Record<CategoryTag, ComponentType<IconProps>>> = {
+  [CategoryTag.JS_ANALYSIS]: JsAnalysisIcon,
+  [CategoryTag.JS_HANDWRITE]: JsHandwriteIcon,
+  [CategoryTag.TS_TYPES]: TsTypeIcon,
+  [CategoryTag.REACT]: ReactIcon,
+  // [CategoryTag.HTML_CSS]: CssHtmlIcon, // 暂未启用
+  [CategoryTag.ALGORITHM]: AlgorithmIcon,
 };
 
 interface QuestionSidebarProps {
@@ -114,7 +126,10 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div>
-              <h2 className="text-sm font-semibold text-purple-700">📚 代码题题库</h2>
+              <h2 className="text-sm font-semibold text-purple-700 flex items-center gap-1.5">
+                <BookOpenIcon size={16} />
+                代码题题库
+              </h2>
               <div className="text-[10px] text-gray-500">
                 共 {stats.total} 题 · 已完成 {stats.completed} 题
               </div>
@@ -149,13 +164,14 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
           <div className="flex gap-2 mt-2">
             <button
               onClick={() => setShowIncomplete(prev => !prev)}
-              className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all ${
+              className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 ${
                 showIncomplete
                   ? 'bg-amber-500 text-white'
                   : 'bg-white/60 text-gray-600 hover:bg-white/80'
               }`}
             >
-              {showIncomplete ? '✓ ' : ''}未完成
+              {showIncomplete && <CheckIcon size={12} />}
+              未完成
             </button>
             <div className="flex-1 flex gap-1">
               <button
@@ -222,9 +238,12 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
                     onToggleCollapse?.();
                     setTimeout(() => onToggleCategory(tag as CategoryTag), 100);
                   }}
-                  className="w-full flex justify-center py-2.5 text-lg hover:bg-white/40 transition-colors"
+                  className="w-full flex justify-center py-2.5 hover:bg-white/40 transition-colors"
                 >
-                  {CategoryIcon[tag as CategoryTag]}
+                  {(() => {
+                    const IconComponent = CategoryIconMap[tag as CategoryTag];
+                    return IconComponent ? <IconComponent size={18} /> : null;
+                  })()}
                 </button>
               </Tooltip>
             ) : null;
@@ -251,13 +270,18 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
                     }`}
                   >
                     <span className="flex items-center gap-2">
-                      <span>{CategoryIcon[tag as CategoryTag]}</span>
+                      {(() => {
+                        const IconComponent = CategoryIconMap[tag as CategoryTag];
+                        return IconComponent ? <IconComponent size={16} /> : null;
+                      })()}
                       <span>{CategoryTagLabel[tag as CategoryTag]}</span>
                     </span>
                     <span className="flex items-center gap-2">
                       <span className="text-xs text-gray-400">({categoryQuestions.length})</span>
                       {hasQuestions && (
-                        <span className={`text-xs transition-transform ${isExpanded ? 'rotate-90' : ''}`}>▶</span>
+                        <span className={`transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
+                          <ChevronRightIcon size={12} />
+                        </span>
                       )}
                     </span>
                   </button>

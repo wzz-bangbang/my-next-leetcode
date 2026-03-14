@@ -10,6 +10,7 @@ import { getBaguData, getCachedBaguData } from '@/lib/bagu-data';
 import { CategoryTag, CategoryTagLabel } from '@/types/question';
 import type { BaguData, BaguQuestion } from '@/types/bagu';
 import { getCodeQuestionList } from '@/services/questions';
+import { StarFilledIcon, BookOpenIcon, RocketIcon, CopyIcon } from '@/components/icons';
 
 interface CodeQuestion {
   id: number;
@@ -142,7 +143,7 @@ export default function FavoritesPage() {
       await navigator.clipboard.writeText(text);
       notifications.show({
         autoClose: 1500,
-        title: '📋 已复制',
+        title: '已复制',
         message: `已复制 ${baguCount} 道题目到剪贴板`,
         color: 'green',
       });
@@ -220,7 +221,10 @@ export default function FavoritesPage() {
       <main className="flex-1 px-3 sm:px-6 py-4 sm:py-8 max-w-4xl mx-auto w-full">
         {/* 标题 */}
         <div className="mb-4 sm:mb-6">
-          <h1 className="text-base sm:text-2xl font-bold text-gray-800 mb-1 sm:mb-2">⭐ 收藏清单</h1>
+          <h1 className="text-base sm:text-2xl font-bold text-gray-800 mb-1 sm:mb-2 flex items-center gap-2">
+            <StarFilledIcon size={24} className="text-yellow-500" />
+            收藏清单
+          </h1>
           <p className="text-xs sm:text-sm text-gray-500">
             共收藏 {baguCount + codeCount} 道题目
           </p>
@@ -230,23 +234,25 @@ export default function FavoritesPage() {
         <div className="flex gap-1.5 sm:gap-2 mb-4 sm:mb-6">
           <button
             onClick={() => setActiveTab('bagu')}
-            className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full !text-[10px] sm:!text-sm font-medium transition-all ${
+            className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full !text-[10px] sm:!text-sm font-medium transition-all flex items-center gap-1.5 ${
               activeTab === 'bagu'
                 ? 'bg-gradient-to-r from-pink-400 to-rose-400 text-white shadow-md'
                 : 'bg-white/60 text-gray-600 hover:bg-white/80'
             }`}
           >
-            📚 八股文 ({baguCount})
+            <BookOpenIcon size={14} />
+            八股文 ({baguCount})
           </button>
           <button
             onClick={() => setActiveTab('code')}
-            className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full !text-[10px] sm:!text-sm font-medium transition-all ${
+            className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full !text-[10px] sm:!text-sm font-medium transition-all flex items-center gap-1.5 ${
               activeTab === 'code'
                 ? 'bg-gradient-to-r from-violet-400 to-purple-400 text-white shadow-md'
                 : 'bg-white/60 text-gray-600 hover:bg-white/80'
             }`}
           >
-            🚀 刷题 ({codeCount})
+            <RocketIcon size={14} />
+            刷题 ({codeCount})
           </button>
         </div>
 
@@ -263,7 +269,7 @@ export default function FavoritesPage() {
                     onClick={copyBaguList}
                     className="flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-full !text-[10px] sm:!text-xs font-medium text-gray-600 bg-white/70 hover:bg-white hover:text-pink-600 hover:shadow-sm transition-all border border-gray-200/50"
                   >
-                    <span>📋</span>
+                    <CopyIcon size={12} />
                     <span>复制题目列表</span>
                   </button>
                 </div>
@@ -291,7 +297,7 @@ export default function FavoritesPage() {
                             onClick={() => removeBaguFavorite(q.id)}
                             className="flex-shrink-0 sm:px-2 sm:py-0.5 sm:rounded-full sm:border sm:border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-all"
                           >
-                            <span className="sm:hidden text-sm">★</span>
+                            <StarFilledIcon size={14} className="sm:hidden" />
                             <span className="hidden sm:inline text-xs">取消收藏</span>
                           </button>
                         </div>
@@ -328,7 +334,7 @@ export default function FavoritesPage() {
                           onClick={() => removeCodeFavorite(q.id)}
                           className="flex-shrink-0 sm:px-2 sm:py-0.5 sm:rounded-full sm:border sm:border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-all"
                         >
-                          <span className="sm:hidden text-sm">★</span>
+                          <StarFilledIcon size={14} className="sm:hidden" />
                           <span className="hidden sm:inline text-xs">取消收藏</span>
                         </button>
                       </div>
@@ -347,11 +353,13 @@ export default function FavoritesPage() {
 function EmptyState({ type }: { type: 'bagu' | 'code' }) {
   return (
     <div className="py-8 sm:py-12 text-center">
-      <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">{type === 'bagu' ? '📚' : '🚀'}</div>
+      <div className="mb-3 sm:mb-4 flex justify-center text-gray-400">
+        {type === 'bagu' ? <BookOpenIcon size={48} /> : <RocketIcon size={48} />}
+      </div>
       <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">暂无收藏的{type === 'bagu' ? '八股文' : '刷题'}题目</p>
       <Link
         href={type === 'bagu' ? '/bagu' : '/code-editor'}
-        className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium text-white shadow-md"
+        className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium text-white shadow-md"
         style={{
           background:
             type === 'bagu'
@@ -359,6 +367,7 @@ function EmptyState({ type }: { type: 'bagu' | 'code' }) {
               : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         }}
       >
+        {type === 'bagu' ? <BookOpenIcon size={14} /> : <RocketIcon size={14} />}
         去{type === 'bagu' ? '看八股文' : '刷题'}
       </Link>
     </div>
