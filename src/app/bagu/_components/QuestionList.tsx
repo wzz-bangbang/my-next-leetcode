@@ -25,6 +25,7 @@ import {
   ChevronRightIcon,
   type IconProps,
 } from '@/components/icons';
+import { iconSize } from '@/styles/theme';
 
 interface QuestionListProps {
   categories: BaguCategory[];
@@ -110,7 +111,7 @@ export default function QuestionList({
             {/* 分类标题 */}
             <button
               onClick={() => hasQuestions && onToggleCategory(category.id)}
-              className={`w-full text-left px-4 py-2.5 !text-[0.9375rem] font-medium flex items-center justify-between transition-colors outline-none focus:outline-none ${
+              className={`w-full text-left px-4 py-2.5 text-sm font-medium flex items-center justify-between transition-colors outline-none focus:outline-none ${
                 hasQuestions
                   ? 'hover:bg-white/40 cursor-pointer text-gray-700'
                   : 'text-gray-400 cursor-default'
@@ -119,7 +120,7 @@ export default function QuestionList({
               <span className="flex items-center gap-2">
                 {(() => {
                   const IconComponent = CategoryIconMap[category.slug] || FileIcon;
-                  return <IconComponent size={16} />;
+                  return <IconComponent size={iconSize.md} />;
                 })()}
                 <span>{category.name}</span>
               </span>
@@ -131,7 +132,7 @@ export default function QuestionList({
                   <span
                     className={`transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                   >
-                    <ChevronRightIcon size={12} />
+                    <ChevronRightIcon size={iconSize.xs} />
                   </span>
                 )}
               </span>
@@ -159,9 +160,9 @@ export default function QuestionList({
                         key={question.id}
                         data-question-id={question.id}
                         onClick={() => onSelectQuestion(question, category.id)}
-                        className={`w-full text-left pl-10 pr-3 py-2 !text-[0.875rem] transition-all duration-200 flex items-center gap-2 outline-none focus:outline-none ${
+                        className={`item-gradient-border item-gradient-bagu w-full text-left pl-10 pr-3 py-2 text-sm transition-all duration-200 flex items-center gap-2 outline-none focus:outline-none ${
                           isSelected
-                            ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
+                            ? 'active font-medium text-purple-700'
                             : 'text-gray-600 hover:bg-white/50'
                         }`}
                       >

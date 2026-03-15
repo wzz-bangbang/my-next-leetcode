@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Modal, Button } from '@mantine/core';
+import { Modal } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import type { BaguListData, BaguQuestionListItem, BaguCategory } from '@/types/bagu';
 import { DiceIcon } from '@/components/icons';
+import { iconSize } from '@/styles/theme';
 
 interface SimulationGroup {
   category: string;
@@ -39,7 +40,7 @@ export default function SimulationModal({
 
     // 使用过滤后的分类数据（基于未完成/已收藏过滤）
     const categories = filteredCategories.filter((c) => c.questions.length > 0);
-    
+
     if (categories.length === 0) {
       let message = '没有可用题目';
       if (showIncomplete && showFavorited) {
@@ -57,11 +58,11 @@ export default function SimulationModal({
       });
       return;
     }
-    
+
     // 目标：3-6 个分类，12-18 题（根据可用数量调整）
     const maxCategories = Math.min(6, categories.length);
     const targetCategoryCount = Math.floor(Math.random() * Math.max(1, maxCategories - 2)) + Math.min(3, maxCategories);
-    
+
     const totalAvailable = categories.reduce((sum, c) => sum + c.questions.length, 0);
     const targetTotal = Math.min(Math.floor(Math.random() * 7) + 12, totalAvailable); // 12-18，但不超过可用数量
 
@@ -92,7 +93,7 @@ export default function SimulationModal({
 
     // 计算每个分类平均应该抽多少题
     const avgPerCategory = Math.ceil(targetTotal / selectedCategories.length);
-    
+
     // 从每个分类中随机抽题
     const result: SimulationGroup[] = [];
     let totalQuestions = 0;
@@ -100,7 +101,7 @@ export default function SimulationModal({
     for (let i = 0; i < selectedCategories.length; i++) {
       const category = selectedCategories[i];
       const isLast = i === selectedCategories.length - 1;
-      
+
       // 计算这个分类应该抽多少题
       let count: number;
       if (isLast) {
@@ -184,9 +185,9 @@ export default function SimulationModal({
       {/* 触发按钮 */}
       <button
         onClick={generateSimulation}
-        className="mt-2 w-full py-1.5 md:py-2 rounded-lg bg-gradient-to-r from-pink-400 to-rose-400 text-white text-[10px] md:text-xs font-medium shadow-sm hover:shadow-md hover:from-pink-500 hover:to-rose-500 transition-all flex items-center justify-center gap-1"
+        className="btn-gradient-border btn-gradient-simulation mt-2.5 w-full py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1.5"
       >
-        <DiceIcon size={14} />
+        <DiceIcon size={iconSize.sm} />
         <span>随机模拟</span>
       </button>
 
@@ -196,7 +197,7 @@ export default function SimulationModal({
         onClose={() => setIsOpen(false)}
         title={
           <div className="flex items-center gap-2">
-            <DiceIcon size={20} className="text-pink-500" />
+            <DiceIcon size={iconSize.lg} className="text-pink-500" />
             <span className="font-semibold text-gray-800">随机模拟面试题</span>
             <span className="text-xs text-gray-400 font-normal">
               ({totalCount} 题)
@@ -207,68 +208,60 @@ export default function SimulationModal({
         radius="lg"
         centered
         styles={{
-          content: {
-            background:
-              'linear-gradient(135deg, rgba(255,240,245,0.95) 0%, rgba(240,248,255,0.95) 100%)',
+          header: {
+            background: 'linear-gradient(to right, rgb(253 242 248), rgb(250 245 255))',
+            borderRadius: '0.5rem 0.5rem 0 0',
           },
         }}
       >
-        <div className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-          {simulationQuestions.map((group, groupIndex) => (
-            <div key={groupIndex}>
-              <h3 className="text-sm font-semibold text-purple-700 mb-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
-                {group.category}
-                <span className="text-xs text-gray-400 font-normal">
-                  ({group.questions.length})
-                </span>
-              </h3>
-              <div className="space-y-1.5 pl-3">
-                {group.questions.map((q, qIndex) => (
-                  <button
-                    key={q.id}
-                    onClick={() => handleSelectQuestion(q)}
-                    className="w-full text-left px-3 py-2 rounded-lg bg-white/70 hover:bg-white hover:shadow-sm transition-all text-sm text-gray-700 hover:text-pink-600 flex items-center gap-2"
-                  >
-                    <span className="text-xs text-gray-400 w-5">{qIndex + 1}.</span>
-                    <span className="flex-1 truncate">{q.title}</span>
-                  </button>
-                ))}
+        <div className="mt-2 max-h-[60vh] overflow-y-auto scrollbar-hide">
+          <div className="divide-y divide-gray-200/50">
+            {simulationQuestions.map((group, groupIndex) => (
+              <div key={groupIndex} className="py-2">
+                {/* 分类标题 */}
+                <div className="w-full text-left px-4 py-2 text-sm font-medium flex items-center gap-2 text-gray-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-pink-400 shrink-0" />
+                  <span>{group.category}</span>
+                </div>
+                {/* 题目列表 */}
+                <div>
+                  {group.questions.map((q) => (
+                    <button
+                      key={q.id}
+                      onClick={() => handleSelectQuestion(q)}
+                      className="w-full text-left pl-10 pr-4 py-2 text-sm transition-all duration-200 outline-none focus:outline-none text-gray-600 hover:bg-gradient-to-r hover:from-purple-500/8 hover:to-transparent"
+                    >
+                      <span className="block">{q.title}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div className="mt-4 pt-4 border-t border-gray-200/50 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Button
+            <button
               onClick={generateSimulation}
-              variant="gradient"
-              gradient={{ from: 'pink', to: 'yellow' }}
-              radius="xl"
-              size="xs"
+              className="btn-gradient-border btn-gradient-simulation px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1"
             >
+              <DiceIcon size={iconSize.sm} />
               重新生成
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={copyQuestionList}
-              variant="gradient"
-              gradient={{ from: 'pink', to: 'red' }}
-              radius="xl"
-              size="xs"
+              className="btn-gradient-border btn-gradient-bagu px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all"
             >
-              复制
-            </Button>
+              复制题目
+            </button>
           </div>
-          <Button
+          <button
             onClick={() => setIsOpen(false)}
-            variant="light"
-            color="gray"
-            radius="xl"
-            size="xs"
+            className="btn-gradient-border btn-gradient-primary px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all"
           >
             关闭
-          </Button>
+          </button>
         </div>
       </Modal>
     </>

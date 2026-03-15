@@ -7,12 +7,13 @@ import Link from 'next/link';
 import ProfileModal from './ProfileModal';
 import { showLoginModal } from '@/lib/api';
 import { StarFilledIcon } from '@/components/icons';
+import { iconSize } from '@/styles/theme';
 
 export default function LoginButton() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  
+
   const isFavoritesActive = pathname === '/favorites';
   const isLoggedIn = status === 'authenticated' && session?.user;
 
@@ -27,28 +28,22 @@ export default function LoginButton() {
         {/* 加载中：不显示任何内容 */}
         {status === 'loading' ? null : isLoggedIn ? (
           <>
-            {/* 收藏按钮 - 头像左侧 */}
+            {/* 收藏按钮 - 渐变边框 */}
             <Link
               href="/favorites"
-              className={`flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
-                isFavoritesActive
-                  ? 'text-white shadow-md'
-                  : 'text-gray-600 hover:text-gray-900 bg-white/30 hover:bg-white/50'
+              data-active={isFavoritesActive}
+              className={`btn-gradient-border btn-gradient-star flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                isFavoritesActive ? 'active' : ''
               }`}
-              style={
-                isFavoritesActive
-                  ? { background: 'linear-gradient(135deg, #f9e866 0%, #f6d365 100%)' }
-                  : undefined
-              }
             >
-              <StarFilledIcon size={14} className="hidden sm:inline-block text-yellow-500" />
-              <span>收藏</span>
+              <StarFilledIcon size={iconSize.sm} />
+              <span>我的收藏</span>
             </Link>
 
             {/* 已登录：显示头像，点击弹出个人信息弹窗 */}
             <button
               onClick={() => setIsProfileModalOpen(true)}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border-2 border-white shadow-md hover:shadow-lg transition-all duration-200"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm hover:shadow-md transition-all duration-200"
             >
               {session?.user?.image ? (
                 <img
@@ -57,17 +52,17 @@ export default function LoginButton() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-sm font-medium">
+                <div className="w-full h-full bg-gradient-to-br from-purple-400 to-indigo-400 flex items-center justify-center text-white text-sm font-medium">
                   {session?.user?.name?.[0] || '?'}
                 </div>
               )}
             </button>
           </>
         ) : (
-          /* 未登录：显示登录按钮 */
+          /* 未登录：显示登录按钮 - 渐变边框 */
           <button
             onClick={() => showLoginModal()}
-            className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-br from-sky-100 to-teal-100 text-sky-700 text-xs sm:text-sm font-medium shadow-sm hover:shadow-md hover:from-sky-200 hover:to-teal-200 transition-all duration-200 border border-sky-200/50"
+            className="btn-gradient-border btn-gradient-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200"
           >
             登录
           </button>

@@ -150,7 +150,7 @@
         },
         {
           "id": "js-basic-25",
-          "title": "ES6模块和Common]S模块的区别",
+          "title": "ES6模块和CommonJS模块的区别",
           "content": "核心区别在于 **CommonJS 是为服务器端同步加载设计的**，而 **ES Modules 是为浏览器端异步加载和静态分析设计的**。\n\n- CJS 是在 Node.js 环境中诞生的，文件模块通常存储在本地硬盘上。因此，CJS 可以使用 `require()` **同步阻塞**地加载文件。它在**运行时**执行代码后，才能知道导入了什么。\n\n- **ES Modules (异步)：** ESM 是为浏览器设计的，模块通常需要通过网络请求加载。因此，ESM 采用**异步加载**，以避免阻塞主线程。ESM 在**代码静态解析阶段**（编译时）就能确定所有依赖关系。\n\n- **CommonJS (动态值拷贝)：**\n  \n  - CJS 导出的是一个值的**拷贝**。一旦模块导出，原始模块内部对变量的修改不会影响到导入方。\n  \n  - `require()` 得到的是一份导出的**值的快照**。\n\n- **ES Modules (静态实时绑定/引用)：**\n  \n  - ESM 导出的是对原始变量的**引用**（Live Binding）。\n  \n  - 这意味着导入方和导出方共享同一个变量。如果导出方在后续代码中修改了该变量，导入方可以观察到这种变化。\n\n**ESM 的优势：** 由于 ESM 采用 `import` / `export` 这种**静态语法**，JS 引擎或构建工具（如 Webpack/Rollup）可以在不执行代码的情况下，分析出模块之间的依赖关系。这使得 **Tree-Shaking（摇树优化）**成为可能，即只打包实际用到的代码，极大地减小了最终产物大小。",
           "hasAnswer": true
         },
@@ -528,7 +528,7 @@
         },
         {
           "id": "react-4",
-          "title": "什么是无状态组件，与有状态组件的区别？本质区别是什么？现在还推荐这样区分吗？",
+          "title": "什么是无状态组件，与有状态组件的区别？现在还推荐这样区分吗？",
           "content": "无状态组件通常指**不维护自身状态、只根据 props 渲染 UI** 的组件，更多承担展示职责。  \n有状态组件则内部维护 state，负责交互和业务逻辑。\n\n在早期 React 中，这种区分基本等同于：\n\n- 无状态组件 → 函数组件\n\n- 有状态组件 → 类组件\n\n但在 Hooks 引入后，函数组件同样可以拥有完整状态和副作用能力，因此**这种区分已经不再是技术层面的限制**。\n\n现在更推荐从**组件职责**出发：\n\n- 状态是否应该属于这个组件\n\n- 是否可以下沉/上提状态\n\n- 是否是纯展示组件\n\n而不是纠结“有没有 state”。\n\n######",
           "hasAnswer": true
         },
@@ -691,7 +691,7 @@
         {
           "id": "react-31",
           "title": "setState 何时同步何时异步?",
-          "content": "严格来说，**setState 从来不是“同步或异步”的问题，而是“是否被批处理”**。\n\n在 React 的模型里，setState 做的事情只是**创建 update 并触发一次更新调度**，并不等价于“立刻改 state”。\n\n- **React 18 之前**\n  \n  - 在 React 事件系统（如 onClick）中，更新会被批处理\n  \n  - 在原生事件、Promise、setTimeout 中，更新不会被批处理，看起来像“同步”\n\n- **React 18 之后**\n  \n  - 默认开启 **自动批处理（automatic batching）**\n  \n  - 不论是 React 事件、Promise、setTimeout，都会合并更新\n  \n  - 统一交给 Scheduler 决定何时 render\n\n如果真的需要强制同步更新，只能使用 `flushSync`，但这会打断调度机制，属于兜底手段，不建议常用。",
+          "content": "严格来说，**setState 从来不是“同步或异步”的问题，而是“是否被批处理”**。\n\n在 React 的模型里，setState 做的事情只是**创建 update 并触发一次更新调度**，并不等价于“立刻改 state”。\n\n- **React 18 之前**\n  - 在 React 事件系统（如 onClick）中，更新会被批处理\n  - 在原生事件、Promise、setTimeout 中，更新不会被批处理，看起来像“同步”\n\n- **React 18 之后**\n  - 默认开启 **自动批处理（automatic batching）**\n  - 不论是 React 事件、Promise、setTimeout，都会合并更新\n  - 统一交给 Scheduler 决定何时 render\n\n如果真的需要强制同步更新，只能使用 `flushSync`，但这会打断调度机制，属于兜底手段，不建议常用。",
           "hasAnswer": true
         },
         {
@@ -703,7 +703,7 @@
         {
           "id": "react-33",
           "title": "useLayoutEffect 和 useEffect 的区别",
-          "content": "两者的核心区别只有一个：**执行时机不同**。\n\n- **useLayoutEffect**\n  \n  - DOM 更新完成\n  \n  - 浏览器绘制之前\n  \n  - 同步执行，会阻塞浏览器绘制\n\n- **useEffect**\n  \n  - 浏览器完成绘制之后\n  \n  - 异步执行\n\n因此 useLayoutEffect 适合：\n\n- 读取布局信息（如 getBoundingClientRect）\n\n- 需要在首帧绘制前同步修改 DOM 的场景\n\n其余绝大多数情况，优先使用 useEffect，避免阻塞渲染。",
+          "content": "两者的核心区别只有一个：**执行时机不同**。\n\n- **useLayoutEffect**\n  - DOM 更新完成\n  - 浏览器绘制之前\n  - 同步执行，会阻塞浏览器绘制\n\n- **useEffect**\n  - 浏览器完成绘制之后\n  - 异步执行\n\n因此 useLayoutEffect 适合：\n\n- 读取布局信息（如 getBoundingClientRect）\n\n- 需要在首帧绘制前同步修改 DOM 的场景\n\n其余绝大多数情况，优先使用 useEffect，避免阻塞渲染。",
           "hasAnswer": true
         },
         {
@@ -751,7 +751,7 @@
         {
           "id": "react-41",
           "title": "React Fiber 是什么? 说说 fiber 架构的工作原理?",
-          "content": "React Fiber 本质上是 **React 的新协调（reconciliation）架构**，它解决的核心问题只有一个：  \n**让渲染过程从“同步、不可中断”，变成“可中断、可恢复、可调度”。**\n\n在 Fiber 之前（Stack Reconciler），React 渲染是一次深度递归：\n\n- 一旦开始 render，就必须把整棵组件树算完\n\n- 过程中无法中断\n\n- 主线程被长期占用，容易造成掉帧、输入卡顿\n\nFiber 引入之后，React 把“一次 render”拆成了很多**以 Fiber Node 为单位的小任务**。\n\n从结构上看：\n\n- 每个组件实例对应一个 Fiber Node\n\n- Fiber Node 同时是：\n  \n  - 组件的“数据结构表示”\n  \n  - 一个“工作单元（work unit）”\n\n从执行模型上看：\n\n- render 阶段不再是递归，而是**可暂停的循环**\n\n- React 每处理完一个 Fiber，就判断：\n  \n  - 时间片是否用完\n  \n  - 是否有更高优先级任务\n\n- 如果需要，就中断当前渲染，稍后从中断点继续\n\n一句话总结 Fiber 的工作原理：**把一次大而不可控的渲染任务，拆成很多可调度的小任务，由 React 自己掌控执行节奏。**",
+          "content": "React Fiber 本质上是 **React 的新协调（reconciliation）架构**，它解决的核心问题只有一个：  \n**让渲染过程从“同步、不可中断”，变成“可中断、可恢复、可调度”。**\n\n在 Fiber 之前（Stack Reconciler），React 渲染是一次深度递归：\n\n- 一旦开始 render，就必须把整棵组件树算完\n\n- 过程中无法中断\n\n- 主线程被长期占用，容易造成掉帧、输入卡顿\n\nFiber 引入之后，React 把“一次 render”拆成了很多**以 Fiber Node 为单位的小任务**。\n\n从结构上看：\n\n- 每个组件实例对应一个 Fiber Node\n\n- Fiber Node 同时是：\n  - 组件的“数据结构表示”\n  - 一个“工作单元（work unit）”\n\n从执行模型上看：\n\n- render 阶段不再是递归，而是**可暂停的循环**\n\n- React 每处理完一个 Fiber，就判断：\n  - 时间片是否用完\n  - 是否有更高优先级任务\n\n- 如果需要，就中断当前渲染，稍后从中断点继续\n\n一句话总结 Fiber 的工作原理：**把一次大而不可控的渲染任务，拆成很多可调度的小任务，由 React 自己掌控执行节奏。**",
           "hasAnswer": true
         },
         {
@@ -763,18 +763,18 @@
         {
           "id": "react-43",
           "title": "讲讲 React Fiber 是如何实现更新过程可控的",
-          "content": "“可控”是 Fiber 的核心价值，具体体现在 **三件事** 上：\n\n1. 第一，渲染任务可拆分（incremental work）\n\nFiber 把渲染拆成一个个 Fiber Node：\n\n- 每个 Fiber 只做很小的一步工作\n\n- React 可以在任意 Fiber 节点处暂停\n\n这让 React 能避免“长时间霸占主线程”。\n\n2. 第二，渲染过程可中断、可恢复\n\n在 render 阶段：\n\n- React 使用 `workInProgress` Fiber 树\n\n- 每完成一个 Fiber，就记录当前进度\n\n- 一旦被打断，下次可以从中断的 Fiber 继续，而不是重来\n\n这是 Fiber 和旧架构**本质上的差异**。\n\n3. 第三，render 和 commit 严格分离\n\nFiber 明确区分两个阶段：\n\n- **render 阶段**：\n  \n  - 纯计算\n  \n  - 可中断\n  \n  - 不产生副作用\n\n- **commit 阶段**：\n  \n  - 一次性提交 DOM\n  \n  - 不可中断\n  \n  - 保证 UI 一致性\n\n这种分离，是 React 能做并发调度的前提。",
+          "content": "“可控”是 Fiber 的核心价值，具体体现在 **三件事** 上：\n\n1. 第一，渲染任务可拆分（incremental work）\n\nFiber 把渲染拆成一个个 Fiber Node：\n\n- 每个 Fiber 只做很小的一步工作\n\n- React 可以在任意 Fiber 节点处暂停\n\n这让 React 能避免“长时间霸占主线程”。\n\n2. 第二，渲染过程可中断、可恢复\n\n在 render 阶段：\n\n- React 使用 `workInProgress` Fiber 树\n\n- 每完成一个 Fiber，就记录当前进度\n\n- 一旦被打断，下次可以从中断的 Fiber 继续，而不是重来\n\n这是 Fiber 和旧架构**本质上的差异**。\n\n3. 第三，render 和 commit 严格分离\n\nFiber 明确区分两个阶段：\n\n- **render 阶段**：\n  - 纯计算\n  - 可中断\n  - 不产生副作用\n\n- **commit 阶段**：\n  - 一次性提交 DOM\n  - 不可中断\n  - 保证 UI 一致性\n\n这种分离，是 React 能做并发调度的前提。",
           "hasAnswer": true
         },
         {
           "id": "react-44",
           "title": "react 如何确定具体场景的执行优先级",
-          "content": "React 的优先级系统在 Fiber 中是通过 **Lane 模型 + Scheduler** 实现的。\n\n1. Lane：优先级的“数据表示”\n\n每一次更新（setState）都会被分配一个 lane：\n\n- lane 是一个 bitmask\n\n- 不同 lane 表示不同紧急程度\n  \n  - 同步输入（点击、输入）\n  \n  - 动画\n  \n  - 普通更新\n  \n  - transition\n  \n  - idle\n\nlane 的本质作用是：**告诉 React：这个更新有多急，能不能等。**\n\n2. Scheduler：优先级的“执行者”\n\nScheduler 会：\n\n- 收集当前所有 pending updates\n\n- 根据 lane 决定：\n  \n  - 先执行哪个\n  \n  - 哪些可以合并\n  \n  - 是否可以打断当前 render\n\nReact 会优先保证输入响应，而不是把时间花在低优先级渲染上。\n\n3. 场景优先级的来源\n\n优先级的来源主要包括：\n\n- 更新发生的上下文（事件、transition）\n\n- 开发者显式标记（如 `startTransition`）\n\n- 内部默认策略（如初次渲染、同步更新）\n\nReact 18 的并发特性，本质上就是**开发者可以参与优先级标注**。",
+          "content": "React 的优先级系统在 Fiber 中是通过 **Lane 模型 + Scheduler** 实现的。\n\n1. Lane：优先级的“数据表示”\n\n每一次更新（setState）都会被分配一个 lane：\n\n- lane 是一个 bitmask\n\n- 不同 lane 表示不同紧急程度\n  - 同步输入（点击、输入）\n  - 动画\n  - 普通更新\n  - transition\n  - idle\n\nlane 的本质作用是：**告诉 React：这个更新有多急，能不能等。**\n\n2. Scheduler：优先级的“执行者”\n\nScheduler 会：\n\n- 收集当前所有 pending updates\n\n- 根据 lane 决定：\n  - 先执行哪个\n  - 哪些可以合并\n  - 是否可以打断当前 render\n\nReact 会优先保证输入响应，而不是把时间花在低优先级渲染上。\n\n3. 场景优先级的来源\n\n优先级的来源主要包括：\n\n- 更新发生的上下文（事件、transition）\n\n- 开发者显式标记（如 `startTransition`）\n\n- 内部默认策略（如初次渲染、同步更新）\n\nReact 18 的并发特性，本质上就是**开发者可以参与优先级标注**。",
           "hasAnswer": true
         },
         {
           "id": "react-45",
-          "title": "fiber 怎么进行任务的终止和恢复的？为什么不直接使用 requestldleCallback?",
+          "title": "React Fiber 怎么进行任务的终止和恢复的？为什么不用 RequestldleCallback ?",
           "content": "React Fiber 通过把一次渲染拆分成多个小的工作单元（Fiber Node），使渲染过程变成**可中断、可恢复的增量执行过程**。\n\n在渲染阶段，React 每次只处理一个 Fiber 节点，处理完成后会判断当前时间片是否用尽，如果有更高优先级任务或者时间不够，就主动让出主线程。\n\n中断时，React 会保存当前的 `workInProgress Fiber`，等下次调度继续从这个 Fiber 节点开始执行，而不是从头重新渲染整棵树。\n\nReact 并不是直接依赖浏览器调度，而是自己实现了一套 Scheduler。 通过 MessageChannel 来创建一个**稳定、可控、优先级更高的异步调度入口**，用来触发一次新的调度循环，而不是用来通信任务完成状态。\n\nrequestIdleCallback 的最大问题是： **调度时机完全由浏览器决定，React 无法精确控制优先级和执行时长。** 回调时机不可预测：浏览器“觉得”空闲才会调用，在动画、输入密集时可能长期不执行\n优先级控制能力弱：只区分是否空闲而没有优先级\n与 React 的调度模型不匹配：React 需要在不同优先级任务之间频繁切换，rIC 不适合高频、精细的任务切分\n\n总结：Fiber 的本质是把同步、不可中断的递归渲染，改造成基于 Fiber Node 的可中断工作流；React 通过自建 Scheduler 控制调度节奏，而不是把渲染节奏完全交给浏览器。",
           "hasAnswer": true
         },
@@ -787,19 +787,19 @@
         {
           "id": "react-47",
           "title": "详细说说 fiber 架构的 render 阶段过程",
-          "content": "render 阶段是 **Fiber 的核心工作阶段**，特点是：  \n**纯计算、可中断、不触碰 DOM。**\n\n整个过程可以理解为一个循环，而不是递归。\n\n1. beginWork（向下）\n- 从 root Fiber 开始\n\n- 对每个 Fiber 执行 `beginWork`\n\n- 根据 props/state 计算子 Fiber\n\n- 标记副作用（flags）\n\n这是“向下构建 Fiber 树”的过程。\n\n2. completeWork（向上）\n- 当一个 Fiber 的子节点处理完成\n\n- 执行 `completeWork`\n\n- 收集子节点的副作用\n\n- 构建 effect list（flags 链）\n\n这是“向上归并结果”的过程。\n\n3. 可中断点\n\n在任意一个 Fiber 处理完成后：\n\n- React 都可以检查时间片\n\n- 如果需要：\n  \n  - 暂停 render\n  \n  - 把控制权还给浏览器\n  \n  - 之后从当前 Fiber 继续\n4. render 阶段的产出\n\nrender 阶段的最终产物是：\n\n- 一棵 **workInProgress Fiber Tree**\n\n- 一份完整的副作用描述（flags）\n\n但 **不会产生任何真实 DOM 变更**。",
+          "content": "render 阶段是 **Fiber 的核心工作阶段**，特点是：  \n**纯计算、可中断、不触碰 DOM。**\n\n整个过程可以理解为一个循环，而不是递归。\n\n1. beginWork（向下）\n\n- 从 root Fiber 开始\n\n- 对每个 Fiber 执行 `beginWork`\n\n- 根据 props/state 计算子 Fiber\n\n- 标记副作用（flags）\n\n这是“向下构建 Fiber 树”的过程。\n\n2. completeWork（向上）\n\n- 当一个 Fiber 的子节点处理完成\n\n- 执行 `completeWork`\n\n- 收集子节点的副作用\n\n- 构建 effect list（flags 链）\n\n这是“向上归并结果”的过程。\n\n3. 可中断点\n\n在任意一个 Fiber 处理完成后：\n\n- React 都可以检查时间片\n\n- 如果需要：\n  - 暂停 render\n  - 把控制权还给浏览器\n  - 之后从当前 Fiber 继续\n\n4. render 阶段的产出\n\nrender 阶段的最终产物是：\n\n- 一棵 **workInProgress Fiber Tree**\n\n- 一份完整的副作用描述（flags）\n\n但 **不会产生任何真实 DOM 变更**。",
           "hasAnswer": true
         },
         {
           "id": "react-48",
           "title": "react 如何实现时间切片",
-          "content": "时间切片（Time Slicing）本质上是：  **把一次长时间占用主线程的渲染任务，拆成多个短任务，在合适的时机主动让出主线程。**\n\nReact 能实现时间切片，靠的是 **Fiber + Scheduler + cooperative scheduling（协作式调度）** 这一整套机制。\n\n**第一步：把渲染任务拆成最小工作单元**\n\n在 Fiber 架构下：\n\n- 每一个 Fiber Node 就是一个**最小可执行单元**\n\n- render 阶段不再是递归调用，而是一个循环\n\n- 每处理完一个 Fiber，React 都有机会“停下来看看要不要继续”\n\n这是时间切片的**结构前提**。  \n如果还是递归，一次函数调用栈跑完，根本没有中断点。\n\n**第二步：在 render 阶段引入“可让出点”**\n\nReact 在 render 阶段，每完成一个 Fiber 的 `beginWork / completeWork` 后，都会检查：\n\n- 当前时间是否超过了本次分配的时间片\n\n- 是否有更高优先级的任务（如用户输入）\n\n一旦判断“该让出主线程了”：\n\n- 当前 render 立即暂停\n\n- 保存当前 `workInProgress` 指针\n\n- 把控制权还给浏览器（让输入、动画先执行）\n\n**第三步：通过 Scheduler 决定何时继续**\n\nReact 并不是随便继续渲染的，而是通过 Scheduler：\n\n- 把剩余的 Fiber 工作挂到一个任务队列里\n\n- 等浏览器空闲、或者当前优先级允许时\n\n- 从上一次中断的 Fiber 继续执行，而不是重头开始\n\n这一步的关键在于：  \n**render 阶段是可恢复的**，这是 Fiber 架构才能做到的事情。",
+          "content": "时间切片（Time Slicing）本质上是： **把一次长时间占用主线程的渲染任务，拆成多个短任务，在合适的时机主动让出主线程。**\n\nReact 能实现时间切片，靠的是 **Fiber + Scheduler + cooperative scheduling（协作式调度）** 这一整套机制。\n\n**第一步：把渲染任务拆成最小工作单元**\n\n在 Fiber 架构下：\n\n- 每一个 Fiber Node 就是一个**最小可执行单元**\n\n- render 阶段不再是递归调用，而是一个循环\n\n- 每处理完一个 Fiber，React 都有机会“停下来看看要不要继续”\n\n这是时间切片的**结构前提**。  \n如果还是递归，一次函数调用栈跑完，根本没有中断点。\n\n**第二步：在 render 阶段引入“可让出点”**\n\nReact 在 render 阶段，每完成一个 Fiber 的 `beginWork / completeWork` 后，都会检查：\n\n- 当前时间是否超过了本次分配的时间片\n\n- 是否有更高优先级的任务（如用户输入）\n\n一旦判断“该让出主线程了”：\n\n- 当前 render 立即暂停\n\n- 保存当前 `workInProgress` 指针\n\n- 把控制权还给浏览器（让输入、动画先执行）\n\n**第三步：通过 Scheduler 决定何时继续**\n\nReact 并不是随便继续渲染的，而是通过 Scheduler：\n\n- 把剩余的 Fiber 工作挂到一个任务队列里\n\n- 等浏览器空闲、或者当前优先级允许时\n\n- 从上一次中断的 Fiber 继续执行，而不是重头开始\n\n这一步的关键在于：  \n**render 阶段是可恢复的**，这是 Fiber 架构才能做到的事情。",
           "hasAnswer": true
         },
         {
           "id": "react-49",
           "title": "fiber 为什么是性能飞跃",
-          "content": "Fiber 被称为性能飞跃，不是因为“单次渲染更快”，而是因为**性能模型发生了根本变化**。\n\n可以从三个层面理解。\n\n**第一，Fiber 解决的是“卡顿问题”，不是“跑得快不快”**\n旧架构的问题不是平均性能，而是**最坏情况**：\n- 一次更新渲染几百个组件\n- 主线程被占用几十毫秒\n- 用户输入、滚动直接卡死\nFiber 的价值在于：  \n👉 **把不可控的长任务，变成可控的短任务**\n这直接提升的是**交互稳定性**，而不是 benchmark 分数。\n\n**第二，Fiber 让“优先级”成为调度原则**\n在 Fiber 之前：\n- 更新基本是 FIFO\n- 用户输入和低优先级更新没有本质区别\nFiber 之后：\n- 每个更新都有优先级（lane）\n- 高优先级更新可以打断低优先级渲染\n- 非紧急更新可以被延后甚至丢弃重算\n这让 React 能做到：  \n**页面再复杂，也优先保证用户交互不卡。**\n\n**第三，Fiber 为并发能力打开了天花板**\nFiber 本身不是并发，但它是并发的**必要前提**。\n没有 Fiber：\n- render 不可中断\n- 无法调度\n- 不可能并发\n有了 Fiber：\n- render 可暂停、可恢复\n- Scheduler 可以插队、合并、延迟\n- 才有 React 18 的并发渲染、自动批处理、transition\n\n**一句话总结 Fiber 为什么是性能飞跃**：Fiber 的性能飞跃不在于加快一次渲染，而在于把渲染从同步、不可控的长任务，变成可调度、可中断的工作流，从而在复杂场景下保证交互优先级和系统稳定性，这也是 React 并发能力的基础。",
+          "content": "Fiber 被称为性能飞跃，不是因为“单次渲染更快”，而是因为**性能模型发生了根本变化**。\n\n可以从三个层面理解。\n\n**第一，Fiber 解决的是“卡顿问题”，不是“跑得快不快”**\n旧架构的问题不是平均性能，而是**最坏情况**：\n\n- 一次更新渲染几百个组件\n- 主线程被占用几十毫秒\n- 用户输入、滚动直接卡死\n  Fiber 的价值在于：  \n  👉 **把不可控的长任务，变成可控的短任务**\n  这直接提升的是**交互稳定性**，而不是 benchmark 分数。\n\n**第二，Fiber 让“优先级”成为调度原则**\n在 Fiber 之前：\n\n- 更新基本是 FIFO\n- 用户输入和低优先级更新没有本质区别\n  Fiber 之后：\n- 每个更新都有优先级（lane）\n- 高优先级更新可以打断低优先级渲染\n- 非紧急更新可以被延后甚至丢弃重算\n  这让 React 能做到：  \n  **页面再复杂，也优先保证用户交互不卡。**\n\n**第三，Fiber 为并发能力打开了天花板**\nFiber 本身不是并发，但它是并发的**必要前提**。\n没有 Fiber：\n\n- render 不可中断\n- 无法调度\n- 不可能并发\n  有了 Fiber：\n- render 可暂停、可恢复\n- Scheduler 可以插队、合并、延迟\n- 才有 React 18 的并发渲染、自动批处理、transition\n\n**一句话总结 Fiber 为什么是性能飞跃**：Fiber 的性能飞跃不在于加快一次渲染，而在于把渲染从同步、不可控的长任务，变成可调度、可中断的工作流，从而在复杂场景下保证交互优先级和系统稳定性，这也是 React 并发能力的基础。",
           "hasAnswer": true
         },
         {
@@ -811,7 +811,7 @@
         {
           "id": "react-51",
           "title": "说说 Redux 的核心方法和工作流程",
-          "content": "Redux 的核心其实非常少，主要就是 **store、action、reducer** 这三件事。\n\n从工作流程看是一个**严格的单向数据流**：\n\n1）UI 触发一个 action（一个普通对象，描述发生了什么）  \n2）action 被 dispatch 到 store  \n3）store 调用 reducer，传入旧 state 和 action  \n4）reducer 根据 action 返回一个新的 state  \n5）store 保存新 state，并通知所有订阅者  \n6）UI 读取最新 state，重新渲染\n\n这里有两个非常关键的点：\n- reducer 必须是**纯函数**\n- state 必须是**不可变更新**\n\n正是这两个约束，保证了 Redux 的可预测性和可调试性。",
+          "content": "Redux 的核心其实非常少，主要就是 **store、action、reducer** 这三件事。\n\n从工作流程看是一个**严格的单向数据流**：\n\n1）UI 触发一个 action（一个普通对象，描述发生了什么）  \n2）action 被 dispatch 到 store  \n3）store 调用 reducer，传入旧 state 和 action  \n4）reducer 根据 action 返回一个新的 state  \n5）store 保存新 state，并通知所有订阅者  \n6）UI 读取最新 state，重新渲染\n\n这里有两个非常关键的点：\n\n- reducer 必须是**纯函数**\n- state 必须是**不可变更新**\n\n正是这两个约束，保证了 Redux 的可预测性和可调试性。",
           "hasAnswer": true
         },
         {
@@ -823,7 +823,7 @@
         {
           "id": "react-53",
           "title": "说说对 Redux 中间件的理解？常用的中间件有哪些？实现原理？",
-          "content": "Redux 中间件的本质是：  \n**在 dispatch action 和 reducer 处理 action 之间，插入一层可扩展的拦截逻辑**。\n\n常见中间件包括：\n- `redux-thunk`：支持 action 返回函数\n- `redux-saga`：用 generator 处理复杂异步流程\n- `redux-logger`：日志和调试\n- `redux-promise`：处理 Promise action\n\n实现原理并不复杂：  \nRedux 在创建 store 时，会把原始的 `dispatch` 包装成一层层函数链，每个中间件都可以：\n- 拦截 action\n- 执行额外逻辑\n- 决定是否、何时、以什么形式继续 dispatch\n\n所以中间件解决的是：  \n**扩展 Redux 能力，但不污染 reducer 纯度**。",
+          "content": "Redux 中间件的本质是：  \n**在 dispatch action 和 reducer 处理 action 之间，插入一层可扩展的拦截逻辑**。\n\n常见中间件包括：\n\n- `redux-thunk`：支持 action 返回函数\n- `redux-saga`：用 generator 处理复杂异步流程\n- `redux-logger`：日志和调试\n- `redux-promise`：处理 Promise action\n\n实现原理并不复杂：  \nRedux 在创建 store 时，会把原始的 `dispatch` 包装成一层层函数链，每个中间件都可以：\n\n- 拦截 action\n- 执行额外逻辑\n- 决定是否、何时、以什么形式继续 dispatch\n\n所以中间件解决的是：  \n**扩展 Redux 能力，但不污染 reducer 纯度**。",
           "hasAnswer": true
         },
         {
@@ -841,49 +841,49 @@
         {
           "id": "react-56",
           "title": "对比 redux 和 zustand",
-          "content": "Redux 和 Zustand 的核心差异，不在 API，而在**设计目标和约束强度**。\n\n**Redux 的定位是“强约束的全局状态管理方案”**：\n- 单一 store、单向数据流\n- 所有状态变化必须通过 action → reducer\n- 强调可预测性、可追溯性、可调试性\n这使得 Redux 非常适合：\n- 复杂业务状态\n- 状态变更规则多、流程长\n- 多人协作、长期维护的项目\n代价也很明显：\n- 样板代码多\n- 心智负担重\n- 简单场景下显得过度设计\n\n**Zustand 的定位是“轻量、贴近 React 的状态容器”**：\n- 基于 hook\n- 没有 reducer、action 的强制约束\n- 按需订阅，更新粒度细\nZustand 更像是： “一个可共享的 useState + useCallback 集合”\n它非常适合：\n- 中小规模项目\n- 对开发效率和简洁性要求高的场景\n\n总结一句话：\n- **Redux 用规则换确定性**\n- **Zustand 用自由换效率**\n\n在实际工程中，我更倾向于：\n- 复杂业务核心状态 → Redux\n- 中小型项目，强调开发效率 → Zustand",
+          "content": "Redux 和 Zustand 的核心差异，不在 API，而在**设计目标和约束强度**。\n\n**Redux 的定位是“强约束的全局状态管理方案”**：\n\n- 单一 store、单向数据流\n- 所有状态变化必须通过 action → reducer\n- 强调可预测性、可追溯性、可调试性\n  这使得 Redux 非常适合：\n- 复杂业务状态\n- 状态变更规则多、流程长\n- 多人协作、长期维护的项目\n  代价也很明显：\n- 样板代码多\n- 心智负担重\n- 简单场景下显得过度设计\n\n**Zustand 的定位是“轻量、贴近 React 的状态容器”**：\n\n- 基于 hook\n- 没有 reducer、action 的强制约束\n- 按需订阅，更新粒度细\n  Zustand 更像是： “一个可共享的 useState + useCallback 集合”\n  它非常适合：\n- 中小规模项目\n- 对开发效率和简洁性要求高的场景\n\n总结一句话：\n\n- **Redux 用规则换确定性**\n- **Zustand 用自由换效率**\n\n在实际工程中，我更倾向于：\n\n- 复杂业务核心状态 → Redux\n- 中小型项目，强调开发效率 → Zustand",
           "hasAnswer": true
         },
         {
           "id": "react-57",
           "title": "React 中组件之间进行数据通信有哪些方式？",
-          "content": "我一般会按**“通信距离 + 状态生命周期”**来回答。\n\n第一层，**父子组件**：\n- props 向下传递\n- 回调函数向上传值  \n    这是最基本、也是最推荐的方式。\n\n第二层，**兄弟组件 / 跨层级组件**：\n- 状态提升到最近的公共父组件\n- 再通过 props 分发\n\n第三层，**Context**：\n- 解决 props drilling\n- 适合低频变化、全局性数据（主题、权限、配置）\n- 缺点是：Context 更新会导致所有消费组件重新 render，粒度比较粗。\n\n第四层，**全局状态管理**：\n- Redux、Zustand、MobX 等\n- 用于生命周期长、影响范围广的状态\n\n核心原则是： **优先用最近、最局部的通信方式，复杂度不够时再升级方案。**",
+          "content": "我一般会按**“通信距离 + 状态生命周期”**来回答。\n\n第一层，**父子组件**：\n\n- props 向下传递\n- 回调函数向上传值  \n   这是最基本、也是最推荐的方式。\n\n第二层，**兄弟组件 / 跨层级组件**：\n\n- 状态提升到最近的公共父组件\n- 再通过 props 分发\n\n第三层，**Context**：\n\n- 解决 props drilling\n- 适合低频变化、全局性数据（主题、权限、配置）\n- 缺点是：Context 更新会导致所有消费组件重新 render，粒度比较粗。\n\n第四层，**全局状态管理**：\n\n- Redux、Zustand、MobX 等\n- 用于生命周期长、影响范围广的状态\n\n核心原则是： **优先用最近、最局部的通信方式，复杂度不够时再升级方案。**",
           "hasAnswer": true
         },
         {
           "id": "react-58",
           "title": "说说 react 的事件代理机制原理和优缺点",
-          "content": "React 的事件系统是**合成事件（Synthetic Event）机制**，核心是**事件代理**。\n\n**原理**上：\n- React 并不会在每个 DOM 节点上绑定事件\n- 而是把事件统一绑定在**根节点（React 17 之后是 root container）**\n- 事件触发后，通过事件冒泡捕获到根节点\n- React 再根据 Fiber 树，模拟捕获和冒泡阶段，分发给对应组件的事件处理函数\n\n**优点**：\n- 性能稳定，避免大量事件监听\n- 事件系统一致，跨浏览器行为统一，框架统一处理浏览器兼容性\n- React 可以完全控制事件触发时机和优先级，为批量更新、优先级调度提供基础\n\n**缺点**：\n- 事件不完全等同于原生事件\n- 在极端场景（如 document 级别监听）下可能产生困惑\n- 需要理解合成事件与原生事件的差异（如事件对象复用、时机差异）",
+          "content": "React 的事件系统是**合成事件（Synthetic Event）机制**，核心是**事件代理**。\n\n**原理**上：\n\n- React 并不会在每个 DOM 节点上绑定事件\n- 而是把事件统一绑定在**根节点（React 17 之后是 root container）**\n- 事件触发后，通过事件冒泡捕获到根节点\n- React 再根据 Fiber 树，模拟捕获和冒泡阶段，分发给对应组件的事件处理函数\n\n**优点**：\n\n- 性能稳定，避免大量事件监听\n- 事件系统一致，跨浏览器行为统一，框架统一处理浏览器兼容性\n- React 可以完全控制事件触发时机和优先级，为批量更新、优先级调度提供基础\n\n**缺点**：\n\n- 事件不完全等同于原生事件\n- 在极端场景（如 document 级别监听）下可能产生困惑\n- 需要理解合成事件与原生事件的差异（如事件对象复用、时机差异）",
           "hasAnswer": true
         },
         {
           "id": "react-59",
           "title": "说说 react 事件和浏览器原生事件执行先后顺序，为什么？",
-          "content": "这个问题的关键在于：  \n**React 事件本质上是绑定在 react 根元素上（在 React 17 之后）的原生事件监听器。**\n\n在同一个元素上挂载的事件，顺序是：\n- → **React 捕获阶段事件**\n- → **原生捕获阶段事件**\n- → **React 冒泡阶段事件**\n- → **原生冒泡阶段事件**\n\n原因在于：\n- React 在 react oot container 上注册了原生事件监听\n- React 可以选择在捕获阶段或冒泡阶段拦截事件\n- 然后在内部模拟完整的捕获/冒泡流程",
+          "content": "这个问题的关键在于：  \n**React 事件本质上是绑定在 react 根元素上（在 React 17 之后）的原生事件监听器。**\n\n在同一个元素上挂载的事件，顺序是：\n\n- → **React 捕获阶段事件**\n- → **原生捕获阶段事件**\n- → **React 冒泡阶段事件**\n- → **原生冒泡阶段事件**\n\n原因在于：\n\n- React 在 react oot container 上注册了原生事件监听\n- React 可以选择在捕获阶段或冒泡阶段拦截事件\n- 然后在内部模拟完整的捕获/冒泡流程",
           "hasAnswer": true
         },
         {
           "id": "react-60",
           "title": "react 的事件为什么要委托，有什么好处？",
-          "content": "React 之所以做事件委托，本质原因是：**React 需要一个“可控、统一、可调度”的事件入口**，而不是简单的性能优化。\n\n从实现上看，React 并不会在每个 DOM 节点上绑定事件，而是：\n- 在根节点（React 17 之后是 root container）\n- 统一注册一组原生事件监听\n- 事件触发后，再由 React 自己根据 Fiber 树分发给对应组件\n\n这样做有几个关键好处：\n\n第一，**统一事件模型，屏蔽浏览器差异**  \nReact 的合成事件层可以抹平不同浏览器在事件对象、冒泡行为上的差异，保证行为一致。\n\n第二，**为批量更新和调度提供控制点**  \n事件回调是 React 非常重要的“更新边界”。  \n通过委托，React 可以在事件回调结束后，统一做 batching、优先级调度，而不是被分散在各个 DOM listener 里。\n\n第三，**避免大量事件监听带来的管理成本**  \n在复杂应用中，组件频繁挂载、卸载，如果每个节点都绑事件，清理和维护成本非常高。  \n集中委托让事件生命周期和 React 树保持一致。\n\n所以总结一句话： React 做事件委托，不只是为了少绑事件，而是为了**完全掌控事件 → 更新 → 渲染这一整条链路**。",
+          "content": "React 之所以做事件委托，本质原因是：**React 需要一个“可控、统一、可调度”的事件入口**，而不是简单的性能优化。\n\n从实现上看，React 并不会在每个 DOM 节点上绑定事件，而是：\n\n- 在根节点（React 17 之后是 root container）\n- 统一注册一组原生事件监听\n- 事件触发后，再由 React 自己根据 Fiber 树分发给对应组件\n\n这样做有几个关键好处：\n\n第一，**统一事件模型，屏蔽浏览器差异**  \nReact 的合成事件层可以抹平不同浏览器在事件对象、冒泡行为上的差异，保证行为一致。\n\n第二，**为批量更新和调度提供控制点**  \n事件回调是 React 非常重要的“更新边界”。  \n通过委托，React 可以在事件回调结束后，统一做 batching、优先级调度，而不是被分散在各个 DOM listener 里。\n\n第三，**避免大量事件监听带来的管理成本**  \n在复杂应用中，组件频繁挂载、卸载，如果每个节点都绑事件，清理和维护成本非常高。  \n集中委托让事件生命周期和 React 树保持一致。\n\n所以总结一句话： React 做事件委托，不只是为了少绑事件，而是为了**完全掌控事件 → 更新 → 渲染这一整条链路**。",
           "hasAnswer": true
         },
         {
           "id": "react-61",
           "title": "react 事件委托如何解决模态框的事件冒泡？",
-          "content": "这个问题其实考的是：**“React 里的事件冒泡，是按 DOM 树，还是按 React 树？”**\n答案是：  **React 的事件冒泡是按 React Fiber 树，而不是 DOM 树。**\n\n在模态框（Modal）场景中，经常是：\n- Modal 的 DOM 被渲染到 `document.body`（通过 Portal）\n- 但在 React 组件结构上，它仍然是某个父组件的子节点\n\nReact 的做法是：\n- 原生事件先在真实 DOM 上冒泡到 root\n- React 拿到事件后\n- **根据 Fiber 树关系重新模拟捕获和冒泡**\n\n因此即使 Modal 的 DOM 在 body 下：\n- React 仍然能正确判断它“逻辑上属于谁”\n- 冒泡顺序仍然符合组件层级预期\n\n总结：React 通过“事件委托 + Fiber 映射”，把**DOM 位置和组件层级解耦**了。",
+          "content": "这个问题其实考的是：**“React 里的事件冒泡，是按 DOM 树，还是按 React 树？”**\n答案是： **React 的事件冒泡是按 React Fiber 树，而不是 DOM 树。**\n\n在模态框（Modal）场景中，经常是：\n\n- Modal 的 DOM 被渲染到 `document.body`（通过 Portal）\n- 但在 React 组件结构上，它仍然是某个父组件的子节点\n\nReact 的做法是：\n\n- 原生事件先在真实 DOM 上冒泡到 root\n- React 拿到事件后\n- **根据 Fiber 树关系重新模拟捕获和冒泡**\n\n因此即使 Modal 的 DOM 在 body 下：\n\n- React 仍然能正确判断它“逻辑上属于谁”\n- 冒泡顺序仍然符合组件层级预期\n\n总结：React 通过“事件委托 + Fiber 映射”，把**DOM 位置和组件层级解耦**了。",
           "hasAnswer": true
         },
         {
           "id": "react-62",
           "title": "react 17 之后的事件机制有什么区别？",
-          "content": "React 17 的事件系统变化是一个**非常典型的架构级调整**，**最关键的变化只有一个**：  **事件不再委托到 `document`，而是委托到 root container。**\n\n在 React 16 及之前：\n- 所有 React 事件都绑定在 `document` 上\n- 多个 React 应用会共享同一套事件系统\n在 React 17 之后：\n- 事件绑定在 `createRoot` 对应的容器上\n- 每个 React 应用拥有独立的事件系统\n\n这样改的核心原因是：\n第一，**支持多个 React 版本共存**  \ndocument 级别委托会导致不同版本的 React 互相干扰。\n\n第二，**降低对全局环境的侵入性**  \nReact 不再“劫持”整个 document，更像一个普通应用。\n\n第三，**为并发特性和渐进升级铺路**  \n事件边界更清晰，调度模型更容易控制。\n\n这次改动对业务代码几乎无感，但对架构非常关键。",
+          "content": "React 17 的事件系统变化是一个**非常典型的架构级调整**，**最关键的变化只有一个**： **事件不再委托到 `document`，而是委托到 root container。**\n\n在 React 16 及之前：\n\n- 所有 React 事件都绑定在 `document` 上\n- 多个 React 应用会共享同一套事件系统\n  在 React 17 之后：\n- 事件绑定在 `createRoot` 对应的容器上\n- 每个 React 应用拥有独立的事件系统\n\n这样改的核心原因是：\n第一，**支持多个 React 版本共存**  \ndocument 级别委托会导致不同版本的 React 互相干扰。\n\n第二，**降低对全局环境的侵入性**  \nReact 不再“劫持”整个 document，更像一个普通应用。\n\n第三，**为并发特性和渐进升级铺路**  \n事件边界更清晰，调度模型更容易控制。\n\n这次改动对业务代码几乎无感，但对架构非常关键。",
           "hasAnswer": true
         },
         {
           "id": "react-63",
           "title": "子组件 portal 能冒泡到父组件吗？",
-          "content": "结论先给： **能，React 事件可以，原生事件不行。**\n\n更准确地说：\n- **React 合成事件：可以冒泡到逻辑父组件**\n- **原生 DOM 事件：只按真实 DOM 结构冒泡**\n\n原因在于：  \nReact 的事件冒泡是基于 **Fiber 树**，而不是 DOM 树。\nPortal 的特点是：\n- DOM 节点被插入到别的地方（比如 body）\n- 但 Fiber 关系不变\n\n所以：\n- React 在事件分发阶段\n- 会“无视 DOM 位置”\n- 按组件层级模拟冒泡\n\n这也是为什么在 Portal 场景下：\n- `e.stopPropagation()` 有时要特别注意\n- 原生事件和 React 事件的行为可能不同 \n\n一句话总结就是： Portal 打破的是 DOM 层级，不是 React 的组件层级。",
+          "content": "结论先给： **能，React 事件可以，原生事件不行。**\n\n更准确地说：\n\n- **React 合成事件：可以冒泡到逻辑父组件**\n- **原生 DOM 事件：只按真实 DOM 结构冒泡**\n\n原因在于：  \nReact 的事件冒泡是基于 **Fiber 树**，而不是 DOM 树。\nPortal 的特点是：\n\n- DOM 节点被插入到别的地方（比如 body）\n- 但 Fiber 关系不变\n\n所以：\n\n- React 在事件分发阶段\n- 会“无视 DOM 位置”\n- 按组件层级模拟冒泡\n\n这也是为什么在 Portal 场景下：\n\n- `e.stopPropagation()` 有时要特别注意\n- 原生事件和 React 事件的行为可能不同\n\n一句话总结就是： Portal 打破的是 DOM 层级，不是 React 的组件层级。",
           "hasAnswer": true
         },
         {
@@ -901,7 +901,7 @@
         {
           "id": "react-66",
           "title": "RSC react server component",
-          "content": "React Server Components 是 React 提出的 **一种让部分组件只在服务器端执行的渲染模式**\n它不是传统意义上的 SSR（Server-Side Rendering）那样生成完整 HTML，而是：\n\n**在服务器执行组件逻辑，把渲染结果以特殊协议序列化成数据流发送给客户端，客户端再把这些数据解释成 UI。**\n\n核心特点：\n\n- 组件代码 **永远不发送到客户端**（不会打包到 bundle 里）。\n- 只能运行在服务器上，不能使用浏览器 API 和交互 Hooks（如 `useState`, `useEffect`）。主要用于数据密集型、展示型的 UI。\n- 主要用于数据密集型、展示型的 UI。\n\n这就能让 React 应用更“轻巧、高效、按需加载”。\n\n| 渲染方式        | JS 发送到客户端       | 数据获取模式         | 互动能力                 |\n| ----------- | --------------- | -------------- | -------------------- |\n| CSR (客户端渲染) | 全组件 JS          | 客户端请求 API      | 强                    |\n| SSR (服务端渲染) | 全组件 JS + HTML   | 服务端预取数据 → HTML | 交互需要 hydrate         |\n| **RSC**     | **只发送必要的交互 JS** | 服务器直接数据访问      | 交互需 Client Component |\n\nReact Server Components 是一种服务器执行的组件模式，它让 UI 的渲染和数据获取在服务端完成，只把 UI 结构通过序列化协议发送给客户端，从而减少 JS bundle、提高性能并简化数据获取，同时和交互组件协同工作，适配复杂应用。\n\n**RSC 适合：数据驱动、多页面/大列表/复杂查询、多数据源聚合，但客户端交互较轻**的页面。\n\n**不适合：交互复杂、状态频繁变化、强实时响应**的组件。",
+          "content": "React Server Components 是 React 提出的 **一种让部分组件只在服务器端执行的渲染模式**\n它不是传统意义上的 SSR（Server-Side Rendering）那样生成完整 HTML，而是：\n\n**在服务器执行组件逻辑，把渲染结果以特殊协议序列化成数据流发送给客户端，客户端再把这些数据解释成 UI。**\n\n核心特点：\n\n- 组件代码 **永远不发送到客户端**（不会打包到 bundle 里）。\n- 只能运行在服务器上，不能使用浏览器 API 和交互 Hooks（如 `useState`, `useEffect`）。主要用于数据密集型、展示型的 UI。\n- 主要用于数据密集型、展示型的 UI。\n\n这就能让 React 应用更“轻巧、高效、按需加载”。\n\n| 渲染方式         | JS 发送到客户端         | 数据获取模式          | 互动能力                |\n| ---------------- | ----------------------- | --------------------- | ----------------------- |\n| CSR (客户端渲染) | 全组件 JS               | 客户端请求 API        | 强                      |\n| SSR (服务端渲染) | 全组件 JS + HTML        | 服务端预取数据 → HTML | 交互需要 hydrate        |\n| **RSC**          | **只发送必要的交互 JS** | 服务器直接数据访问    | 交互需 Client Component |\n\nReact Server Components 是一种服务器执行的组件模式，它让 UI 的渲染和数据获取在服务端完成，只把 UI 结构通过序列化协议发送给客户端，从而减少 JS bundle、提高性能并简化数据获取，同时和交互组件协同工作，适配复杂应用。\n\n**RSC 适合：数据驱动、多页面/大列表/复杂查询、多数据源聚合，但客户端交互较轻**的页面。\n\n**不适合：交互复杂、状态频繁变化、强实时响应**的组件。",
           "hasAnswer": true
         }
       ]
@@ -2174,5 +2174,5 @@
       ]
     }
   ],
-  "generatedAt": "2026-03-14T08:45:39.105Z"
+  "generatedAt": "2026-03-15T13:25:54.887Z"
 }

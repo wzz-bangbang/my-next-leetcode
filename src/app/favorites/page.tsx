@@ -11,6 +11,7 @@ import { CategoryTag, CategoryTagLabel } from '@/types/question';
 import type { BaguData, BaguQuestion } from '@/types/bagu';
 import { getCodeQuestionList } from '@/services/questions';
 import { StarFilledIcon, BookOpenIcon, RocketIcon, CopyIcon } from '@/components/icons';
+import { iconSize } from '@/styles/theme';
 
 interface CodeQuestion {
   id: number;
@@ -71,7 +72,7 @@ export default function FavoritesPage() {
     prevSessionStatus.current = sessionStatus;
   }, [sessionStatus]);
 
-  // 八股文收藏按分类分组
+  // 八股题收藏按分类分组
   const baguFavoritesByCategory = useMemo(() => {
     if (!baguData) return new Map<number, { name: string; questions: BaguQuestion[] }>();
 
@@ -127,7 +128,7 @@ export default function FavoritesPage() {
   const baguCount = baguFavorites.size;
   const codeCount = codeFavorites.size;
 
-  // 复制八股文收藏列表
+  // 复制八股题收藏列表
   const copyBaguList = useCallback(async () => {
     const lines: string[] = [];
     
@@ -157,7 +158,7 @@ export default function FavoritesPage() {
     }
   }, [baguFavoritesByCategory, baguCount]);
 
-  // 取消收藏八股文
+  // 取消收藏八股题
   const removeBaguFavorite = useCallback(async (questionId: number) => {
     const { success, status } = await toggleFavorite('bagu', questionId, true); // currentStatus=true means it's favorited
     if (!success) {
@@ -202,27 +203,16 @@ export default function FavoritesPage() {
   }, []);
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{
-        background: `
-          linear-gradient(135deg, 
-            rgba(255, 182, 193, 0.4) 0%,
-            rgba(152, 251, 152, 0.3) 25%,
-            rgba(135, 206, 250, 0.4) 50%,
-            rgba(221, 160, 221, 0.3) 75%,
-            rgba(255, 255, 224, 0.4) 100%
-          )
-        `,
-      }}
+    <div className="bg-white  min-h-screen flex flex-col relative overflow-hidden bg-white"
     >
+
       <Header />
 
-      <main className="flex-1 px-3 sm:px-6 py-4 sm:py-8 max-w-4xl mx-auto w-full">
+      <main className="relative z-10 flex-1 px-3 sm:px-6 py-4 sm:py-8 max-w-4xl mx-auto w-full">
         {/* 标题 */}
         <div className="mb-4 sm:mb-6">
           <h1 className="text-base sm:text-2xl font-bold text-gray-800 mb-1 sm:mb-2 flex items-center gap-2">
-            <StarFilledIcon size={24} className="text-yellow-500" />
+            <StarFilledIcon size={iconSize.xl} className="text-yellow-500" />
             收藏清单
           </h1>
           <p className="text-xs sm:text-sm text-gray-500">
@@ -234,30 +224,31 @@ export default function FavoritesPage() {
         <div className="flex gap-1.5 sm:gap-2 mb-4 sm:mb-6">
           <button
             onClick={() => setActiveTab('bagu')}
-            className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full !text-[10px] sm:!text-sm font-medium transition-all flex items-center gap-1.5 ${
-              activeTab === 'bagu'
-                ? 'bg-gradient-to-r from-pink-400 to-rose-400 text-white shadow-md'
-                : 'bg-white/60 text-gray-600 hover:bg-white/80'
+            data-active={activeTab === 'bagu'}
+            className={`btn-gradient-border btn-gradient-bagu px-2.5 sm:px-4 py-1 sm:py-2 rounded-full !text-[10px] sm:!text-sm font-medium transition-all flex items-center gap-1.5 ${
+              activeTab === 'bagu' ? 'active' : ''
             }`}
           >
-            <BookOpenIcon size={14} />
-            八股文 ({baguCount})
+            <BookOpenIcon size={iconSize.sm} />
+            八股题 ({baguCount})
           </button>
           <button
             onClick={() => setActiveTab('code')}
-            className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full !text-[10px] sm:!text-sm font-medium transition-all flex items-center gap-1.5 ${
-              activeTab === 'code'
-                ? 'bg-gradient-to-r from-violet-400 to-purple-400 text-white shadow-md'
-                : 'bg-white/60 text-gray-600 hover:bg-white/80'
+            data-active={activeTab === 'code'}
+            className={`btn-gradient-border btn-gradient-code px-2.5 sm:px-4 py-1 sm:py-2 rounded-full !text-[10px] sm:!text-sm font-medium transition-all flex items-center gap-1.5 ${
+              activeTab === 'code' ? 'active' : ''
             }`}
           >
-            <RocketIcon size={14} />
+            <RocketIcon size={iconSize.sm} />
             刷题 ({codeCount})
           </button>
         </div>
 
         {/* 内容区 */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 sm:p-6 shadow-sm">
+        <div className="rounded-2xl p-3 sm:p-6 shadow-sm"
+        style={{
+          background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.02) 0%, rgba(99, 102, 241, 0.02) 100%)',
+        }}>
           {activeTab === 'bagu' ? (
             baguFavoritesByCategory.size === 0 ? (
               <EmptyState type="bagu" />
@@ -267,10 +258,10 @@ export default function FavoritesPage() {
                 <div className="flex items-center justify-start">
                   <button
                     onClick={copyBaguList}
-                    className="flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-full !text-[10px] sm:!text-xs font-medium text-gray-600 bg-white/70 hover:bg-white hover:text-pink-600 hover:shadow-sm transition-all border border-gray-200/50"
+                    className="btn-gradient-border btn-gradient-bagu flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-full !text-[10px] sm:!text-xs font-medium transition-all"
                   >
-                    <CopyIcon size={12} />
-                    <span>复制题目列表</span>
+                    <CopyIcon size={iconSize.xs} />
+                    <span>复制题目</span>
                   </button>
                 </div>
                 
@@ -283,24 +274,25 @@ export default function FavoritesPage() {
                     </h3>
                     <div className="space-y-1 sm:space-y-2">
                       {questions.map((q) => (
-                        <div
+                        <Link
                           key={q.id}
-                          className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-white/70 hover:bg-white hover:shadow-sm transition-all group"
+                          href={`/bagu?q=${q.id}`}
+                          className="flex items-center gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl hover:bg-white hover:shadow-sm transition-all group"
                         >
-                          <Link
-                            href={`/bagu?q=${q.id}`}
-                            className="flex-1 text-[11px] sm:text-sm text-gray-700 hover:text-pink-600 truncate"
-                          >
+                          <span className="flex-1 text-[11px] sm:text-sm text-gray-700 group-hover:text-pink-600 truncate transition-colors">
                             {q.title}
-                          </Link>
+                          </span>
                           <button
-                            onClick={() => removeBaguFavorite(q.id)}
-                            className="flex-shrink-0 sm:px-2 sm:py-0.5 sm:rounded-full sm:border sm:border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-all"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              removeBaguFavorite(q.id);
+                            }}
+                            className="shrink-0 sm:px-2 sm:py-0.5 sm:rounded-lg sm:border sm:border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-all"
                           >
-                            <StarFilledIcon size={14} className="sm:hidden" />
+                            <StarFilledIcon size={iconSize.sm} className="sm:hidden" />
                             <span className="hidden sm:inline text-xs">取消收藏</span>
                           </button>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   </div>
@@ -320,24 +312,25 @@ export default function FavoritesPage() {
                   </h3>
                   <div className="space-y-1 sm:space-y-2">
                     {questions.map((q) => (
-                      <div
+                      <Link
                         key={q.id}
-                        className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-3 rounded-lg sm:rounded-xl bg-white/70 hover:bg-white hover:shadow-sm transition-all group"
+                        href={`/code-editor?q=${tag}-${q.slug}`}
+                        className="flex items-center gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl  hover:bg-white hover:shadow-sm transition-all group"
                       >
-                        <Link
-                          href={`/code-editor?q=${tag}-${q.slug}`}
-                          className="flex-1 text-[11px] sm:text-sm text-gray-700 hover:text-violet-600 truncate"
-                        >
+                        <span className="flex-1 text-[11px] sm:text-sm text-gray-700 group-hover:text-violet-600 truncate transition-colors">
                           {q.title}
-                        </Link>
+                        </span>
                         <button
-                          onClick={() => removeCodeFavorite(q.id)}
-                          className="flex-shrink-0 sm:px-2 sm:py-0.5 sm:rounded-full sm:border sm:border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-all"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            removeCodeFavorite(q.id);
+                          }}
+                          className="shrink-0 sm:px-2 sm:py-0.5 sm:rounded-lg sm:border sm:border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-all"
                         >
-                          <StarFilledIcon size={14} className="sm:hidden" />
+                          <StarFilledIcon size={iconSize.sm} className="sm:hidden" />
                           <span className="hidden sm:inline text-xs">取消收藏</span>
                         </button>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -354,21 +347,15 @@ function EmptyState({ type }: { type: 'bagu' | 'code' }) {
   return (
     <div className="py-8 sm:py-12 text-center">
       <div className="mb-3 sm:mb-4 flex justify-center text-gray-400">
-        {type === 'bagu' ? <BookOpenIcon size={48} /> : <RocketIcon size={48} />}
+        {type === 'bagu' ? <BookOpenIcon size={iconSize.placeholder} /> : <RocketIcon size={iconSize.placeholder} />}
       </div>
-      <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">暂无收藏的{type === 'bagu' ? '八股文' : '刷题'}题目</p>
+      <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">暂无收藏的{type === 'bagu' ? '八股题' : '刷题'}题目</p>
       <Link
         href={type === 'bagu' ? '/bagu' : '/code-editor'}
-        className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium text-white shadow-md"
-        style={{
-          background:
-            type === 'bagu'
-              ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        }}
+        className={`btn-gradient-border ${type === 'bagu' ? 'btn-gradient-bagu' : 'btn-gradient-code'} inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all`}
       >
-        {type === 'bagu' ? <BookOpenIcon size={14} /> : <RocketIcon size={14} />}
-        去{type === 'bagu' ? '看八股文' : '刷题'}
+        {type === 'bagu' ? <BookOpenIcon size={iconSize.sm} /> : <RocketIcon size={iconSize.sm} />}
+        去{type === 'bagu' ? '看八股题' : '刷题'}
       </Link>
     </div>
   );

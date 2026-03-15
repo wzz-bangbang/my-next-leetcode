@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { TextInput, Button, Alert } from '@mantine/core';
+import { TextInput, Alert } from '@mantine/core';
+import { Loader } from '@mantine/core';
 import { validateEmail } from '@/lib/validation';
 import { useCountdown } from '@/hooks/useCountdown';
 import { sendCode, verifyEmail, changeEmail } from '@/services/auth';
@@ -169,7 +170,7 @@ export default function ChangeEmailForm({ onSuccess }: ChangeEmailFormProps) {
       {step === 1 && (
         <form onSubmit={handleVerifyOldEmail} noValidate>
           <div className="space-y-3">
-            <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+            <div className="text-sm text-gray-600 bg-gray-50 rounded-full px-4 py-3">
               当前邮箱：<span className="font-medium">{maskEmail(currentEmail)}</span>
             </div>
 
@@ -179,38 +180,30 @@ export default function ChangeEmailForm({ onSuccess }: ChangeEmailFormProps) {
                 value={oldCode}
                 onChange={(e) => { setOldCode(e.target.value.replace(/\D/g, '')); setCodeError(''); }}
                 error={codeError}
-                radius="md"
+                radius="xl"
                 size="md"
                 className="flex-1"
                 maxLength={6}
               />
-              <Button
+              <button
                 type="button"
-                variant="light"
-                color="gray"
-                radius="md"
-                size="md"
-                loading={isSendingCode}
-                disabled={isActive}
                 onClick={handleSendOldCode}
-                className="whitespace-nowrap"
+                disabled={isSendingCode || isActive}
+                className="btn-gradient-border btn-gradient-primary px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-1.5"
               >
+                {isSendingCode && <Loader size="xs" />}
                 {isActive ? `${countdown}s` : '获取验证码'}
-              </Button>
+              </button>
             </div>
 
-            <Button
-              fullWidth
+            <button
               type="submit"
-              loading={isLoading}
-              radius="md"
-              size="md"
-              variant="light"
-              color="cyan"
-              className="!bg-gradient-to-r !from-sky-100 !to-teal-100 !text-sky-700 hover:!from-sky-200 hover:!to-teal-200 !border !border-sky-200/50"
+              disabled={isLoading}
+              className="btn-gradient-border btn-gradient-code w-full py-2.5 rounded-full text-sm font-medium transition-all flex items-center justify-center gap-2"
             >
+              {isLoading && <Loader size="xs" />}
               下一步
-            </Button>
+            </button>
           </div>
         </form>
       )}
@@ -224,7 +217,7 @@ export default function ChangeEmailForm({ onSuccess }: ChangeEmailFormProps) {
               value={newEmail}
               onChange={(e) => { setNewEmail(e.target.value.trim()); setEmailError(''); }}
               error={emailError}
-              radius="md"
+              radius="xl"
               size="md"
             />
 
@@ -234,24 +227,20 @@ export default function ChangeEmailForm({ onSuccess }: ChangeEmailFormProps) {
                 value={newCode}
                 onChange={(e) => { setNewCode(e.target.value.replace(/\D/g, '')); setCodeError(''); }}
                 error={codeError}
-                radius="md"
+                radius="xl"
                 size="md"
                 className="flex-1"
                 maxLength={6}
               />
-              <Button
+              <button
                 type="button"
-                variant="light"
-                color="gray"
-                radius="md"
-                size="md"
-                loading={isSendingCode}
-                disabled={isActive}
                 onClick={handleSendNewCode}
-                className="whitespace-nowrap"
+                disabled={isSendingCode || isActive}
+                className="btn-gradient-border btn-gradient-primary px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-1.5"
               >
+                {isSendingCode && <Loader size="xs" />}
                 {isActive ? `${countdown}s` : '获取验证码'}
-              </Button>
+              </button>
             </div>
 
             <button
@@ -262,18 +251,14 @@ export default function ChangeEmailForm({ onSuccess }: ChangeEmailFormProps) {
               ← 返回上一步
             </button>
 
-            <Button
-              fullWidth
+            <button
               type="submit"
-              loading={isLoading}
-              radius="md"
-              size="md"
-              variant="light"
-              color="cyan"
-              className="!bg-gradient-to-r !from-sky-100 !to-teal-100 !text-sky-700 hover:!from-sky-200 hover:!to-teal-200 !border !border-sky-200/50"
+              disabled={isLoading}
+              className="btn-gradient-border btn-gradient-code w-full py-2.5 rounded-full text-sm font-medium transition-all flex items-center justify-center gap-2"
             >
+              {isLoading && <Loader size="xs" />}
               确认换绑
-            </Button>
+            </button>
           </div>
         </form>
       )}

@@ -2,55 +2,22 @@ import Link from "next/link";
 import Preloader from "@/components/Preloader";
 import HomeLoginButton from "../components/HomeLoginButton";
 import { BookOpenIcon, RocketIcon, SparklesIcon, HeartIcon } from "@/components/icons";
+import { iconSize } from "@/styles/theme";
 
 export default function Home() {
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
-      style={{
-        background: `
-          linear-gradient(135deg, 
-            rgba(255, 182, 193, 0.4) 0%,
-            rgba(152, 251, 152, 0.3) 25%,
-            rgba(135, 206, 250, 0.4) 50%,
-            rgba(221, 160, 221, 0.3) 75%,
-            rgba(255, 255, 224, 0.4) 100%
-          )
-        `,
-      }}
-    >
-      {/* 右上角登录按钮（使用公共组件的包装） */}
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-white">
+      {/* 右上角登录按钮 */}
       <HomeLoginButton />
-      {/* 装饰性渐变圆形 */}
+
+      {/* 淡色装饰背景 */}
       <div
-        className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-60 blur-3xl"
-        style={{
-          background: "radial-gradient(circle, rgba(255,182,193,0.6) 0%, transparent 70%)",
-        }}
+        className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full opacity-20 blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(168, 85, 247, 0.6) 0%, transparent 70%)" }}
       />
       <div
-        className="absolute top-[20%] right-[-5%] w-[400px] h-[400px] rounded-full opacity-50 blur-3xl"
-        style={{
-          background: "radial-gradient(circle, rgba(135,206,250,0.6) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        className="absolute bottom-[-10%] left-[30%] w-[450px] h-[450px] rounded-full opacity-50 blur-3xl"
-        style={{
-          background: "radial-gradient(circle, rgba(152,251,152,0.5) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        className="absolute bottom-[20%] right-[20%] w-[350px] h-[350px] rounded-full opacity-40 blur-3xl"
-        style={{
-          background: "radial-gradient(circle, rgba(221,160,221,0.6) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        className="absolute top-[50%] left-[10%] w-[300px] h-[300px] rounded-full opacity-40 blur-3xl"
-        style={{
-          background: "radial-gradient(circle, rgba(255,255,180,0.5) 0%, transparent 70%)",
-        }}
+        className="absolute bottom-[-15%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-20 blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(99, 102, 241, 0.6) 0%, transparent 70%)" }}
       />
 
       {/* 主内容 */}
@@ -58,7 +25,7 @@ export default function Home() {
         <h1
           className="text-4xl sm:text-5xl md:text-6xl font-bold mb-8 tracking-tight"
           style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #a855f7 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -66,56 +33,40 @@ export default function Home() {
         >
           前端工程师求职指北
         </h1>
-        
+
         <p className="text-gray-600 text-lg sm:text-xl mb-12 max-w-md flex items-center justify-center gap-1.5">
           系统练习前端面试常考题，助你斩获心仪 Offer
-          <SparklesIcon size={20} className="text-yellow-500" />
+          <SparklesIcon size={iconSize.lg} className="text-yellow-500" />
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* 八股题按钮 - 渐变边框 */}
           <Link
             href="/bagu"
-            className="group relative inline-flex items-center justify-center px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white rounded-full overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 active:scale-95"
-            style={{
-              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-            }}
+            className="btn-gradient-border btn-gradient-bagu group inline-flex items-center justify-center px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
           >
-            <span className="relative z-10 flex items-center gap-2">
-              <BookOpenIcon size={20} />
-              八股文
+            <span className="flex items-center gap-2">
+              <BookOpenIcon size={iconSize.lg} />
+              八股题
             </span>
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{
-                background: "linear-gradient(135deg, #f5576c 0%, #f093fb 100%)",
-              }}
-            />
           </Link>
 
+          {/* 手写题按钮 - 渐变边框 */}
           <Link
             href="/code-editor"
-            className="group relative inline-flex items-center justify-center px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white rounded-full overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 active:scale-95"
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            }}
+            className="btn-gradient-border btn-gradient-code group inline-flex items-center justify-center px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
           >
-            <span className="relative z-10 flex items-center gap-2">
-              <RocketIcon size={20} />
+            <span className="flex items-center gap-2">
+              <RocketIcon size={iconSize.lg} />
               手写题
             </span>
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{
-                background: "linear-gradient(135deg, #764ba2 0%, #f093fb 100%)",
-              }}
-            />
           </Link>
         </div>
       </main>
 
       {/* 底部装饰 */}
-      <footer className="absolute bottom-6 text-gray-500 text-sm flex items-center gap-1.5">
-        Made with <HeartIcon size={14} className="text-pink-500" fill="currentColor" /> for Frontend Engineers
+      <footer className="absolute bottom-6 text-gray-400 text-sm flex items-center gap-1.5">
+        Made with <HeartIcon size={iconSize.sm} className="text-pink-400" fill="currentColor" /> for Frontend Engineers
       </footer>
 
       {/* 预加载八股数据 */}

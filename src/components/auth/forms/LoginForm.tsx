@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { TextInput, PasswordInput, Button, Alert } from '@mantine/core';
+import { TextInput, PasswordInput, Alert } from '@mantine/core';
+import { Loader } from '@mantine/core';
 import { validateLoginForm, validateRegisterForm, validateUsername, validateEmail } from '@/lib/validation';
 import { useCountdown } from '@/hooks/useCountdown';
 import { register, sendCode } from '@/services/auth';
@@ -188,7 +189,7 @@ export default function LoginForm({ onSuccess, onModeChange }: LoginFormProps) {
               onChange={(e) => { setName(e.target.value.trim()); setNameError(''); }}
               error={nameError}
               maxLength={20}
-              radius="md"
+              radius="xl"
               size="md"
             />
           )}
@@ -199,7 +200,7 @@ export default function LoginForm({ onSuccess, onModeChange }: LoginFormProps) {
             value={email}
             onChange={(e) => { setEmail(e.target.value.trim()); setEmailError(''); }}
             error={emailError}
-            radius="md"
+            radius="xl"
             size="md"
           />
 
@@ -211,7 +212,7 @@ export default function LoginForm({ onSuccess, onModeChange }: LoginFormProps) {
                 value={password}
                 onChange={(e) => { setPassword(e.target.value.trim()); setPasswordError(''); }}
                 error={passwordError}
-                radius="md"
+                radius="xl"
                 size="md"
               />
               {isRegisterMode && (
@@ -220,7 +221,7 @@ export default function LoginForm({ onSuccess, onModeChange }: LoginFormProps) {
                   value={confirmPassword}
                   onChange={(e) => { setConfirmPassword(e.target.value.trim()); setConfirmPasswordError(''); }}
                   error={confirmPasswordError}
-                  radius="md"
+                  radius="xl"
                   size="md"
                 />
               )}
@@ -235,24 +236,20 @@ export default function LoginForm({ onSuccess, onModeChange }: LoginFormProps) {
                 value={verifyCode}
                 onChange={(e) => { setVerifyCode(e.target.value.replace(/\D/g, '')); setCodeError(''); }}
                 error={codeError}
-                radius="md"
+                radius="xl"
                 size="md"
                 className="flex-1"
                 maxLength={6}
               />
-              <Button
+              <button
                 type="button"
-                variant="light"
-                color="gray"
-                radius="md"
-                size="md"
-                loading={isSendingCode}
-                disabled={isActive}
                 onClick={handleSendCode}
-                className="whitespace-nowrap"
+                disabled={isSendingCode || isActive}
+                className="btn-gradient-border btn-gradient-primary px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-1.5"
               >
+                {isSendingCode && <Loader size="xs" />}
                 {isActive ? `${countdown}s` : '获取验证码'}
-              </Button>
+              </button>
             </div>
           )}
 
@@ -279,32 +276,23 @@ export default function LoginForm({ onSuccess, onModeChange }: LoginFormProps) {
           )}
 
           {/* 提交按钮 */}
-          <Button
-            fullWidth
+          <button
             type="submit"
-            loading={isLoading}
-            radius="md"
-            size="md"
-            variant="light"
-            color="cyan"
-            className="!bg-gradient-to-r !from-sky-100 !to-teal-100 !text-sky-700 hover:!from-sky-200 hover:!to-teal-200 !border !border-sky-200/50"
+            disabled={isLoading}
+            className="btn-gradient-border btn-gradient-code w-full py-2.5 rounded-full text-sm font-medium transition-all flex items-center justify-center gap-2"
           >
+            {isLoading && <Loader size="xs" />}
             {isRegisterMode ? '注册' : '登录'}
-          </Button>
+          </button>
 
           {/* 切换登录/注册 */}
-          <Button
+          <button
             type="button"
             onClick={() => { setIsRegisterMode(!isRegisterMode); setLoginType('password'); clearErrors(); }}
-            fullWidth
-            radius="md"
-            size="md"
-            variant="light"
-            color="grape"
-            className="!bg-gradient-to-r !from-purple-50 !to-pink-50 !text-purple-600 hover:!from-purple-100 hover:!to-pink-100 !border !border-purple-200/50"
+            className="btn-gradient-border btn-gradient-bagu w-full py-2.5 rounded-full text-sm font-medium transition-all"
           >
             {isRegisterMode ? '已有账号？去登录' : '没有账号？去注册'}
-          </Button>
+          </button>
         </div>
       </form>
     </>

@@ -434,42 +434,10 @@ export default function BaguClient({ initialData }: BaguClientProps) {
   }, [filteredQuestions, currentIndex, findNearestFilteredIndex, expandedCategories, toggleCategory, selectQuestion]);
 
   return (
-    <div
-      className="h-screen flex flex-col relative overflow-hidden"
-      style={{
-        background: `
-          linear-gradient(135deg,
-            rgba(255, 182, 193, 0.4) 0%,
-            rgba(152, 251, 152, 0.3) 25%,
-            rgba(135, 206, 250, 0.4) 50%,
-            rgba(221, 160, 221, 0.3) 75%,
-            rgba(255, 255, 224, 0.4) 100%
-          )
-        `,
-      }}
-    >
-      {/* 装饰性渐变圆形 */}
-      <div
-        className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-40 blur-3xl pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(255,182,193,0.6) 0%, transparent 70%)',
-        }}
-      />
-      <div
-        className="absolute top-[30%] right-[-5%] w-[400px] h-[400px] rounded-full opacity-30 blur-3xl pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(135,206,250,0.6) 0%, transparent 70%)',
-        }}
-      />
-      <div
-        className="absolute bottom-[-10%] left-[30%] w-[450px] h-[450px] rounded-full opacity-30 blur-3xl pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(152,251,152,0.5) 0%, transparent 70%)',
-        }}
-      />
+    <div className="h-screen flex flex-col relative overflow-hidden bg-white">
+      {/* 淡色装饰背景 */}
+      <div className="page-bg-decoration page-bg-bagu-1" />
+      <div className="page-bg-decoration page-bg-bagu-2" />
 
       {/* 公共头部 */}
       <Header />

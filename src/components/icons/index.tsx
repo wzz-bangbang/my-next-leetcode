@@ -9,7 +9,7 @@ import {
   Star,
   Heart,
 
-  // 分类图标 - 八股文
+  // 分类图标 - 八股题
   FileText,
   BookType,
   Palette,
@@ -73,7 +73,7 @@ export const StarFilledIcon = ({ size = 16, className = '' }: IconProps) => (
 );
 export const HeartIcon = Heart;
 
-// 八股文分类图标
+// 八股题分类图标
 export const JsBasicIcon = FileText;        // JS基础 - 📜
 export const TypeScriptIcon = BookType;     // TypeScript - 📘
 export const CssHtmlIcon = Palette;         // CSS & HTML - 🎨

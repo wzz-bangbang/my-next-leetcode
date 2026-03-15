@@ -1,5 +1,5 @@
 /**
- * 八股文 MD 文件解析脚本
+ * 八股题 MD 文件解析脚本
  * 解析 public/bagu/ 下的所有 MD 文件，生成 bagu-data.json
  *
  * 运行: npm run build:bagu
@@ -327,7 +327,7 @@ function parseFolder(folderPath, categoryId) {
  * 主函数
  */
 function main() {
-  console.log('🚀 开始解析八股文 MD 文件...\n');
+  console.log('🚀 开始解析八股题 MD 文件...\n');
 
   const categories = [];
   const items = fs.readdirSync(BAGU_DIR);

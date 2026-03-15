@@ -9,6 +9,8 @@ declare module 'next-auth' {
       image?: string | null;
       /** 登录方式：credentials/code/github/google */
       loginType?: string;
+      /** 是否已设置密码 */
+      hasPassword?: boolean;
     };
   }
 }
@@ -17,5 +19,6 @@ declare module 'next-auth/jwt' {
   interface JWT {
     userId?: number;
     loginType?: string;
+    hasPassword?: boolean;
   }
 }

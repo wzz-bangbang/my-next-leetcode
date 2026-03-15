@@ -19,6 +19,7 @@ import {
   CheckIcon,
   type IconProps,
 } from '@/components/icons';
+import { iconSize } from '@/styles/theme';
 
 // 重新导出给外部使用
 export { QuestionStatus };
@@ -45,6 +46,7 @@ interface QuestionSidebarProps {
   collapsed?: boolean;
   onToggleCollapse?: () => void;
   statusMap: Record<number, QuestionStatus>;
+  favoriteQuestions: Set<number>;
 }
 
 const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
@@ -58,9 +60,11 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
   collapsed = false,
   onToggleCollapse,
   statusMap,
+  favoriteQuestions,
 }, ref) => {
   // 筛选状态
   const [showIncomplete, setShowIncomplete] = useState(false);
+  const [showFavorited, setShowFavorited] = useState(false);
   const [difficultyFilters, setDifficultyFilters] = useState<Set<Difficulty>>(new Set());
 
   const getStatus = (questionId: number): QuestionStatus => {
@@ -82,7 +86,7 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
 
   // 筛选后的题目（按分类）
   const filteredQuestionsByCategory = useMemo(() => {
-    const hasFilters = showIncomplete || difficultyFilters.size > 0;
+    const hasFilters = showIncomplete || showFavorited || difficultyFilters.size > 0;
     if (!hasFilters) return questionsByCategory;
 
     const filtered = new Map<CategoryTag, QuestionListItem[]>();
@@ -90,16 +94,18 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
       const filteredQuestions = questions.filter(q => {
         // 未完成筛选
         const incompleteMatch = !showIncomplete || getStatus(q.id) !== QuestionStatus.SOLVED;
+        // 已收藏筛选
+        const favoritedMatch = !showFavorited || favoriteQuestions.has(q.id);
         // 难度筛选
         const difficultyMatch = difficultyFilters.size === 0 || difficultyFilters.has(q.difficulty as Difficulty);
-        return incompleteMatch && difficultyMatch;
+        return incompleteMatch && favoritedMatch && difficultyMatch;
       });
       if (filteredQuestions.length > 0) {
         filtered.set(tag, filteredQuestions);
       }
     });
     return filtered;
-  }, [questionsByCategory, showIncomplete, difficultyFilters, statusMap]);
+  }, [questionsByCategory, showIncomplete, showFavorited, difficultyFilters, statusMap, favoriteQuestions]);
 
   // 统计信息（基于筛选后的数据）
   const stats = useMemo(() => {
@@ -112,25 +118,25 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
     return { total, completed };
   }, [filteredQuestionsByCategory, statusMap]);
 
-  const hasFilters = showIncomplete || difficultyFilters.size > 0;
+  const hasFilters = showIncomplete || showFavorited || difficultyFilters.size > 0;
 
   return (
     <div
       className={`flex-shrink-0 backdrop-blur-md border-r border-purple-200/50 flex flex-col min-h-0 transition-all duration-300 ${
         collapsed ? 'w-[48px]' : 'w-[240px]'
       }`}
-      style={{ background: 'linear-gradient(180deg, rgba(139,92,246,0.15) 0%, rgba(167,139,250,0.1) 100%)' }}
+      style={{ background: 'linear-gradient(180deg, rgba(139,92,246,0.05) 0%, rgba(167,139,250,0.03) 100%), #ffffff' }}
     >
       {/* 头部 */}
-      <div className="px-3 py-3 border-b border-purple-200/50 bg-white/20 shrink-0">
+      <div className="px-4 py-3 border-b border-purple-200/50 bg-white/20 shrink-0">
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div>
-              <h2 className="text-sm font-semibold text-purple-700 flex items-center gap-1.5">
-                <BookOpenIcon size={16} />
+              <h2 className="text-sm font-semibold text-purple-700 mb-0.5 flex items-center gap-1.5">
+                <BookOpenIcon size={iconSize.md} />
                 代码题题库
               </h2>
-              <div className="text-[10px] text-gray-500">
+              <div className="text-xs text-gray-500">
                 共 {stats.total} 题 · 已完成 {stats.completed} 题
               </div>
             </div>
@@ -161,63 +167,86 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
 
         {/* 筛选按钮 */}
         {!collapsed && (
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={() => setShowIncomplete(prev => !prev)}
-              className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 ${
-                showIncomplete
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-white/60 text-gray-600 hover:bg-white/80'
-              }`}
-            >
-              {showIncomplete && <CheckIcon size={12} />}
-              未完成
-            </button>
-            <div className="flex-1 flex gap-1">
+          <div className="space-y-2 mt-2.5">
+            {/* 第一行：难度筛选 */}
+            <div className="flex gap-1">
               <button
                 onClick={() => toggleDifficulty(Difficulty.EASY)}
-                className={`flex-1 py-1.5 text-xs rounded-lg transition-all ${
+                className={`btn-gradient-border flex-1 py-1.5 text-xs sm:text-sm rounded-full transition-all ${
                   difficultyFilters.has(Difficulty.EASY)
-                    ? 'text-white'
-                    : 'bg-white/60 hover:bg-white/80'
+                    ? 'active'
+                    : ''
                 }`}
                 style={{
-                  backgroundColor: difficultyFilters.has(Difficulty.EASY) ? DifficultyColor[Difficulty.EASY] : undefined,
-                  color: difficultyFilters.has(Difficulty.EASY) ? 'white' : DifficultyColor[Difficulty.EASY],
-                }}
-                title="简单"
+                  '--btn-gradient': `linear-gradient(135deg, ${DifficultyColor[Difficulty.EASY]} 0%, ${DifficultyColor[Difficulty.EASY]} 100%)`,
+                  backgroundColor: difficultyFilters.has(Difficulty.EASY) ? `${DifficultyColor[Difficulty.EASY]}1a` : undefined,
+                  color: DifficultyColor[Difficulty.EASY],
+                } as React.CSSProperties}
               >
-                简
+                简单
               </button>
               <button
                 onClick={() => toggleDifficulty(Difficulty.MEDIUM)}
-                className={`flex-1 py-1.5 text-xs rounded-lg transition-all ${
+                className={`btn-gradient-border flex-1 py-1.5 text-xs sm:text-sm rounded-full transition-all ${
                   difficultyFilters.has(Difficulty.MEDIUM)
-                    ? 'text-white'
-                    : 'bg-white/60 hover:bg-white/80'
+                    ? 'active'
+                    : ''
                 }`}
                 style={{
-                  backgroundColor: difficultyFilters.has(Difficulty.MEDIUM) ? DifficultyColor[Difficulty.MEDIUM] : undefined,
-                  color: difficultyFilters.has(Difficulty.MEDIUM) ? 'white' : DifficultyColor[Difficulty.MEDIUM],
-                }}
-                title="中等"
+                  '--btn-gradient': `linear-gradient(135deg, ${DifficultyColor[Difficulty.MEDIUM]} 0%, ${DifficultyColor[Difficulty.MEDIUM]} 100%)`,
+                  backgroundColor: difficultyFilters.has(Difficulty.MEDIUM) ? `${DifficultyColor[Difficulty.MEDIUM]}1a` : undefined,
+                  color: DifficultyColor[Difficulty.MEDIUM],
+                } as React.CSSProperties}
               >
-                中
+                中等
               </button>
               <button
                 onClick={() => toggleDifficulty(Difficulty.HARD)}
-                className={`flex-1 py-1.5 text-xs rounded-lg transition-all ${
+                className={`btn-gradient-border flex-1 py-1.5 text-xs sm:text-sm rounded-full transition-all ${
                   difficultyFilters.has(Difficulty.HARD)
-                    ? 'text-white'
-                    : 'bg-white/60 hover:bg-white/80'
+                    ? 'active'
+                    : ''
                 }`}
                 style={{
-                  backgroundColor: difficultyFilters.has(Difficulty.HARD) ? DifficultyColor[Difficulty.HARD] : undefined,
-                  color: difficultyFilters.has(Difficulty.HARD) ? 'white' : DifficultyColor[Difficulty.HARD],
-                }}
-                title="困难"
+                  '--btn-gradient': `linear-gradient(135deg, ${DifficultyColor[Difficulty.HARD]} 0%, ${DifficultyColor[Difficulty.HARD]} 100%)`,
+                  backgroundColor: difficultyFilters.has(Difficulty.HARD) ? `${DifficultyColor[Difficulty.HARD]}1a` : undefined,
+                  color: DifficultyColor[Difficulty.HARD],
+                } as React.CSSProperties}
               >
-                难
+                困难
+              </button>
+            </div>
+            {/* 第二行：未完成 + 已收藏 */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowIncomplete(prev => !prev)}
+                data-active={showIncomplete}
+                className={`btn-gradient-border btn-gradient-complete flex-1 px-3 py-1.5 text-xs sm:text-sm rounded-full transition-all flex items-center justify-center gap-1 ${
+                  showIncomplete
+                    ? 'active'
+                    : ''
+                }`}
+                style={{
+                  backgroundColor: showIncomplete ? 'rgba(34, 197, 94, 0.1)' : undefined,
+                }}
+              >
+                {showIncomplete && <CheckIcon size={iconSize.sm} />}
+                未完成
+              </button>
+              <button
+                onClick={() => setShowFavorited(prev => !prev)}
+                data-active={showFavorited}
+                className={`btn-gradient-border btn-gradient-star flex-1 px-3 py-1.5 text-xs sm:text-sm rounded-full transition-all flex items-center justify-center gap-1 ${
+                  showFavorited
+                    ? 'active'
+                    : ''
+                }`}
+                style={{
+                  backgroundColor: showFavorited ? 'rgba(251, 191, 36, 0.1)' : undefined,
+                }}
+              >
+                {showFavorited && <CheckIcon size={iconSize.sm} />}
+                已收藏
               </button>
             </div>
           </div>
@@ -242,7 +271,7 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
                 >
                   {(() => {
                     const IconComponent = CategoryIconMap[tag as CategoryTag];
-                    return IconComponent ? <IconComponent size={18} /> : null;
+                    return IconComponent ? <IconComponent size={iconSize.lg - 2} /> : null;
                   })()}
                 </button>
               </Tooltip>
@@ -272,7 +301,7 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
                     <span className="flex items-center gap-2">
                       {(() => {
                         const IconComponent = CategoryIconMap[tag as CategoryTag];
-                        return IconComponent ? <IconComponent size={16} /> : null;
+                        return IconComponent ? <IconComponent size={iconSize.md} /> : null;
                       })()}
                       <span>{CategoryTagLabel[tag as CategoryTag]}</span>
                     </span>
@@ -280,7 +309,7 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
                       <span className="text-xs text-gray-400">({categoryQuestions.length})</span>
                       {hasQuestions && (
                         <span className={`transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
-                          <ChevronRightIcon size={12} />
+                          <ChevronRightIcon size={iconSize.xs} />
                         </span>
                       )}
                     </span>
@@ -309,9 +338,9 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
                               data-question-id={q.id}
                               data-question-key={questionKey}
                               onClick={() => onSelectQuestion(q.id, categoryTag)}
-                              className={`w-full text-left pl-10 pr-2 py-2 text-sm transition-all duration-200 flex items-center gap-1 outline-none focus:outline-none ${
+                              className={`item-gradient-border item-gradient-code w-full text-left pl-10 pr-3 py-2 text-sm transition-all duration-200 flex items-center gap-2 outline-none focus:outline-none ${
                                 isSelected
-                                  ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
+                                  ? 'active font-medium text-indigo-700'
                                   : 'text-gray-600 hover:bg-white/50'
                               }`}
                             >
@@ -322,8 +351,8 @@ const QuestionSidebar = forwardRef<HTMLDivElement, QuestionSidebarProps>(({
                               <span
                                 className="text-xs px-1.5 py-0.5 rounded flex-shrink-0"
                                 style={{
-                                  backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : `${DifficultyColor[q.difficulty as Difficulty]}20`,
-                                  color: isSelected ? 'white' : DifficultyColor[q.difficulty as Difficulty]
+                                  backgroundColor: `${DifficultyColor[q.difficulty as Difficulty]}20`,
+                                  color: DifficultyColor[q.difficulty as Difficulty]
                                 }}
                               >
                                 {DifficultyLabel[q.difficulty as Difficulty]}

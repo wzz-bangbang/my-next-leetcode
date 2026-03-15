@@ -56,9 +56,9 @@ CREATE TABLE IF NOT EXISTS code_questions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ========== 八股文相关表 ==========
+-- ========== 八股题相关表 ==========
 
--- 八股文分类表
+-- 八股题分类表
 -- id: 1=JS基础, 2=TypeScript, 3=CSS&HTML, 4=React, 5=Vue, 6=浏览器, 7=Next.js, 8=工程化, 9=CI&CD, 10=开放题&场景题, 11=小程序, 12=AI, 13=技术选型, 14=工作协作
 CREATE TABLE IF NOT EXISTS bagu_categories (
     id TINYINT PRIMARY KEY,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS bagu_categories (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 八股文题目表
+-- 八股题题目表
 CREATE TABLE IF NOT EXISTS bagu_questions (
     id INT PRIMARY KEY,
     slug VARCHAR(100) NOT NULL UNIQUE,
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS user_code_progress (
     INDEX idx_favorite (user_id, is_favorite)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 八股文进度表（合并了收藏和状态）
+-- 八股题进度表（合并了收藏和状态）
 CREATE TABLE IF NOT EXISTS user_bagu_progress (
     user_id INT NOT NULL,
     question_id INT NOT NULL,

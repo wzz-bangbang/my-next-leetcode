@@ -17,7 +17,7 @@ async function importBagu() {
     const baguPath = path.join(__dirname, '../public/bagu-data.json');
     const baguData = JSON.parse(fs.readFileSync(baguPath, 'utf-8'));
 
-    console.log(`找到 ${baguData.categories.length} 个八股文分类`);
+    console.log(`找到 ${baguData.categories.length} 个八股题分类`);
 
     let questionId = 1; // 全局题目ID，从1开始
 
@@ -65,7 +65,7 @@ async function importBagu() {
       console.log(`  ✓ ${category.questions.length} 题已导入`);
     }
 
-    console.log(`\n八股文导入完成: ${questionId - 1} 道`);
+    console.log(`\n八股题导入完成: ${questionId - 1} 道`);
 
   } catch (err) {
     console.error('导入失败:', err);

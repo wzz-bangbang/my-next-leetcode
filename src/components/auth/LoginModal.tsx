@@ -93,10 +93,12 @@ export default function LoginModal({ redirectUrl = '/' }: LoginModalProps) {
           <SocialLoginButtons redirectUrl={redirectUrl} />
         )}
 
-        {/* 提示 */}
-        <p className="text-xs text-gray-400 text-center mt-4">
-          登录即表示同意我们的服务条款
-        </p>
+        {/* 提示（仅登录/注册模式显示） */}
+        {!isAuthenticatedMode && mode !== 'resetPassword' && (
+          <p className="text-xs text-gray-400 text-center mt-4">
+            登录即表示同意我们的服务条款
+          </p>
+        )}
       </div>
     </div>,
     document.body

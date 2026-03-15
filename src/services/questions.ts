@@ -19,14 +19,14 @@ export async function getCodeQuestionDetail(questionId: number) {
   });
 }
 
-/** 获取八股文列表 */
+/** 获取八股题列表 */
 export async function getBaguList() {
   return apiGet<BaguData>('/api/bagu', {
     showLoginOnUnauthorized: false,
   });
 }
 
-/** 获取八股文详情 */
+/** 获取八股题详情 */
 export async function getBaguDetail(questionId: number) {
   return apiGet<BaguQuestionDetail>(`/api/bagu?id=${questionId}`, {
     showLoginOnUnauthorized: false,

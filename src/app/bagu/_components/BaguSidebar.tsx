@@ -6,6 +6,7 @@ import QuestionList from './QuestionList';
 import SimulationModal from './SimulationModal';
 import type { BaguListData, BaguCategory, BaguQuestionListItem } from '@/types/bagu';
 import { BookOpenIcon, CloseIcon, CheckIcon } from '@/components/icons';
+import { iconSize } from '@/styles/theme';
 
 interface BaguSidebarProps {
   data: BaguListData;
@@ -120,7 +121,7 @@ export default function BaguSidebar({
       `}
       style={{
         background:
-          'linear-gradient(180deg, rgba(139,92,246,0.15) 0%, rgba(167,139,250,0.1) 100%), #ffffff',
+          'linear-gradient(180deg, rgba(139,92,246,0.05) 0%, rgba(167,139,250,0.03) 100%), #ffffff',
       }}
     >
       {/* 移动端顶部占位 */}
@@ -131,8 +132,8 @@ export default function BaguSidebar({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xs md:text-sm font-semibold text-purple-700 mb-0.5 md:mb-1 flex items-center gap-1.5">
-              <BookOpenIcon size={16} />
-              八股文题库
+              <BookOpenIcon size={iconSize.md} />
+              八股题题库
             </h2>
             <div className="text-[10px] md:text-xs text-gray-500">
               共 {stats.total} 题 · 已完成 {stats.completed} 题
@@ -142,7 +143,7 @@ export default function BaguSidebar({
             className="md:hidden p-1.5 rounded-full hover:bg-purple-100 text-gray-600"
             onClick={onCloseSidebar}
           >
-            <CloseIcon size={16} />
+            <CloseIcon size={iconSize.md} />
           </button>
         </div>
 
@@ -158,27 +159,35 @@ export default function BaguSidebar({
         />
 
         {/* 过滤按钮 */}
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 mt-2.5">
           <button
             onClick={onToggleIncomplete}
-            className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 ${
+            data-active={showIncomplete}
+            className={`btn-gradient-border btn-gradient-complete flex-1 px-3 py-1.5 text-xs sm:text-sm rounded-full transition-all flex items-center justify-center gap-1 ${
               showIncomplete
-                ? 'bg-amber-500 text-white'
-                : 'bg-white/60 text-gray-600 hover:bg-white/80'
+                ? 'active'
+                : ''
             }`}
+            style={{
+              backgroundColor: showIncomplete ? 'rgba(34, 197, 94, 0.1)' : undefined,
+            }}
           >
-            {showIncomplete && <CheckIcon size={12} />}
+            {showIncomplete && <CheckIcon size={iconSize.sm} />}
             未完成
           </button>
           <button
             onClick={onToggleFavorited}
-            className={`flex-1 px-2 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 ${
+            data-active={showFavorited}
+            className={`btn-gradient-border btn-gradient-star flex-1 px-3 py-1.5 text-xs sm:text-sm rounded-full transition-all flex items-center justify-center gap-1 ${
               showFavorited
-                ? 'bg-yellow-500 text-white'
-                : 'bg-white/60 text-gray-600 hover:bg-white/80'
+                ? 'active'
+                : ''
             }`}
+            style={{
+              backgroundColor: showFavorited ? 'rgba(251, 191, 36, 0.1)' : undefined,
+            }}
           >
-            {showFavorited && <CheckIcon size={12} />}
+            {showFavorited && <CheckIcon size={iconSize.sm} />}
             已收藏
           </button>
         </div>

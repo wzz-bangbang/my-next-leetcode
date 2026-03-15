@@ -1,20 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { PasswordInput, Button, Alert } from '@mantine/core';
+import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { PasswordInput, Alert } from '@mantine/core';
+import { Loader } from '@mantine/core';
 import { validatePassword } from '@/lib/validation';
-import { changePassword, setPassword as setNewPassword, checkHasPassword } from '@/services/auth';
+import { changePassword, setPassword as setNewPassword } from '@/services/auth';
 
 interface ChangePasswordFormProps {
   onSuccess: () => void;
 }
 
 export default function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
-  const [hasPassword, setHasPassword] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    checkHasPassword().then(setHasPassword);
-  }, []);
+  const { data: session, status, update } = useSession();
+  // 从 session 获取 hasPassword，默认 true（走修改流程）
+  const hasPassword = session?.user?.hasPassword ?? true;
 
   // 表单值
   const [oldPassword, setOldPassword] = useState('');
@@ -60,16 +60,20 @@ export default function ChangePasswordForm({ onSuccess }: ChangePasswordFormProp
     }
 
     setIsLoading(true);
-    
+
     // 根据是否有密码调用不同的接口
-    const { ok, status } = hasPassword 
+    const { ok, status } = hasPassword
       ? await changePassword(oldPassword, password)
       : await setNewPassword(password);
-    
+
     setIsLoading(false);
 
     if (ok) {
       setSuccessMessage(hasPassword ? '密码修改成功' : '密码设置成功');
+      // 如果是首次设置密码，更新 session
+      if (!hasPassword) {
+        await update({ hasPassword: true });
+      }
       setTimeout(() => onSuccess(), 1500);
     } else {
       if (status === 400) {
@@ -82,8 +86,8 @@ export default function ChangePasswordForm({ onSuccess }: ChangePasswordFormProp
     }
   };
 
-  // 加载中
-  if (hasPassword === null) {
+  // session 加载中
+  if (status === 'loading') {
     return (
       <div className="text-center py-8">
         <div className="text-gray-400">加载中...</div>
@@ -117,7 +121,7 @@ export default function ChangePasswordForm({ onSuccess }: ChangePasswordFormProp
               value={oldPassword}
               onChange={(e) => { setOldPassword(e.target.value.trim()); setOldPasswordError(''); }}
               error={oldPasswordError}
-              radius="md"
+              radius="xl"
               size="md"
             />
           )}
@@ -127,7 +131,7 @@ export default function ChangePasswordForm({ onSuccess }: ChangePasswordFormProp
             value={password}
             onChange={(e) => { setPassword(e.target.value.trim()); setPasswordError(''); }}
             error={passwordError}
-            radius="md"
+            radius="xl"
             size="md"
           />
 
@@ -136,22 +140,18 @@ export default function ChangePasswordForm({ onSuccess }: ChangePasswordFormProp
             value={confirmPassword}
             onChange={(e) => { setConfirmPassword(e.target.value.trim()); setConfirmPasswordError(''); }}
             error={confirmPasswordError}
-            radius="md"
+            radius="xl"
             size="md"
           />
 
-          <Button
-            fullWidth
+          <button
             type="submit"
-            loading={isLoading}
-            radius="md"
-            size="md"
-            variant="light"
-            color="cyan"
-            className="!bg-gradient-to-r !from-sky-100 !to-teal-100 !text-sky-700 hover:!from-sky-200 hover:!to-teal-200 !border !border-sky-200/50"
+            disabled={isLoading}
+            className="btn-gradient-border btn-gradient-code w-full py-2.5 rounded-full text-sm font-medium transition-all flex items-center justify-center gap-2"
           >
+            {isLoading && <Loader size="xs" />}
             {hasPassword ? '确认修改' : '设置密码'}
-          </Button>
+          </button>
         </div>
       </form>
     </>

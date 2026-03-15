@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Modal, Text, Stack, Button } from '@mantine/core';
+import { Modal, Text, Stack } from '@mantine/core';
 import { Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import { deactivateAccount } from '@/services/auth';
 import { showLoginModal } from '@/lib/api';
+import { Loader } from '@mantine/core';
 
 interface ProfileModalProps {
   opened: boolean;
@@ -95,57 +96,41 @@ export default function ProfileModal({ opened, onClose, session, onLogout }: Pro
           </Stack>
 
           {/* 操作按钮 */}
-          <Stack gap="xs" w="100%">
+          <div className="w-full flex flex-col gap-2">
             {/* OAuth 用户不显示邮箱换绑（邮箱由第三方平台管理） */}
             {(session?.user?.loginType === 'credentials' || session?.user?.loginType === 'code') && (
-              <Button
-                variant="light"
-                color="gray"
-                fullWidth
-                radius="md"
-                size="sm"
+              <button
+                className="btn-gradient-border btn-gradient-primary w-full py-2 rounded-full text-sm font-medium transition-all"
                 onClick={() => {
                   onClose();
                   showLoginModal('changeEmail');
                 }}
               >
                 邮箱换绑
-              </Button>
+              </button>
             )}
-            <Button
-              variant="light"
-              color="gray"
-              fullWidth
-              radius="md"
-              size="sm"
+            <button
+              className="btn-gradient-border btn-gradient-primary w-full py-2 rounded-full text-sm font-medium transition-all"
               onClick={() => {
                 onClose();
                 showLoginModal('changePassword');
               }}
             >
               修改密码
-            </Button>
-            <Button
-              variant="light"
-              color="orange"
-              fullWidth
-              radius="md"
-              size="sm"
+            </button>
+            <button
+              className="btn-gradient-border btn-gradient-star w-full py-2 rounded-full text-sm font-medium transition-all"
               onClick={onLogout}
             >
               退出登录
-            </Button>
-            <Button
-              variant="subtle"
-              color="red"
-              fullWidth
-              radius="md"
-              size="sm"
+            </button>
+            <button
+              className="w-full py-2 rounded-full text-sm font-medium text-red-400 hover:text-red-500 hover:bg-red-50 transition-all"
               onClick={() => setShowDeactivateConfirm(true)}
             >
               注销账号
-            </Button>
-          </Stack>
+            </button>
+          </div>
         </Stack>
       </Modal>
 
@@ -167,37 +152,30 @@ export default function ProfileModal({ opened, onClose, session, onLogout }: Pro
           <Text size="sm" c="dimmed" ta="center">
             注销后账号将不可用，此操作不可撤销。
           </Text>
-          
+
           {deactivateError && (
             <Text size="sm" c="red" ta="center">{deactivateError}</Text>
           )}
 
-          <Stack gap="xs">
-            <Button
-              variant="filled"
-              color="red"
-              fullWidth
-              radius="md"
-              size="sm"
-              loading={isDeactivating}
+          <div className="flex flex-col gap-2">
+            <button
+              className="w-full py-2 rounded-full text-sm font-medium bg-red-400/80 text-white hover:bg-red-500/80 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              disabled={isDeactivating}
               onClick={handleDeactivate}
             >
+              {isDeactivating && <Loader size="xs" color="white" />}
               确认注销
-            </Button>
-            <Button
-              variant="light"
-              color="gray"
-              fullWidth
-              radius="md"
-              size="sm"
+            </button>
+            <button
+              className="btn-gradient-border btn-gradient-primary w-full py-2 rounded-full text-sm font-medium transition-all"
               onClick={() => {
                 setShowDeactivateConfirm(false);
                 setDeactivateError('');
               }}
             >
               取消
-            </Button>
-          </Stack>
+            </button>
+          </div>
         </Stack>
       </Modal>
     </>

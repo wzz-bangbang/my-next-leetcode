@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { TextInput, PasswordInput, Button, Alert } from '@mantine/core';
+import { TextInput, PasswordInput, Alert } from '@mantine/core';
+import { Loader } from '@mantine/core';
 import { validateEmail, validatePassword } from '@/lib/validation';
 import { useCountdown } from '@/hooks/useCountdown';
 import { sendCode, resetPassword } from '@/services/auth';
@@ -124,7 +125,7 @@ export default function ResetPasswordForm({ onSuccess, onBack }: ResetPasswordFo
             value={email}
             onChange={(e) => { setEmail(e.target.value.trim()); setEmailError(''); }}
             error={emailError}
-            radius="md"
+            radius="xl"
             size="md"
           />
 
@@ -134,24 +135,20 @@ export default function ResetPasswordForm({ onSuccess, onBack }: ResetPasswordFo
               value={verifyCode}
               onChange={(e) => { setVerifyCode(e.target.value.replace(/\D/g, '')); setCodeError(''); }}
               error={codeError}
-              radius="md"
+              radius="xl"
               size="md"
               className="flex-1"
               maxLength={6}
             />
-            <Button
+            <button
               type="button"
-              variant="light"
-              color="gray"
-              radius="md"
-              size="md"
-              loading={isSendingCode}
-              disabled={isActive}
               onClick={handleSendCode}
-              className="whitespace-nowrap"
+              disabled={isSendingCode || isActive}
+              className="btn-gradient-border btn-gradient-primary px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-1.5"
             >
+              {isSendingCode && <Loader size="xs" />}
               {isActive ? `${countdown}s` : '获取验证码'}
-            </Button>
+            </button>
           </div>
 
           <PasswordInput
@@ -159,7 +156,7 @@ export default function ResetPasswordForm({ onSuccess, onBack }: ResetPasswordFo
             value={password}
             onChange={(e) => { setPassword(e.target.value.trim()); setPasswordError(''); }}
             error={passwordError}
-            radius="md"
+            radius="xl"
             size="md"
           />
 
@@ -168,7 +165,7 @@ export default function ResetPasswordForm({ onSuccess, onBack }: ResetPasswordFo
             value={confirmPassword}
             onChange={(e) => { setConfirmPassword(e.target.value.trim()); setConfirmPasswordError(''); }}
             error={confirmPasswordError}
-            radius="md"
+            radius="xl"
             size="md"
           />
 
@@ -180,18 +177,14 @@ export default function ResetPasswordForm({ onSuccess, onBack }: ResetPasswordFo
             ← 返回登录
           </button>
 
-          <Button
-            fullWidth
+          <button
             type="submit"
-            loading={isLoading}
-            radius="md"
-            size="md"
-            variant="light"
-            color="cyan"
-            className="!bg-gradient-to-r !from-sky-100 !to-teal-100 !text-sky-700 hover:!from-sky-200 hover:!to-teal-200 !border !border-sky-200/50"
+            disabled={isLoading}
+            className="btn-gradient-border btn-gradient-code w-full py-2.5 rounded-full text-sm font-medium transition-all flex items-center justify-center gap-2"
           >
+            {isLoading && <Loader size="xs" />}
             重置密码
-          </Button>
+          </button>
         </div>
       </form>
     </>

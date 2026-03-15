@@ -6,3 +6,12 @@
 
 ## 语言
 - 回复使用中文
+
+## 样式规范
+- 按钮样式参考：`src/styles/button-styles.md`
+- 主题配置参考：`src/styles/theme.ts`
+- 全局样式参考：`src/app/globals.css`
+- 按钮统一使用 `btn-gradient-border` 类 + 主题色类（如 `btn-gradient-bagu`）
+- 按钮圆角统一使用 `rounded-full`
+- 图标尺寸使用 `iconSize` 常量：`import { iconSize } from '@/styles/theme'`
+- 避免使用 Mantine Button 组件，统一使用原生 button/Link + 自定义样式类

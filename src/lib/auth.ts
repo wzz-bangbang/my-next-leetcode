@@ -284,22 +284,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     // JWT 回调：把用户 ID 和登录方式存到 token 里
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
+      // 处理 session update（如设置密码后更新 hasPassword）
+      if (trigger === 'update' && session?.hasPassword !== undefined) {
+        token.hasPassword = session.hasPassword;
+        return token;
+      }
+      
       if (user && account) {
         token.loginType = account.provider;
         
         // Credentials / Code 登录：user.id 已经是数据库 ID
         if (account.provider === 'credentials' || account.provider === 'code') {
           token.userId = Number(user.id);
+          // 查询是否有密码
+          const users = await query<{ password_hash: string | null }[]>(
+            'SELECT password_hash FROM users WHERE id = ?',
+            [user.id]
+          );
+          token.hasPassword = users.length > 0 && !!users[0].password_hash;
         }
-        // OAuth 登录：需要查询数据库获取用户 ID
+        // OAuth 登录：需要查询数据库获取用户 ID 和密码状态
         else {
-          const users = await query<{ id: number }[]>(
-            'SELECT u.id FROM users u JOIN accounts a ON u.id = a.user_id WHERE a.provider = ? AND a.provider_account_id = ?',
+          const users = await query<{ id: number; password_hash: string | null }[]>(
+            'SELECT u.id, u.password_hash FROM users u JOIN accounts a ON u.id = a.user_id WHERE a.provider = ? AND a.provider_account_id = ?',
             [account.provider, account.providerAccountId]
           );
           if (users.length > 0) {
             token.userId = users[0].id;
+            token.hasPassword = !!users[0].password_hash;
           }
         }
       }
@@ -313,6 +326,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       if (token.loginType) {
         session.user.loginType = token.loginType as string;
+      }
+      if (typeof token.hasPassword === 'boolean') {
+        session.user.hasPassword = token.hasPassword;
       }
       return session;
     },

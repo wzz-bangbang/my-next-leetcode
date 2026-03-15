@@ -747,33 +747,10 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
   }
 
   return (
-    <div
-      className="h-screen flex flex-col relative overflow-hidden"
-      style={{
-        background: `
-          linear-gradient(135deg,
-            rgba(255, 182, 193, 0.4) 0%,
-            rgba(152, 251, 152, 0.3) 25%,
-            rgba(135, 206, 250, 0.4) 50%,
-            rgba(221, 160, 221, 0.3) 75%,
-            rgba(255, 255, 224, 0.4) 100%
-          )
-        `,
-      }}
-    >
-      {/* 装饰性渐变圆形 */}
-      <div
-        className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-40 blur-3xl pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(255,182,193,0.6) 0%, transparent 70%)' }}
-      />
-      <div
-        className="absolute top-[30%] right-[-5%] w-[400px] h-[400px] rounded-full opacity-30 blur-3xl pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(135,206,250,0.6) 0%, transparent 70%)' }}
-      />
-      <div
-        className="absolute bottom-[-10%] left-[30%] w-[450px] h-[450px] rounded-full opacity-30 blur-3xl pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(152,251,152,0.5) 0%, transparent 70%)' }}
-      />
+    <div className="h-screen flex flex-col relative overflow-hidden bg-white">
+      {/* 淡色装饰背景 */}
+      <div className="page-bg-decoration page-bg-code-1" />
+      <div className="page-bg-decoration page-bg-code-2" />
 
       <Header />
 
@@ -786,13 +763,10 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
         </p>
         <a
           href="/bagu"
-          className="mt-6 px-6 py-2.5 rounded-full text-sm font-medium text-white shadow-md flex items-center gap-1.5"
-          style={{
-            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-          }}
+          className="btn-gradient-border btn-gradient-bagu mt-6 px-6 py-2.5 rounded-lg text-sm font-medium flex items-center gap-1.5"
         >
           <BookOpenIcon size={16} />
-          去看八股文
+          去看八股题
         </a>
       </div>
 
@@ -824,6 +798,7 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
           statusMap={statusMap}
+          favoriteQuestions={favoriteQuestions}
         />
 
         {/* 右侧主区域 */}
@@ -863,30 +838,39 @@ function CodeEditorClient({ initialQuestions }: CodeEditorClientProps) {
             {/* 操作按钮 */}
             <div className="flex-shrink-0 px-5 py-3 border-b border-gray-200/50 bg-white/20">
               <div className="flex flex-wrap gap-2">
-                <Button onClick={handleSave} variant="light" radius="xl" size="sm" color="violet" leftSection={<SaveIcon size={14} />}>
-                  保存
-                </Button>
-                {/* [已移至状态栏] 模板按钮 */}
-                <Button
+                <button
+                  onClick={handleSave}
+                  className="btn-gradient-border btn-gradient-code px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1"
+                >
+                  <SaveIcon size={14} />
+                  <span>保存</span>
+                </button>
+                <button
                   onClick={handleMarkAsSolved}
-                  variant="light"
-                  radius="xl"
-                  size="sm"
-                  color={isCurrentSolved ? 'green' : 'gray'}
-                  leftSection={isCurrentSolved ? <CheckIcon size={14} /> : <ClockIcon size={14} />}
+                  data-active={isCurrentSolved}
+                  className={`btn-gradient-border btn-gradient-complete px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1 ${
+                    isCurrentSolved ? 'active' : ''
+                  }`}
+                  style={{
+                    backgroundColor: isCurrentSolved ? 'rgba(34, 197, 94, 0.1)' : undefined,
+                  }}
                 >
-                  {isCurrentSolved ? '已完成' : '标为完成'}
-                </Button>
-                <Button
+                  {isCurrentSolved ? <CheckIcon size={14} /> : <ClockIcon size={14} />}
+                  <span>{isCurrentSolved ? '已完成' : '未完成'}</span>
+                </button>
+                <button
                   onClick={handleToggleFavorite}
-                  variant="light"
-                  radius="xl"
-                  size="sm"
-                  color={isCurrentFavorited ? 'yellow' : 'gray'}
-                  leftSection={isCurrentFavorited ? <StarFilledIcon size={14} /> : <StarIcon size={14} />}
+                  data-active={isCurrentFavorited}
+                  className={`btn-gradient-border btn-gradient-star px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1 ${
+                    isCurrentFavorited ? 'active' : ''
+                  }`}
+                  style={{
+                    backgroundColor: isCurrentFavorited ? 'rgba(251, 191, 36, 0.1)' : undefined,
+                  }}
                 >
-                  {isCurrentFavorited ? '已收藏' : '收藏'}
-                </Button>
+                  {isCurrentFavorited ? <StarFilledIcon size={14} /> : <StarIcon size={14} />}
+                  <span>{isCurrentFavorited ? '已收藏' : '收藏'}</span>
+                </button>
               </div>
             </div>
 

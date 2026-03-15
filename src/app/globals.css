@@ -3,6 +3,18 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* 渐变色定义 */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-bagu: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  --gradient-code: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --gradient-favorite: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+  --gradient-simulation: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+
+  /* 主题色 */
+  --color-bagu-primary: #a855f7;
+  --color-code-primary: #6366f1;
+  --color-favorite-primary: #eab308;
 }
 
 @theme inline {
@@ -12,29 +24,380 @@
   --font-mono: 'SF Mono', 'Monaco', 'Menlo', monospace;
 }
 
+/* 自定义字号类 */
+.text-2xs {
+  font-size: 0.625rem; /* 10px */
+  line-height: 1.2;
+}
+
+/* 全局滚动条样式 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.4);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.6);
+}
+
+/* 隐藏滚动条 */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* 禁用暗色模式，保持白色背景 */
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
 }
+*/
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system,
-    BlinkMacSystemFont, sans-serif;
+  font-family:
+    'PingFang SC',
+    'Microsoft YaHei',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+
+/* ============ 渐变边框按钮系统 ============ */
+
+/* 渐变边框基础样式 - 使用伪元素实现 */
+.btn-gradient-border {
+  position: relative;
+  /* background: white; */
+  border: none;
+  z-index: 0;
+  transition: all 0.2s ease;
+}
+
+.btn-gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: inherit;
+  background: var(--btn-gradient, var(--gradient-primary));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: -1;
+  transition: opacity 0.2s ease;
+}
+
+/* 激活/选中状态 - 边框更粗 + 阴影 */
+.btn-gradient-border.active::before,
+.btn-gradient-border[data-active='true']::before {
+  padding: 2px;
+}
+
+.btn-gradient-border.active,
+.btn-gradient-border[data-active='true'] {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 悬停状态 */
+.btn-gradient-border:hover:not(:disabled) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 禁用状态 */
+.btn-gradient-border:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-gradient-border:disabled::before {
+  opacity: 0.5;
+}
+
+/* 主渐变 - 紫蓝 */
+.btn-gradient-primary {
+  --btn-gradient: var(--gradient-primary);
+  color: #667eea;
+}
+.btn-gradient-primary.active,
+.btn-gradient-primary[data-active='true'] {
+  color: #764ba2;
+}
+
+/* 八股题渐变 - 紫粉 */
+.btn-gradient-bagu {
+  --btn-gradient: var(--gradient-bagu);
+  color: #a855f7;
+}
+.btn-gradient-bagu.active,
+.btn-gradient-bagu[data-active='true'] {
+  color: #a855f7;
+  background-color: rgba(239, 100, 249, 0.08);
+}
+
+/* 代码编辑器渐变 - 蓝紫 */
+.btn-gradient-code {
+  --btn-gradient: var(--gradient-code);
+  color: #6366f1;
+}
+.btn-gradient-code.active,
+.btn-gradient-code[data-active='true'] {
+  color: #6366f1;
+  background-color: rgba(99, 102, 241, 0.08);
+}
+
+/* 收藏渐变 - 黄色（用于收藏页内的筛选按钮） */
+.btn-gradient-favorite {
+  --btn-gradient: var(--gradient-favorite);
+  color: #d97706;
+}
+.btn-gradient-favorite.active,
+.btn-gradient-favorite[data-active='true'] {
+  color: #d97706;
+}
+
+/* 收藏星星渐变 - 与收藏页面统一的橙黄色 */
+.btn-gradient-star {
+  --btn-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #f59e0b;
+}
+.btn-gradient-star.active,
+.btn-gradient-star[data-active='true'] {
+  color: #d97706;
+  background-color: rgba(251, 191, 36, 0.1);
+}
+
+/* 随机模拟渐变 - 粉红 */
+.btn-gradient-simulation {
+  --btn-gradient: var(--gradient-simulation);
+  color: #ec4899;
+}
+
+/* 完成状态渐变 - 绿色 */
+.btn-gradient-complete {
+  --btn-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #22c55e;
+}
+.btn-gradient-complete.active,
+.btn-gradient-complete[data-active='true'] {
+  color: #16a34a;
+}
+
+/* 未完成状态渐变 - 灰色 */
+.btn-gradient-incomplete {
+  --btn-gradient: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  color: #6b7280;
+}
+
+/* ============ 列表项选中状态 ============ */
+
+/* 列表项渐变边框（左侧） */
+.item-gradient-border {
+  position: relative;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.item-gradient-border::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--item-gradient, var(--gradient-primary));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.item-gradient-border.active::before,
+.item-gradient-border[data-active='true']::before {
+  opacity: 1;
+}
+
+.item-gradient-border.active,
+.item-gradient-border[data-active='true'] {
+  background: linear-gradient(
+    90deg,
+    rgba(139, 92, 246, 0.08) 0%,
+    transparent 100%
+  );
+}
+
+/* 八股题列表项 */
+.item-gradient-bagu {
+  --item-gradient: var(--gradient-bagu);
+}
+.item-gradient-bagu.active,
+.item-gradient-bagu[data-active='true'] {
+  background: linear-gradient(
+    90deg,
+    rgba(168, 85, 247, 0.08) 0%,
+    transparent 100%
+  );
+}
+
+/* 代码编辑器列表项 */
+.item-gradient-code {
+  --item-gradient: var(--gradient-code);
+}
+.item-gradient-code.active,
+.item-gradient-code[data-active='true'] {
+  background: linear-gradient(
+    90deg,
+    rgba(99, 102, 241, 0.08) 0%,
+    transparent 100%
+  );
+}
+
+/* ============ 页面装饰背景 ============ */
+
+/* 淡色装饰圆形 */
+.page-bg-decoration {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.3;
+  z-index: 0;
+}
+
+/* 八股题页面装饰 */
+.page-bg-bagu-1 {
+  top: -10%;
+  right: -5%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(168, 85, 247, 0.4) 0%,
+    transparent 70%
+  );
+}
+
+.page-bg-bagu-2 {
+  bottom: -10%;
+  left: -5%;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(
+    circle,
+    rgba(236, 72, 153, 0.3) 0%,
+    transparent 70%
+  );
+}
+
+/* 代码编辑器页面装饰 */
+.page-bg-code-1 {
+  top: -10%;
+  left: -5%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.4) 0%,
+    transparent 70%
+  );
+}
+
+.page-bg-code-2 {
+  bottom: -10%;
+  right: -5%;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.3) 0%,
+    transparent 70%
+  );
+}
+
+/* 收藏页面装饰 */
+.page-bg-favorite-1 {
+  top: -10%;
+  right: -5%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(245, 158, 11, 0.35) 0%,
+    transparent 70%
+  );
+}
+
+.page-bg-favorite-2 {
+  bottom: -10%;
+  left: -5%;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(
+    circle,
+    rgba(234, 179, 8, 0.25) 0%,
+    transparent 70%
+  );
 }
 
 /* 重置 button 基础样式，确保 Tailwind 类能覆盖 UI 库 */
 button:where(:not(.mantine-Button-root):not([class*='mantine'])) {
   box-sizing: border-box;
   cursor: pointer;
-  font-size: inherit;
+  font-size: unset;
   font-family: inherit;
-  font-weight: inherit;
-  line-height: inherit;
+  font-weight: unset;
+  line-height: unset;
   border: none;
+}
+
+/* 全局 button hover 效果 */
+button {
+  transition: transform 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: scale(1.03);
+}
+
+/* 强制 btn-gradient 按钮使用 Tailwind 字号 */
+.btn-gradient-border.text-xs {
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+}
+.btn-gradient-border.text-sm {
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+}
+@media (min-width: 640px) {
+  .btn-gradient-border.sm\:text-sm {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+  }
 }
 
 /* Markdown 内容样式 */
@@ -253,7 +616,6 @@ button:where(:not(.mantine-Button-root):not([class*='mantine'])) {
   font-weight: 600;
   color: #374151;
 }
-
 
 .markdown-content tr:hover {
   background-color: #f3f4f6;

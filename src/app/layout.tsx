@@ -7,10 +7,11 @@ import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import Providers from '@/components/Providers';
 import LoginModal from '@/components/auth/LoginModal';
+import { mantineTheme } from '@/styles/mantine-theme';
 
 export const metadata: Metadata = {
   title: "前端求职指北",
-  description: "前端面试八股文和手写题练习平台",
+  description: "前端面试八股题和手写题练习平台",
 };
 
 export default function RootLayout({
@@ -25,7 +26,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <Providers>
-          <MantineProvider>
+          <MantineProvider theme={mantineTheme}>
             <Notifications position="top-right" />
             <LoginModal />
             {children}

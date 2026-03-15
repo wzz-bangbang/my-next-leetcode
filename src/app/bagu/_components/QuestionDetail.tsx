@@ -1,6 +1,6 @@
 'use client';
 
-import { Tooltip, Button, ActionIcon, Loader } from '@mantine/core';
+import { Tooltip, Loader } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import dynamic from 'next/dynamic';
 import type { BaguQuestionListItem, BaguQuestionDetail as BaguQuestionDetailType, BaguCategory } from '@/types/bagu';
@@ -17,6 +17,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
 } from '@/components/icons';
+import { iconSize } from '@/styles/theme';
 
 const MarkdownContent = dynamic(() => import('./MarkdownContent'), {
   loading: () => (
@@ -99,15 +100,15 @@ export default function QuestionDetail({
       )}
 
       {/* 移动端题目选择栏 */}
-      <div className="md:hidden shrink-0 px-2 py-2 border-b border-gray-200/50 bg-white/50 backdrop-blur-sm">
+      <div className="md:hidden shrink-0 px-2 py-1.5 border-b border-gray-200/50 bg-white/50 backdrop-blur-sm">
         <button
           onClick={onOpenSidebar}
-          className="w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/60 border border-purple-200/50 text-left"
+          className="btn-gradient-border btn-gradient-bagu w-full flex items-center gap-1.5 px-3 py-1.5 rounded-full text-left"
         >
-          <MenuIcon size={14} className="text-purple-600" />
+          <MenuIcon size={iconSize.sm} />
           {question ? (
             <div className="flex-1 min-w-0 flex items-center gap-1.5">
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 shrink-0">
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 shrink-0">
                 {category?.name}
               </span>
               <span className="text-xs font-medium text-gray-800 truncate">
@@ -117,7 +118,7 @@ export default function QuestionDetail({
           ) : (
             <span className="text-xs text-gray-500">选择题目</span>
           )}
-          <ChevronDownIcon size={10} className="text-gray-400" />
+          <ChevronDownIcon size={iconSize.xs} className="text-gray-400" />
         </button>
       </div>
 
@@ -126,43 +127,47 @@ export default function QuestionDetail({
           {/* 题目标题栏 - PC端 */}
           <div className="hidden md:block shrink-0 px-6 py-4 border-b border-gray-200/50 bg-white/50 backdrop-blur-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-600">
+              <span className="text-sm px-2 py-1 rounded-full bg-purple-100 text-purple-600">
                 {category?.name}
               </span>
               <div className="flex items-center gap-2">
-                <Button
+                <button
                   onClick={onToggleFavorite}
-                  variant="light"
-                  radius="xl"
-                  size="xs"
-                  color={isFavorited ? 'yellow' : 'gray'}
-                  leftSection={isFavorited ? <StarFilledIcon size={14} /> : <StarIcon size={14} />}
+                  data-active={isFavorited}
+                  className={`btn-gradient-border btn-gradient-star px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1 ${
+                    isFavorited ? 'active' : ''
+                  }`}
+                  style={{
+                    backgroundColor: isFavorited ? 'rgba(251, 191, 36, 0.1)' : undefined,
+                  }}
                 >
-                  {isFavorited ? '已收藏' : '收藏'}
-                </Button>
-                <Button
+                  {isFavorited ? <StarFilledIcon size={iconSize.sm} /> : <StarIcon size={iconSize.sm} />}
+                  <span>{isFavorited ? '已收藏' : '收藏'}</span>
+                </button>
+                <button
                   onClick={onToggleComplete}
-                  variant="light"
-                  radius="xl"
-                  size="xs"
-                  color={isCompleted ? 'green' : 'gray'}
-                  leftSection={isCompleted ? <CheckIcon size={14} /> : <ClockIcon size={14} />}
+                  data-active={isCompleted}
+                  className={`btn-gradient-border btn-gradient-complete px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1 ${
+                    isCompleted ? 'active' : ''
+                  }`}
+                  style={{
+                    backgroundColor: isCompleted ? 'rgba(34, 197, 94, 0.1)' : undefined,
+                  }}
                 >
-                  {isCompleted ? '已完成' : '标为完成'}
-                </Button>
+                  {isCompleted ? <CheckIcon size={iconSize.sm} /> : <ClockIcon size={iconSize.sm} />}
+                  <span>{isCompleted ? '已完成' : '未完成'}</span>
+                </button>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold text-gray-800">{question.title}</h1>
               <Tooltip label="复制标题" position="top" withArrow>
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                  size="sm"
+                <button
                   onClick={() => copyToClipboard(question.title)}
+                  className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
                 >
-                  <CopyIcon size={14} />
-                </ActionIcon>
+                  <CopyIcon size={iconSize.xs} />
+                </button>
               </Tooltip>
             </div>
           </div>
@@ -173,14 +178,14 @@ export default function QuestionDetail({
               {isLoading && !detail ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <Loader color="violet" size="md" />
-                  <p className="text-xs sm:text-sm mt-3">加载中...</p>
+                  <p className="text-xs sm:text-sm sm:text-sm mt-3">加载中...</p>
                 </div>
               ) : detail?.content ? (
                 <MarkdownContent content={detail.content} />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                  <NoteIcon size={48} className="mb-3 sm:mb-4" />
-                  <p className="text-xs sm:text-base">暂无答案，等待补充...</p>
+                  <NoteIcon size={iconSize.placeholder} className="mb-3 sm:mb-4" />
+                  <p className="text-xs sm:text-sm sm:text-base">暂无答案，等待补充...</p>
                 </div>
               )}
             </div>
@@ -188,95 +193,85 @@ export default function QuestionDetail({
             {/* PC端底部导航 */}
             <div className="hidden sm:block shrink-0 pt-6 mt-6 border-t border-gray-200/50">
               <div className="flex items-center justify-between">
-                <Button
+                <button
                   onClick={onPrev}
-                  variant="light"
-                  radius="xl"
-                  size="xs"
-                  color="violet"
                   disabled={!hasPrev}
-                  leftSection={<ArrowLeftIcon size={12} />}
+                  className="btn-gradient-border btn-gradient-bagu px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1"
                 >
-                  <span className="text-xs">上一题</span>
-                </Button>
+                  <ArrowLeftIcon size={iconSize.sm} />
+                  <span>上一题</span>
+                </button>
 
-                <span className="text-xs text-gray-400">
+                <span className="text-xs sm:text-sm text-gray-400">
                   {currentIndex >= 0 ? currentIndex + 1 : '-'} / {totalCount}
                 </span>
 
-                <Button
+                <button
                   onClick={onNext}
-                  variant="light"
-                  radius="xl"
-                  size="xs"
-                  color="violet"
                   disabled={!hasNext}
-                  rightSection={<ArrowRightIcon size={12} />}
+                  className="btn-gradient-border btn-gradient-bagu px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1"
                 >
-                  <span className="text-xs">下一题</span>
-                </Button>
+                  <span>下一题</span>
+                  <ArrowRightIcon size={iconSize.sm} />
+                </button>
               </div>
             </div>
           </div>
 
           {/* 移动端底部固定导航 */}
-          <div className="sm:hidden absolute bottom-0 left-0 right-0 z-10 px-2 py-2.5 bg-white/95 backdrop-blur-sm border-t border-gray-200/50 flex items-center justify-between gap-1">
-            <Button
+          <div className="sm:hidden absolute bottom-0 left-0 right-0 z-10 px-2 py-2 bg-white/95 backdrop-blur-sm border-t border-gray-200/50 flex items-center justify-between gap-1.5">
+            <button
               onClick={onPrev}
-              variant="light"
-              radius="xl"
-              size="xs"
-              color="violet"
               disabled={!hasPrev}
-              className="px-2! shrink-0"
+              className="btn-gradient-border btn-gradient-bagu px-2 py-1.5 rounded-full transition-all shrink-0"
             >
-              <ArrowLeftIcon size={12} />
-            </Button>
+              <ArrowLeftIcon size={iconSize.sm} />
+            </button>
 
-            <Button
+            <button
               onClick={onToggleFavorite}
-              variant="light"
-              radius="xl"
-              size="xs"
-              color={isFavorited ? 'yellow' : 'gray'}
-              className="px-2! shrink-0"
+              data-active={isFavorited}
+              className={`btn-gradient-border btn-gradient-star px-2.5 py-1.5 rounded-full transition-all shrink-0 ${
+                isFavorited ? 'active' : ''
+              }`}
+              style={{
+                backgroundColor: isFavorited ? 'rgba(251, 191, 36, 0.1)' : undefined,
+              }}
             >
-              <span className="text-[10px] whitespace-nowrap flex items-center gap-0.5">
-                {isFavorited ? <StarFilledIcon size={12} /> : <StarIcon size={12} />}
+              <span className="text-xs whitespace-nowrap flex items-center gap-1">
+                {isFavorited ? <StarFilledIcon size={iconSize.sm} /> : <StarIcon size={iconSize.sm} />}
                 <span>{isFavorited ? '已收藏' : '收藏'}</span>
               </span>
-            </Button>
+            </button>
 
-            <Button
+            <button
               onClick={onToggleComplete}
-              variant="light"
-              radius="xl"
-              size="xs"
-              color={isCompleted ? 'green' : 'gray'}
-              className="px-2! shrink-0"
+              data-active={isCompleted}
+              className={`btn-gradient-border btn-gradient-complete px-2.5 py-1.5 rounded-full transition-all shrink-0 ${
+                isCompleted ? 'active' : ''
+              }`}
+              style={{
+                backgroundColor: isCompleted ? 'rgba(34, 197, 94, 0.1)' : undefined,
+              }}
             >
-              <span className="text-[10px] whitespace-nowrap flex items-center gap-0.5">
-                {isCompleted ? <CheckIcon size={12} /> : <ClockIcon size={12} />}
+              <span className="text-xs whitespace-nowrap flex items-center gap-1">
+                {isCompleted ? <CheckIcon size={iconSize.sm} /> : <ClockIcon size={iconSize.sm} />}
                 <span>{isCompleted ? '完成' : '待完成'}</span>
               </span>
-            </Button>
+            </button>
 
-            <Button
+            <button
               onClick={onNext}
-              variant="light"
-              radius="xl"
-              size="xs"
-              color="violet"
               disabled={!hasNext}
-              className="px-2! shrink-0"
+              className="btn-gradient-border btn-gradient-bagu px-2 py-1.5 rounded-full transition-all shrink-0"
             >
-              <ArrowRightIcon size={12} />
-            </Button>
+              <ArrowRightIcon size={iconSize.sm} />
+            </button>
           </div>
         </>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-4 sm:p-6">
-          <BookOpenIcon size={64} className="mb-3 sm:mb-4" />
+          <BookOpenIcon size={iconSize.hero} className="mb-3 sm:mb-4" />
           <p className="text-sm sm:text-lg text-center">
             <span className="md:hidden">点击上方选择题目</span>
             <span className="hidden md:inline">请从左侧选择一道题目</span>
